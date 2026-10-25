@@ -40,7 +40,8 @@ jobs:
               if re.match(r'(^|/)\.env($|\.)', rel, re.IGNORECASE):
                   continue
               end = matches[i + 1].start() if i + 1 < len(matches) else len(source)
-              body = source[match.end():end].rstrip('\n')
+              body = source[match.end():end]
+              body = re.sub(r'\n*={10,}[ \t]*$', '', body).rstrip('\n')
               target = Path(rel)
               target.parent.mkdir(parents=True, exist_ok=True)
               target.write_text(body + '\n', encoding='utf-8')
@@ -56,6 +57,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No reconstructed changes to commit."
           else
-            git commit -m "Restore PRI-ANIME application source"
+            git commit -m "Restore PRI-ANIME source without bundle delimiters"
             git push
           fi
