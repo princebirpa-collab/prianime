@@ -1,0 +1,40 @@
+{
+  "name": "Story",
+  "type": "object",
+  "properties": {
+    "owner_ref": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "story",
+        "character",
+        "episode",
+        "dialogue"
+      ]
+    },
+    "language": {
+      "type": "string"
+    },
+    "style": {
+      "type": "string"
+    },
+    "script": {
+      "type": "string"
+    },
+    "prompt": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "owner_ref",
+    "title",
+    "script"
+  ]
+}
+
+================================================================================

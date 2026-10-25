@@ -1,0 +1,44 @@
+{
+  "name": "Progress",
+  "type": "object",
+  "properties": {
+    "owner_ref": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "anime",
+        "video"
+      ]
+    },
+    "ref_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "cover": {
+      "type": "string"
+    },
+    "episode": {
+      "type": "number"
+    },
+    "position": {
+      "type": "number"
+    },
+    "duration": {
+      "type": "number"
+    },
+    "link": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "owner_ref",
+    "kind",
+    "ref_id"
+  ]
+}
+
+================================================================================

@@ -1,0 +1,52 @@
+{
+  "name": "VideoJob",
+  "type": "object",
+  "properties": {
+    "owner_ref": {
+      "type": "string"
+    },
+    "prompt": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string"
+    },
+    "style": {
+      "type": "string"
+    },
+    "aspect_ratio": {
+      "type": "string"
+    },
+    "voice": {
+      "type": "string"
+    },
+    "provider": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "processing",
+        "completed",
+        "failed"
+      ],
+      "default": "queued"
+    },
+    "video_url": {
+      "type": "string"
+    },
+    "error": {
+      "type": "string"
+    },
+    "duration": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "owner_ref",
+    "prompt"
+  ]
+}
+
+================================================================================

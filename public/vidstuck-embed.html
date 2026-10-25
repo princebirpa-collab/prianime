@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PRI-ANIME â€” Vidstuck Responsive Embed</title>
+<style>
+  body { margin: 0; background: #0d0817; color: #f2e9cf; font-family: system-ui, sans-serif; padding: 24px; }
+  h1 { font-size: 20px; font-weight: 600; }
+  p { color: #b7a98a; font-size: 13px; line-height: 1.6; max-width: 720px; }
+  code { background: #241a3d; padding: 2px 6px; border-radius: 6px; font-size: 12px; color: #d7b84a; }
+  pre { background: #1a1230; border: 1px solid #3d2f5e; border-radius: 12px; padding: 16px; overflow-x: auto; font-size: 12px; color: #dcd2ee; }
+  /* ===== Responsive iframe embed â€” copy this block anywhere ===== */
+  .vidstuck-embed { position: relative; width: 100%; max-width: 960px; aspect-ratio: 16 / 9; background: #000; border-radius: 12px; overflow: hidden; }
+  .vidstuck-embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+</style>
+</head>
+<body>
+  <h1>Vidstuck Responsive Embed â€” copy-ready snippet</h1>
+
+  <!-- Live demo of the embed below -->
+  <div class="vidstuck-embed">
+    <iframe
+      src="https://vidstuck.cc/embed/tv/280564/1/1"
+      title="Vidstuck player"
+      loading="lazy"
+      allowfullscreen
+      referrerpolicy="origin"
+      allow="autoplay; fullscreen; encrypted-media; picture-in-picture"></iframe>
+  </div>
+
+  <p>URL format â€” TV: <code>https://vidstuck.cc/embed/tv/&lt;TMDB_ID&gt;/&lt;SEASON&gt;/&lt;EPISODE&gt;</code>, Movies: <code>https://vidstuck.cc/embed/movie/&lt;TMDB_ID&gt;</code></p>
+
+  <pre>&lt;!-- Paste anywhere on your webpage --&gt;
+&lt;div class="vidstuck-embed" style="position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;"&gt;
+  &lt;iframe
+    src="https://vidstuck.cc/embed/tv/280564/1/1"
+    title="Vidstuck player"
+    loading="lazy"
+    allowfullscreen
+    referrerpolicy="origin"
+    allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+    style="position:absolute;inset:0;width:100%;height:100%;border:0;"&gt;&lt;/iframe&gt;
+&lt;/div&gt;</pre>
+
+  <p>Responsive hai: <code>aspect-ratio: 16/9</code> har screen par auto-scale karta hai. Apne anime ke liye TMDB ID badlein â€” PRI-ANIME app ke andar yehi structure <code>/watch?anime=&lt;AniList_ID&gt;</code> par automatically chal jata hai.</p>
+</body>
+</html>
+
+
+================================================================================

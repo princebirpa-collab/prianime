@@ -1,0 +1,64 @@
+{
+  "name": "Video",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "video_url": {
+      "type": "string"
+    },
+    "thumbnail_url": {
+      "type": "string"
+    },
+    "subtitles_url": {
+      "type": "string"
+    },
+    "duration": {
+      "type": "number"
+    },
+    "category": {
+      "type": "string"
+    },
+    "anime_id": {
+      "type": "number"
+    },
+    "episode_number": {
+      "type": "number"
+    },
+    "creator_name": {
+      "type": "string"
+    },
+    "licence": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "published",
+        "review",
+        "hidden"
+      ],
+      "default": "published"
+    },
+    "views": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "title",
+    "video_url"
+  ]
+}
+
+================================================================================

@@ -1,0 +1,24 @@
+{
+  "name": "ReelComment",
+  "type": "object",
+  "properties": {
+    "reel_id": {
+      "type": "string"
+    },
+    "author_name": {
+      "type": "string"
+    },
+    "author_ref": {
+      "type": "string"
+    },
+    "text": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "reel_id",
+    "text"
+  ]
+}
+
+================================================================================

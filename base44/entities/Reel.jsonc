@@ -1,0 +1,61 @@
+{
+  "name": "Reel",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "video_url": {
+      "type": "string"
+    },
+    "thumbnail_url": {
+      "type": "string"
+    },
+    "creator_name": {
+      "type": "string"
+    },
+    "creator_ref": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "likes": {
+      "type": "number",
+      "default": 0
+    },
+    "views": {
+      "type": "number",
+      "default": 0
+    },
+    "captions": {
+      "type": "string"
+    },
+    "duration": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "published",
+        "hidden"
+      ],
+      "default": "published"
+    },
+    "licence": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "video_url"
+  ]
+}
+
+================================================================================

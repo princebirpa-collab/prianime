@@ -1,0 +1,50 @@
+{
+  "name": "Watchlist",
+  "type": "object",
+  "properties": {
+    "owner_ref": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "watchlist",
+        "favorite"
+      ]
+    },
+    "anime_id": {
+      "type": "number"
+    },
+    "title": {
+      "type": "string"
+    },
+    "cover": {
+      "type": "string"
+    },
+    "banner": {
+      "type": "string"
+    },
+    "score": {
+      "type": "number"
+    },
+    "episodes": {
+      "type": "number"
+    },
+    "format": {
+      "type": "string"
+    },
+    "genres": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "owner_ref",
+    "anime_id",
+    "kind"
+  ]
+}
+
+================================================================================

@@ -1,0 +1,27 @@
+{
+  "name": "ReelLike",
+  "type": "object",
+  "properties": {
+    "reel_id": {
+      "type": "string"
+    },
+    "owner_ref": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "like",
+        "bookmark"
+      ],
+      "default": "like"
+    }
+  },
+  "required": [
+    "reel_id",
+    "owner_ref",
+    "kind"
+  ]
+}
+
+================================================================================
