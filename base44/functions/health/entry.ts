@@ -75,5 +75,3 @@ export default async function () {
     note: 'Metadata is public; personalisation is stored on the device because this app runs without sign-in.',
   });
 }
-
-================================================================================

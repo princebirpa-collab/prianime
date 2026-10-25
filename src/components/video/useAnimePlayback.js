@@ -54,5 +54,3 @@ export default function useAnimePlayback(anime, match) {
     historyError: history.error || save.error,
   };
 }
-
-================================================================================

@@ -16,5 +16,3 @@ export default function AnimeRowRemote({ title, subtitle, body, viewAll, rank })
     />
   );
 }
-
-================================================================================

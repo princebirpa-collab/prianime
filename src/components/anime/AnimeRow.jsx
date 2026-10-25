@@ -71,5 +71,3 @@ export default function AnimeRow({ title, subtitle, items = [], loading, error, 
     </section>
   );
 }
-
-================================================================================

@@ -120,5 +120,3 @@ export default async function (req) {
     return Response.json({ ok: false, error: error.message || 'Provider check failed.' }, { status: 500 });
   }
 }
-
-================================================================================

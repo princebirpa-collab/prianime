@@ -23,6 +23,3 @@ const HoverCardContent = React.forwardRef(({ className, align = "center", sideOf
 HoverCardContent.displayName = HoverCardPrimitive.Content.displayName
 
 export { HoverCard, HoverCardTrigger, HoverCardContent }
-
-
-================================================================================

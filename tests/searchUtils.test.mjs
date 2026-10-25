@@ -146,5 +146,3 @@ test("out-of-order and duplicate terms produce stable variant sets", () => {
   assert.deepEqual(searchVariants("Wind Breaker"), searchVariants("Wind Breaker"));
   assert.deepEqual(searchVariants("  wind breaker "), searchVariants("wind breaker"));
 });
-
-================================================================================

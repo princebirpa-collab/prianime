@@ -94,5 +94,3 @@ export function usePaginatedAnime(body) {
 
   return { items, ...state, loadMore, retry, reset: () => setPage(1) };
 }
-
-================================================================================

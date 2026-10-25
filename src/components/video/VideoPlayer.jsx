@@ -235,5 +235,3 @@ export default function VideoPlayer({ src, poster, subtitles, title, startAt = 0
     </div>
   );
 }
-
-================================================================================

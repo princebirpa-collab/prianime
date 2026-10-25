@@ -29,5 +29,3 @@ export default function EmptyState({ icon: Icon = SearchX, title, body, actionLa
     </div>
   );
 }
-
-================================================================================

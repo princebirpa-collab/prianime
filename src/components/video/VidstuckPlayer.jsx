@@ -50,5 +50,3 @@ export default function VidstuckPlayer({ src, startAt = 0, onProgress }) {
     </div>
   );
 }
-
-================================================================================

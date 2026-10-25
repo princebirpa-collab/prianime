@@ -63,6 +63,3 @@ export const ResponsiveImage = React.forwardRef(
   }
 )
 ResponsiveImage.displayName = "ResponsiveImage"
-
-
-================================================================================

@@ -72,5 +72,3 @@ export function useHoverPreview() {
 
   return { open, openPreview, scheduleClose, cancelClose, closeNow };
 }
-
-================================================================================

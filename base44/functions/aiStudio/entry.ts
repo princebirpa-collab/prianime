@@ -59,5 +59,3 @@ ${prompt || 'Continue the conversation with a useful next step.'}`;
     );
   }
 }
-
-================================================================================

@@ -38,6 +38,3 @@ export function useResponsiveImage({ parsed, fittingType, focalPoint, quality, c
     },
   }
 }
-
-
-================================================================================

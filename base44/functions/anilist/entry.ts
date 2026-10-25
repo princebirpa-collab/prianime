@@ -163,5 +163,3 @@ export default async function (req) {
     return Response.json({ ok: false, error: error.message || 'AniList request failed.' }, { status });
   }
 }
-
-================================================================================

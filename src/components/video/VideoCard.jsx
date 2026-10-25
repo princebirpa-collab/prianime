@@ -48,5 +48,3 @@ export default function VideoCard({ video, progress }) {
     </article>
   );
 }
-
-================================================================================

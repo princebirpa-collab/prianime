@@ -47,5 +47,3 @@ export function useTheme() {
 }
 
 export const currentThemeMeta = (id) => THEMES.find((t) => t.id === id) || THEMES[0];
-
-================================================================================

@@ -28,5 +28,3 @@ export function resolveAkaBackupUrl(value, { mediaType, season, episode }) {
   const slug = parsed.kind === "episode" ? parsed.slug : series?.[1];
   return slug ? buildAkaUrl({ slug, season, episode }) : "";
 }
-
-================================================================================

@@ -109,6 +109,3 @@ const Image = React.forwardRef(
 Image.displayName = "Image"
 
 export { Image }
-
-
-================================================================================

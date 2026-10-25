@@ -89,5 +89,3 @@ export async function recordAnimeView(anime) {
     /* view tracking is best-effort */
   }
 }
-
-================================================================================

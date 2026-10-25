@@ -89,5 +89,3 @@ export function clampPerPage(value, fallback = 20, max = 25) {
   if (!Number.isFinite(perPage) || perPage < 1) return fallback;
   return Math.min(perPage, max);
 }
-
-================================================================================

@@ -38,5 +38,3 @@ export function seasonLabel(season, year) {
   const title = { WINTER: "Winter", SPRING: "Spring", SUMMER: "Summer", FALL: "Fall" }[season] || season;
   return `${title} ${year || ""}`.trim();
 }
-
-================================================================================

@@ -29,5 +29,3 @@ export default function EmbedIframe({ src, title = "Embedded video player" }) {
     </div>
   );
 }
-
-================================================================================

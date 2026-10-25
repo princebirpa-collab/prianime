@@ -20,5 +20,3 @@ export default function AnimePlayback({ anime, match }) {
     </div>
   );
 }
-
-================================================================================

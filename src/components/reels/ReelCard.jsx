@@ -189,5 +189,3 @@ export default function ReelCard({ reel, active, liked, bookmarked, onLike, onBo
     </div>
   );
 }
-
-================================================================================

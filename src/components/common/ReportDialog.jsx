@@ -105,5 +105,3 @@ export default function ReportDialog({ targetType, targetId, targetLabel, trigge
     </Dialog>
   );
 }
-
-================================================================================

@@ -229,5 +229,3 @@ export default async function (req) {
     return Response.json({ ok: false, error: error.message || 'MyAnimeList request failed.' }, { status: 502 });
   }
 }
-
-================================================================================

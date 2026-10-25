@@ -14,5 +14,3 @@ export default function useAnimeSource(animeId) {
     retry: false,
   });
 }
-
-================================================================================

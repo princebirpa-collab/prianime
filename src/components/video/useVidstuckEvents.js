@@ -28,5 +28,3 @@ export default function useVidstuckEvents(frameRef, src, onProgress) {
     return () => window.removeEventListener("message", receive);
   }, [frameRef, src]);
 }
-
-================================================================================

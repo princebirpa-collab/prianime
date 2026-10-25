@@ -19,5 +19,3 @@ export default function AnimeSaltBackup({ title, pageUrl, onSelect, mediaType, s
     </div>
   );
 }
-
-================================================================================

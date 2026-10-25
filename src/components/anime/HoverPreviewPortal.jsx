@@ -57,5 +57,3 @@ export default function HoverPreviewPortal({ anchorRef, open, onPointerEnter, on
     document.body
   );
 }
-
-================================================================================

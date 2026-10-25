@@ -35,5 +35,3 @@ export default function ServerVideoPlayer({ src, title, startAt = 0, onProgress 
     </div>
   );
 }
-
-================================================================================

@@ -36,5 +36,3 @@ export function useWatchlist(kind) {
 
   return { items, loading, isSaved, toggle, refresh };
 }
-
-================================================================================

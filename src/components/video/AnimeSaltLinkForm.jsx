@@ -29,5 +29,3 @@ export default function AnimeSaltLinkForm({ onSelect, mediaType, defaultValue = 
     </form>
   );
 }
-
-================================================================================

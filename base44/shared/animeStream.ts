@@ -78,5 +78,3 @@ export async function resolveAnimeStream(animeId) {
   pending.set(animeId, lookup);
   return lookup;
 }
-
-================================================================================

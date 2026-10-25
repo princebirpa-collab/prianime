@@ -19,5 +19,3 @@ export function buildVidstuckUrl({ mediaType, tmdbId, season = 1, episode = 1 })
   url.searchParams.set("subtitle", "english");
   return url.href;
 }
-
-================================================================================

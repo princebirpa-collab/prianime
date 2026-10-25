@@ -64,5 +64,3 @@ export default async function (req) {
     return Response.json({ ok: false, error: error.message || 'Could not start the render job.' }, { status: 500 });
   }
 }
-
-================================================================================

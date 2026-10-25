@@ -35,6 +35,3 @@ export default function ProtectedRoute({ fallback = <DefaultFallback />, unauthe
 
   return <Outlet />;
 }
-
-
-================================================================================

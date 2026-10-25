@@ -168,5 +168,3 @@ export default function InteractiveSmoke() {
 
   return <canvas ref={canvasRef} aria-hidden="true" className="pointer-events-none fixed inset-0 z-40" />;
 }
-
-================================================================================

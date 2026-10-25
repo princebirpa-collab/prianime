@@ -21,5 +21,3 @@ export default function PageHeader({ eyebrow, title, description, children }) {
     </header>
   );
 }
-
-================================================================================
