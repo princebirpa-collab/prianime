@@ -8,6 +8,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
 import { ThemeProvider } from '@/lib/theme';
 import Layout from '@/components/layout/Layout';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 // Add page imports here
 import Home from '@/pages/Home';
 import Browse from '@/pages/Browse';
@@ -81,6 +82,7 @@ function App() {
             <AuthenticatedApp />
           </Router>
           <Toaster />
+          <SpeedInsights />
         </QueryClientProvider>
       </AuthProvider>
     </ThemeProvider>
