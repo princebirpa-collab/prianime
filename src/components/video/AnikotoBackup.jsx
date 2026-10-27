@@ -16,8 +16,35 @@ function episodesOf(payload) {
   return Array.isArray(value) ? value : [];
 }
 
+function episodeNumber(item, index) {
+  const value = item?.number ?? item?.episode_number ?? item?.episodeNumber ?? item?.episode ?? index + 1;
+  const parsed = Number(String(value).match(/\d+(?:\.\d+)?/)?.[0]);
+  return Number.isFinite(parsed) ? parsed : index + 1;
+}
+
 function episodeLabel(item, index) {
   return String(item?.title || item?.name || item?.episode_title || item?.number || item?.episode || index + 1);
+}
+
+function normalizeTitle(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/\b(season|cour|part)\s*\d+\b/g, " ")
+    .replace(/\bs\s*\d+\b/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
+function findTitleMatch(items, wantedTitle) {
+  const wanted = normalizeTitle(wantedTitle);
+  if (!wanted) return null;
+  const exact = items.find((item) => normalizeTitle(titleOf(item)) === wanted);
+  if (exact) return exact;
+  return items.find((item) => {
+    const candidate = normalizeTitle(titleOf(item));
+    return candidate && (candidate.includes(wanted) || wanted.includes(candidate));
+  }) || null;
 }
 
 function embedOf(item, language) {
@@ -31,7 +58,7 @@ function embedOf(item, language) {
   }
 }
 
-export default function AnikotoBackup({ title }) {
+export default function AnikotoBackup({ title, season, episode }) {
   const [items, setItems] = useState([]);
   const [selectedId, setSelectedId] = useState("");
   const [seriesData, setSeriesData] = useState(null);
@@ -46,19 +73,29 @@ export default function AnikotoBackup({ title }) {
     let cancelled = false;
     setBusy(true);
     setError("");
-    fetch("/api/anikoto?action=recent&page=1&per_page=50")
-      .then(async (response) => {
-        const payload = await response.json().catch(() => ({}));
-        if (!response.ok || !payload?.ok) throw new Error(payload?.error || "AniKoto list is unavailable.");
-        const data = payload.data;
-        const rows = Array.isArray(data) ? data : data?.anime || data?.results || data?.items || data?.data || [];
-        if (!Array.isArray(rows)) throw new Error("AniKoto returned an unexpected anime list.");
-        if (!cancelled) {
-          setItems(rows);
-          const needle = String(title || "").trim().toLowerCase();
-          const match = rows.find((item) => needle && titleOf(item).toLowerCase() === needle);
-          if (match && idOf(match)) setSelectedId(idOf(match));
-        }
+    Promise.all([1, 2, 3].map((page) =>
+      fetch(`/api/anikoto?action=recent&page=${page}&per_page=50`)
+        .then(async (response) => {
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok || !payload?.ok) throw new Error(payload?.error || "AniKoto list is unavailable.");
+          const data = payload.data;
+          const rows = Array.isArray(data) ? data : data?.anime || data?.results || data?.items || data?.data || [];
+          if (!Array.isArray(rows)) throw new Error("AniKoto returned an unexpected anime list.");
+          return rows;
+        })
+    ))
+      .then((pages) => {
+        if (cancelled) return;
+        const unique = new Map();
+        pages.flat().forEach((item, index) => {
+          const id = idOf(item);
+          if (id && !unique.has(id)) unique.set(id, item);
+          else if (!id) unique.set(`no-id-${index}-${titleOf(item)}`, item);
+        });
+        const rows = [...unique.values()];
+        setItems(rows);
+        const match = findTitleMatch(rows, title);
+        if (match && idOf(match)) setSelectedId(idOf(match));
       })
       .catch((err) => { if (!cancelled) setError(err.message || "AniKoto is temporarily unavailable."); })
       .finally(() => { if (!cancelled) setBusy(false); });
@@ -75,7 +112,7 @@ export default function AnikotoBackup({ title }) {
       .then(async (response) => {
         const payload = await response.json().catch(() => ({}));
         if (!response.ok || !payload?.ok) throw new Error(payload?.error || "Could not load this series.");
-        if (!cancelled) { setSeriesData(payload.data); setEpisodeIndex("0"); }
+        if (!cancelled) setSeriesData(payload.data);
       })
       .catch((err) => { if (!cancelled) setError(err.message || "Could not load episodes."); })
       .finally(() => { if (!cancelled) setBusy(false); });
@@ -83,6 +120,21 @@ export default function AnikotoBackup({ title }) {
   }, [selectedId]);
 
   const episodes = useMemo(() => episodesOf(seriesData), [seriesData]);
+
+  useEffect(() => {
+    if (!episodes.length) {
+      setEpisodeIndex("0");
+      return;
+    }
+    const requested = Number(episode);
+    if (Number.isFinite(requested) && requested > 0) {
+      const matchIndex = episodes.findIndex((item, index) => episodeNumber(item, index) === requested);
+      setEpisodeIndex(String(matchIndex >= 0 ? matchIndex : 0));
+    } else {
+      setEpisodeIndex("0");
+    }
+  }, [episodes, episode, season]);
+
   const selectedEpisode = episodes[Number(episodeIndex)] || null;
   const src = selectedEpisode ? embedOf(selectedEpisode, language) : "";
   const filteredItems = useMemo(() => {
@@ -92,10 +144,10 @@ export default function AnikotoBackup({ title }) {
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-muted-foreground">AniKoto · Additional backup server. Vidstuck and your existing backup remain unchanged.</p>
+      <p className="text-sm text-muted-foreground">AniKoto · Extra backup. It tries to match the current title and episode; Vidstuck and AnimeSalt remain unchanged.</p>
       <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(180px,0.7fr)]">
         <div className="space-y-1.5">
-          <label htmlFor="anikoto-search" className="block text-xs text-muted-foreground">Find anime in AniKoto's recent list</label>
+          <label htmlFor="anikoto-search" className="block text-xs text-muted-foreground">Anime</label>
           <input id="anikoto-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search title…" className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" />
           <select value={selectedId} onChange={(event) => setSelectedId(event.target.value)} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm">
             <option value="">Select anime</option>
