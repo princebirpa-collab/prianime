@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import VidstuckPlayer from "@/components/video/VidstuckPlayer";
 import AnimeSaltBackup from "@/components/video/AnimeSaltBackup";
+import AnikotoBackup from "@/components/video/AnikotoBackup";
 import { parseVidstuckUrl } from "@/components/video/vidstuckUrls";
 
 function readBackup(key) {
@@ -56,13 +57,15 @@ export default function ServerVideoPlayer({ src, title, startAt = 0, onProgress 
     <div className="space-y-3">
       <div role="group" aria-label="Playback server" className="flex flex-wrap items-center gap-2">
         <span className="mr-1 text-xs text-muted-foreground">Server</span>
-        {[{ id: "vidstuck", label: "Vidstuck · Main" }, { id: "animesalt", label: "AnimeSalt · Backup" }].map((item) => (
+        {[{ id: "vidstuck", label: "Vidstuck · Main" }, { id: "animesalt", label: "AnimeSalt · Backup" }, { id: "anikoto", label: "AniKoto · Extra Backup" }].map((item) => (
           <button key={item.id} type="button" aria-pressed={server === item.id} onClick={() => switchServer(item.id)} className={`rounded-full border px-4 py-2 text-xs font-semibold transition ${server === item.id ? "border-primary bg-primary/10 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60 hover:text-primary"}`}>{item.label}</button>
         ))}
       </div>
       {server === "vidstuck"
         ? <VidstuckPlayer src={src} startAt={resume?.src === src ? resume.position : startAt} onProgress={rememberProgress} />
-        : <AnimeSaltBackup key={src} title={title} pageUrl={backupLink} onSelect={selectBackup} mediaType={source.mediaType} season={source.season} episode={source.episode} />}
+        : server === "animesalt"
+          ? <AnimeSaltBackup key={src} title={title} pageUrl={backupLink} onSelect={selectBackup} mediaType={source.mediaType} season={source.season} episode={source.episode} />
+          : <AnikotoBackup key={src} title={title} />}
     </div>
   );
 }
