@@ -8,7 +8,8 @@ export default function ServerVideoPlayer({ src, title, startAt = 0, onProgress 
   const progress = useRef(null);
   const [resume, setResume] = useState(null);
   const source = parseVidstuckUrl(src);
-  const storageKey = `pri-anime:animesalt:${source.mediaType}:${source.tmdbId}`;
+  const safeSource = source || { mediaType: "tv", tmdbId: 0, season: 1, episode: 1 };
+  const storageKey = `pri-anime:animesalt:${safeSource.mediaType}:${safeSource.tmdbId}`;
   const [backupLink, setBackupLink] = useState(() => window.localStorage.getItem(storageKey) || "");
   const selectBackup = (value) => {
     window.localStorage.setItem(storageKey, value);
@@ -19,6 +20,16 @@ export default function ServerVideoPlayer({ src, title, startAt = 0, onProgress 
     if (next === "animesalt" && progress.current?.src === src) setResume(progress.current);
     setServer(next);
   };
+  if (!source) {
+    return (
+      <div className="grid aspect-video w-full place-items-center rounded-2xl bg-black px-6 text-center">
+        <div>
+          <p className="font-display text-lg text-white">The anime player could not be opened</p>
+          <p className="mt-2 max-w-md text-sm text-white/60">This link is not a supported VidStuck embed URL. Select the episode again or choose a supported source.</p>
+        </div>
+      </div>
+    );
+  }
   const rememberProgress = (position, duration, detail = {}) => {
     if ((detail.season ?? source.season) === source.season && (detail.episode ?? source.episode) === source.episode) progress.current = { src, position };
     onProgress?.(position, duration, detail);
