@@ -8,13 +8,10 @@ export default function ServerVideoPlayer({ src, title, startAt = 0, onProgress 
   const progress = useRef(null);
   const [resume, setResume] = useState(null);
   const source = parseVidstuckUrl(src);
-  const safeSource = source || { mediaType: "tv", tmdbId: 0, season: 1, episode: 1 };
-  const storageKey = `pri-anime:animesalt:${safeSource.mediaType}:${safeSource.tmdbId}`;
-  const [backupLink, setBackupLink] = useState(() => {
-    try { return window.localStorage.getItem(storageKey) || ""; } catch { return ""; }
-  });
+  const storageKey = `pri-anime:animesalt:${source.mediaType}:${source.tmdbId}`;
+  const [backupLink, setBackupLink] = useState(() => window.localStorage.getItem(storageKey) || "");
   const selectBackup = (value) => {
-    try { window.localStorage.setItem(storageKey, value); } catch { /* Storage may be unavailable in restricted browsers. */ }
+    window.localStorage.setItem(storageKey, value);
     setBackupLink(value);
   };
   const switchServer = (next) => {
@@ -22,9 +19,6 @@ export default function ServerVideoPlayer({ src, title, startAt = 0, onProgress 
     if (next === "animesalt" && progress.current?.src === src) setResume(progress.current);
     setServer(next);
   };
-  if (!source) {
-    return <div className="grid aspect-video w-full place-items-center rounded-xl bg-black p-6 text-center text-white"><div><p className="text-lg">Source lookup unavailable</p><p className="mt-2 text-sm text-white/60">This episode link is invalid or could not be resolved. Re-select the episode and try again.</p></div></div>;
-  }
   const rememberProgress = (position, duration, detail = {}) => {
     if ((detail.season ?? source.season) === source.season && (detail.episode ?? source.episode) === source.episode) progress.current = { src, position };
     onProgress?.(position, duration, detail);
