@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ExternalLink, RotateCcw } from "lucide-react";
+import { ExternalLink, RotateCcw, Search, X } from "lucide-react";
 import EmbedIframe from "@/components/video/EmbedIframe";
 
 function titleOf(item) {
@@ -147,8 +147,13 @@ export default function AnikotoBackup({ title, season, episode }) {
       <p className="text-sm text-muted-foreground">AniKoto · Extra backup. It tries to match the current title and episode; Vidstuck and AnimeSalt remain unchanged.</p>
       <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(180px,0.7fr)]">
         <div className="space-y-1.5">
-          <label htmlFor="anikoto-search" className="block text-xs text-muted-foreground">Anime</label>
-          <input id="anikoto-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search title…" className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" />
+          <label htmlFor="anikoto-search" className="block text-xs font-semibold text-foreground">Search anime</label>
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+            <input id="anikoto-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Type an anime title…" autoComplete="off" className="w-full rounded-xl border border-border bg-background py-3 pl-9 pr-10 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20" />
+            {query && <button type="button" onClick={() => setQuery("")} aria-label="Clear anime search" className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"><X className="h-4 w-4" aria-hidden="true" /></button>}
+          </div>
+          <p className="text-[11px] text-muted-foreground">Searches the anime currently loaded from AniKoto.</p>
           <select value={selectedId} onChange={(event) => setSelectedId(event.target.value)} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm">
             <option value="">Select anime</option>
             {filteredItems.map((item, index) => {
@@ -172,6 +177,7 @@ export default function AnikotoBackup({ title, season, episode }) {
       {busy && <p role="status" className="text-xs text-muted-foreground">Loading AniKoto data…</p>}
       {error && <p role="alert" className="text-xs text-destructive">{error}</p>}
       {!busy && !error && !items.length && <p className="text-xs text-muted-foreground">No anime list was returned. Try reloading.</p>}
+      {!busy && !error && items.length > 0 && filteredItems.length === 0 && <p role="status" className="text-xs text-muted-foreground">No loaded anime matches “{query}”. Try another title or reload the list.</p>}
       {selectedEpisode && !src && <p role="status" className="text-xs text-muted-foreground">No {language === "sub" ? "sub" : "dub"} embed is available for this episode.</p>}
       {src && <EmbedIframe key={`${src}:${attempt}`} src={src} title={`AniKoto backup · ${titleOf(seriesData?.anime || seriesData)}`} />}
       <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
