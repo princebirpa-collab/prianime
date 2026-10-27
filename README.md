@@ -1,62 +1,38 @@
-# Base44 Project
+# PRI-ANIME
 
-Use this repository to run and edit the app locally, then publish changes back through Base44.
+PRI-ANIME is a React + Vite website deployed on Vercel.
 
-Any change pushed to the repo will also be reflected in the Base44 Builder.
+## Run locally
 
-## Prerequisites
+1. Install Node.js (LTS).
+2. Clone this repository.
+3. Install dependencies:
 
-1. Clone the repository using the project's Git URL.
-2. Navigate to the project directory.
-3. Install dependencies: `npm install`.
-4. Install the Base44 CLI: `npm install -g base44@latest`.
-5. Install [Deno](https://docs.deno.com/runtime/getting_started/installation/) â€” the local Base44 backend runs on it.
+   ```bash
+   npm install
+   ```
 
-Run `base44 --help` (or see the [CLI reference](https://docs.base44.com/developers/references/cli/commands/introduction)) for the full command surface.
+4. Start the development server:
 
-## Run Locally
+   ```bash
+   npm run dev
+   ```
 
-Three commands, from the project root:
+5. Build for production:
 
-```bash
-base44 login   # one-time per machine
-base44 link    # one-time per clone
-base44 dev     # local backend + frontend together
-```
+   ```bash
+   npm run build
+   ```
 
-Open the frontend URL that `base44 dev` prints (typically `http://localhost:5173`).
+## Deploy on Vercel
 
-Notes:
+Connect this GitHub repository to the Vercel project. Use the default Vite settings:
+- Build command: `npm run build`
+- Output directory: `dist`
+- Install command: `npm install`
 
-- **Every fresh clone needs `base44 link`.** It writes `base44/.app.jsonc` (the app-id pointer), which is deliberately gitignored. Your app id is in the Builder URL (`app.base44.com/apps/<id>/...`); `base44 link --help` shows the non-interactive flags.
-- **`base44 dev` runs the frontend for you** (via `site.serveCommand` in this repo's `base44/config.jsonc`) â€” never run `npm run dev` yourself: alone it serves a UI with no backend behind it (`[base44] Proxy not enabled`, every `/api` call fails), and alongside `base44 dev` the second Vite silently takes the next port and you end up looking at the wrong one.
-- **The app must be published at least once for the UI to load under `base44 dev`.** The frontend boots by fetching app settings from the hosted app; before the first publish that fails and every page redirects to login. The local API works regardless.
-- Entities, functions, and auth run locally â€” entity data is **in-memory only**, wiped when `base44 dev` restarts. Everything else (Core integrations, OAuth login) is forwarded to your deployed app. Full breakdown: [Local development overview](https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview).
+Vercel should automatically create a deployment when a commit is pushed to the connected branch.
 
-## Frontend Only, Hosted Backend
+## Important migration note
 
-To work on just the frontend against your app's live hosted backend:
-
-```bash
-base44 dev --remote
-```
-
-âš ï¸ In this mode writes go to your app's **production data** â€” plain `base44 dev` keeps everything local.
-
-## Publish Your Changes
-
-After pushing your changes to git, open the Base44 dashboard and publish the app:
-
-```bash
-base44 dashboard open
-```
-
-This repo syncs to Base44 through git, so publish from the dashboard rather than `base44 deploy` â€” a CLI deploy ships your local tree directly, bypassing the sync, and the deployed state silently diverges from the repo.
-
-## Docs & Support
-
-GitHub integration: [https://docs.base44.com/developers/app-code/local-development/github](https://docs.base44.com/developers/app-code/local-development/github)
-
-Local development: [https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview](https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview)
-
-Support: [https://app.base44.com/support](https://app.base44.com/support)
+The Base44 Vite build plugin has been removed so it no longer injects build-time tooling or development notifications. Some existing features still import the Base44 SDK for authentication, stories, notifications, watch history, and library data. Those runtime features must be migrated to a replacement backend before the SDK and the `base44/` backend definitions can safely be deleted. The VidStuck player is separate from Base44 and has not been intentionally changed as part of this build-tool cleanup.
