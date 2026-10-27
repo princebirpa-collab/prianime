@@ -1,5 +1,5 @@
 {
-  "name": "base44-app",
+  "name": "pri-anime",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@base44/sdk": "^0.8.57",
-    "@base44/vite-plugin": "^1.0.47",
     "@hello-pangea/dnd": "^17.0.0",
     "@hookform/resolvers": "^4.1.2",
     "@radix-ui/react-accordion": "^1.2.3",
