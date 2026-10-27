@@ -65,7 +65,7 @@ export default function ServerVideoPlayer({ src, title, startAt = 0, onProgress 
         ? <VidstuckPlayer src={src} startAt={resume?.src === src ? resume.position : startAt} onProgress={rememberProgress} />
         : server === "animesalt"
           ? <AnimeSaltBackup key={src} title={title} pageUrl={backupLink} onSelect={selectBackup} mediaType={source.mediaType} season={source.season} episode={source.episode} />
-          : <AnikotoBackup key={src} title={title} />}
+          : <AnikotoBackup key={src} title={title} season={source.season} episode={source.episode} />}
     </div>
   );
 }
