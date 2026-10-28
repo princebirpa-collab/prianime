@@ -69,7 +69,7 @@ export default function Library() {
   });
 
   const grid = saved[tab] || [];
-  const continueRows = tab === "continue" ? progress.video : tab === "recent" ? progress.anime : [];
+  const continueRows = tab === "continue"\n    ? [\n        ...progress.anime.map((row) => ({ ...row, sourceKind: "anime" })),\n        ...progress.video.map((row) => ({ ...row, sourceKind: "video" })),\n      ].sort((a, b) => new Date(b.updated_date || 0) - new Date(a.updated_date || 0))\n    : tab === "recent" ? progress.anime : [];
 
   return (
     <div className="pb-16">
@@ -172,7 +172,7 @@ export default function Library() {
               {continueRows.map((row) => (
                 <div key={row.id} className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/40 p-3">
                   <Link
-                    to={tab === "continue" ? `/watch/${row.ref_id}` : `/anime/${row.ref_id}`}
+                    to={tab === "continue" ? (row.sourceKind === "anime" ? (row.link || `/watch?anime=${row.ref_id}&episode=${row.episode || 1}`) : `/watch/${row.ref_id}`) : `/anime/${row.ref_id}`}
                     className="flex min-w-0 flex-1 items-center gap-3"
                   >
                     <span className="h-14 w-24 shrink-0 overflow-hidden rounded-md bg-muted">
