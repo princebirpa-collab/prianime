@@ -8,6 +8,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
 import { ThemeProvider } from '@/lib/theme';
 import Layout from '@/components/layout/Layout';
+import IntroOverlay from '@/components/IntroOverlay';
 // Add page imports here
 import Home from '@/pages/Home';
 import Browse from '@/pages/Browse';
@@ -69,11 +70,10 @@ const AuthenticatedApp = () => {
   );
 };
 
-
 function App() {
-
   return (
     <ThemeProvider>
+      <IntroOverlay />
       <AuthProvider>
         <QueryClientProvider client={queryClientInstance}>
           <Router>
