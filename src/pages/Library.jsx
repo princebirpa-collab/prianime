@@ -69,7 +69,12 @@ export default function Library() {
   });
 
   const grid = saved[tab] || [];
-  const continueRows = tab === "continue"\n    ? [\n        ...progress.anime.map((row) => ({ ...row, sourceKind: "anime" })),\n        ...progress.video.map((row) => ({ ...row, sourceKind: "video" })),\n      ].sort((a, b) => new Date(b.updated_date || 0) - new Date(a.updated_date || 0))\n    : tab === "recent" ? progress.anime : [];
+  const continueRows = tab === "continue"
+    ? [
+        ...progress.anime.map((row) => ({ ...row, sourceKind: "anime" })),
+        ...progress.video.map((row) => ({ ...row, sourceKind: "video" })),
+      ].sort((a, b) => new Date(b.updated_date || 0) - new Date(a.updated_date || 0))
+    : tab === "recent" ? progress.anime : [];
 
   return (
     <div className="pb-16">
