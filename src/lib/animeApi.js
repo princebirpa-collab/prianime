@@ -177,6 +177,25 @@ export async function callAniList(body) {
   const hit = cache.get(key);
   if (hit && hit.expires > Date.now()) return hit.value;
 
+  // Share one in-flight metadata request between components that mount
+  // together. This only affects AniList metadata; playback providers are separate.
+  if (inFlight.has(key)) return inFlight.get(key);
+
+  const request = callAniListUncached(body, key);
+  inFlight.set(key, request);
+  try {
+    return await request;
+  } finally {
+    inFlight.delete(key);
+  }
+}
+
+const inFlight = new Map();
+
+async function callAniListUncached(body, key) {
+  const hit = cache.get(key);
+  if (hit && hit.expires > Date.now()) return hit.value;
+
   const serverResult = await tryServer(body);
   let result;
   // A server search that comes back empty is NOT trusted as final â€” AniList
