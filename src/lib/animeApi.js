@@ -191,6 +191,16 @@ function titleSearchScore(anime, query) {
   }));
 }
 
+async function searchMalTitles(query) {
+  const response = await fetch(`/api/mal-search?q=${encodeURIComponent(query)}`, {
+    headers: { Accept: "application/json" },
+    signal: AbortSignal.timeout(8000),
+  });
+  if (!response.ok) return [];
+  const payload = await response.json();
+  return Array.isArray(payload?.data) ? payload.data : [];
+}
+
 export async function callAniList(body) {
   const key = JSON.stringify(body);
   const hit = cache.get(key);
@@ -241,6 +251,32 @@ export async function callAniList(body) {
         break;
       }
       await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+
+    // MAL/Jikan is a title-discovery fallback only. Resolve any discovered
+    // MAL titles back through AniList so the UI keeps AniList IDs/routes and
+    // playback identity; never pass a MAL ID into an AniList watch route.
+    if (result.items.length === 0) {
+      try {
+        const malHits = await searchMalTitles(variables.search);
+        const aliases = [...new Set(malHits.flatMap((hit) =>
+          [hit.title, hit.title_english, hit.title_japanese, ...(hit.title_synonyms || [])]
+            .filter(Boolean)
+        ))].slice(0, 4);
+        for (const alias of aliases) {
+          const data = await graphql(LIST_QUERY, { ...variables, search: alias });
+          const items = (data?.Page?.media || [])
+            .map(normalize)
+            .filter((anime) => anime && titleSearchScore(anime, alias) > 0);
+          if (items.length) {
+            result = { items, pageInfo: data?.Page?.pageInfo || null, item: null };
+            break;
+          }
+        }
+      } catch {
+        // MAL is an optional secondary metadata source; retain AniList's
+        // valid empty result rather than turning an upstream outage into error.
+      }
     }
   } else {
     const variables = buildListVariables(body);
