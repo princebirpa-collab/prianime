@@ -39,6 +39,7 @@ export function normalize(media) {
     source: "anilist",
     display: media.title?.english || media.title?.romaji || "Untitled",
     titleRomaji: media.title?.romaji || "",
+    titleNative: media.title?.native || "",
     cover: media.coverImage?.extraLarge || media.coverImage?.large || "",
     accent: media.coverImage?.color || "",
     banner: media.bannerImage || media.coverImage?.extraLarge || "",
@@ -172,6 +173,23 @@ function buildListVariables(body) {
   return variables;
 }
 
+function titleSearchScore(anime, query) {
+  const clean = (value) => String(value || "").toLocaleLowerCase().normalize("NFKD")
+    .replace(/[\\u0300-\\u036f]/g, "")
+    .replace(/[^\\p{L}\\p{N}]+/gu, " ").trim();
+  const q = clean(query);
+  if (!q) return 0;
+  const titles = [anime?.display, anime?.titleRomaji, anime?.titleNative].map(clean).filter(Boolean);
+  if (titles.some((title) => title === q)) return 100;
+  if (titles.some((title) => title.includes(q) || q.includes(title))) return 80;
+  const qTokens = q.split(/\\s+/).filter(Boolean);
+  return Math.max(0, ...titles.map((title) => {
+    const tokens = new Set(title.split(/\\s+/));
+    const matched = qTokens.filter((token) => tokens.has(token)).length;
+    return matched / Math.max(qTokens.length, 1) >= 0.75 ? 50 + matched : 0;
+  }));
+}
+
 export async function callAniList(body) {
   const key = JSON.stringify(body);
   const hit = cache.get(key);
@@ -216,7 +234,7 @@ export async function callAniList(body) {
     const attempts = variants.length > 1 ? [variants[0], ...variants] : [variants[0], variants[0]];
     for (const variant of attempts) {
       const data = await graphql(LIST_QUERY, { ...variables, search: variant });
-      const items = (data?.Page?.media || []).map(normalize).filter(Boolean);
+      const items = (data?.Page?.media || []).map(normalize).filter((anime) => anime && titleSearchScore(anime, variables.search) > 0);
       if (items.length > 0) {
         result = { items, pageInfo: data?.Page?.pageInfo || null, item: null };
         break;
