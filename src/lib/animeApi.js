@@ -175,16 +175,17 @@ function buildListVariables(body) {
 
 function titleSearchScore(anime, query) {
   const clean = (value) => String(value || "").toLocaleLowerCase().normalize("NFKD")
-    .replace(/[\\u0300-\\u036f]/g, "")
-    .replace(/[^\\p{L}\\p{N}]+/gu, " ").trim();
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
   const q = clean(query);
   if (!q) return 0;
   const titles = [anime?.display, anime?.titleRomaji, anime?.titleNative].map(clean).filter(Boolean);
   if (titles.some((title) => title === q)) return 100;
   if (titles.some((title) => title.includes(q) || q.includes(title))) return 80;
-  const qTokens = q.split(/\\s+/).filter(Boolean);
+  const qTokens = q.split(/\s+/).filter(Boolean);
   return Math.max(0, ...titles.map((title) => {
-    const tokens = new Set(title.split(/\\s+/));
+    const tokens = new Set(title.split(/\s+/));
     const matched = qTokens.filter((token) => tokens.has(token)).length;
     return matched / Math.max(qTokens.length, 1) >= 0.75 ? 50 + matched : 0;
   }));
