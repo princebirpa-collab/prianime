@@ -1,7 +1,7 @@
 import { base44 } from "@/api/base44Client";
 import { searchVariants, withRetries } from "@/lib/searchUtils";
 
-const DIRECT_URL = "https://graphql.anilist.co";
+const DIRECT_URL = "/api/anilist";
 const TTL = 5 * 60 * 1000;
 const SERVER_KEY = "pri:anilist:server-mode";
 const cache = new Map();
