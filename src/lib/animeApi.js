@@ -72,23 +72,6 @@ export function normalize(media) {
   };
 }
 
-let serverMode = typeof sessionStorage !== "undefined" && sessionStorage.getItem(SERVER_KEY) !== "off";
-
-async function tryServer(body) {
-  if (!serverMode) return null;
-  try {
-    const response = await base44.functions.invoke("anilist", body);
-    if (response?.data?.ok) return response.data;
-    serverMode = false;
-    sessionStorage.setItem(SERVER_KEY, "off");
-    return null;
-  } catch {
-    serverMode = false;
-    sessionStorage.setItem(SERVER_KEY, "off");
-    return null;
-  }
-}
-
 async function fetchGraphQL(query, variables) {
   const response = await fetch(DIRECT_URL, {
     method: "POST",
@@ -206,26 +189,10 @@ export async function callAniList(body) {
   const hit = cache.get(key);
   if (hit && hit.expires > Date.now()) return hit.value;
 
-  const serverResult = await tryServer(body);
   let result;
-  // Server-side search results can occasionally be unrelated to the entered
-  // title. For searches, prefer the direct AniList query/variant pipeline so
-  // each result is matched against the user's actual query.
-  if (serverResult && body.action !== "search") {
-    result = {
-      items: (serverResult.items || []).map(normalize),
-      item: serverResult.item ? normalize(serverResult.item) : null,
-      pageInfo: serverResult.pageInfo || null,
-    };
-    if (serverResult.item) {
-      result.item = {
-        ...normalize(serverResult.item),
-        characters: serverResult.item.characters || [],
-        relations: serverResult.item.relations || [],
-        recommendations: (serverResult.item.recommendations || []).map(normalize),
-      };
-    }
-  } else if (body.action === "by_id") {
+  // Use the same-origin Vercel AniList proxy consistently for every catalog
+  // request. The legacy Base44 "anilist" function is not a catalog source.
+  if (body.action === "by_id") {
     const id = Number(body.id);
     if (!id) throw new Error("A numeric anime id is required.");
     const data = await graphql(DETAIL_QUERY, { id });
