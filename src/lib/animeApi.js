@@ -179,10 +179,10 @@ export async function callAniList(body) {
 
   const serverResult = await tryServer(body);
   let result;
-  // A server search that comes back empty is NOT trusted as final â€” AniList
-  // intermittently serves empty pages to valid queries â€” so it falls through
-  // to the validated direct search with variants below.
-  if (serverResult && (serverResult.items?.length || body.action !== "search")) {
+  // Server-side search results can occasionally be unrelated to the entered
+  // title. For searches, prefer the direct AniList query/variant pipeline so
+  // each result is matched against the user's actual query.
+  if (serverResult && body.action !== "search") {
     result = {
       items: (serverResult.items || []).map(normalize),
       item: serverResult.item ? normalize(serverResult.item) : null,
