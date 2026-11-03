@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-const INTRO_SEEN_KEY = "prianime-intro-completed:v2";
+const INTRO_SEEN_KEY = "prianime-intro-completed:session:v1";
 
 // Set VITE_R2_PUBLIC_BASE_URL in Vercel to the public Cloudflare R2
 // bucket domain (without a trailing slash). Local public assets remain fallback.
@@ -10,7 +10,7 @@ const introAsset = (filename) =>
 
 function hasSeenIntro() {
   try {
-    return window.localStorage.getItem(INTRO_SEEN_KEY) === "1";
+    return window.sessionStorage.getItem(INTRO_SEEN_KEY) === "1";
   } catch {
     return false;
   }
@@ -43,7 +43,7 @@ export default function IntroOverlay() {
 
   const dismiss = () => {
     try {
-      window.localStorage.setItem(INTRO_SEEN_KEY, "1");
+      window.sessionStorage.setItem(INTRO_SEEN_KEY, "1");
     } catch {
       // Keep the intro dismissible when storage is blocked.
     }
