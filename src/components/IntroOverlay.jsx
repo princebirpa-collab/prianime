@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-const INTRO_SEEN_KEY = "prianime-intro-completed:v1";
+const INTRO_SEEN_KEY = "prianime-intro-completed:v2";
 
 // Set VITE_R2_PUBLIC_BASE_URL in Vercel to the public Cloudflare R2
 // bucket domain (without a trailing slash). Local public assets remain fallback.
