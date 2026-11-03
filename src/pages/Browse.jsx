@@ -93,7 +93,7 @@ export default function Browse() {
     <div className="pb-16">
       <PageHeader
         eyebrow="Browse"
-        title={committedQuery ? `Results for â€œ${committedQuery}â€` : "The whole catalogue"}
+        title={committedQuery ? `Results for “${committedQuery}”` : "The whole catalogue"}
         description="Live AniList metadata with scores, genres, formats and episode counts. Filters are applied on the API, not on the page."
       >
         <div className="flex flex-wrap items-center gap-2">
@@ -112,7 +112,7 @@ export default function Browse() {
               id="browse-search"
               value={input}
               onChange={onSearchInput}
-              placeholder="Title, franchise, studioâ€¦"
+              placeholder="Title, franchise, studio…"
               className="w-56 bg-transparent text-sm outline-none placeholder:text-muted-foreground/80"
             />
             <button
@@ -165,8 +165,8 @@ export default function Browse() {
           <span className="inline-flex items-center gap-2">
             <SlidersHorizontal className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
             {loading && items.length === 0
-              ? "Querying AniListâ€¦"
-              : `${total || items.length} titles${total && items.length < total ? ` Â· showing ${items.length}` : ""}`}
+              ? "Querying AniList…"
+              : `${total || items.length} titles${total && items.length < total ? ` · showing ${items.length}` : ""}`}
           </span>
           {(committedQuery || genre) && (
             <button
@@ -196,7 +196,7 @@ export default function Browse() {
         ) : items.length === 0 ? (
           <EmptyState
             title="No anime found for this search"
-            body={`AniList returned no matching titles for â€œ${committedQuery}â€. Try a shorter or differently spelled title${genre ? ", or clear the genre filter" : ""}.`}
+            body={`AniList returned no matching titles for “${committedQuery}”. Try a shorter or differently spelled title${genre ? ", or clear the genre filter" : ""}.`}
             actionLabel="Clear filters"
             onAction={clearAllFilters}
           />
