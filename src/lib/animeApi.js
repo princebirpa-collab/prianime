@@ -312,7 +312,7 @@ async function jikanRating(title) {
   const payload = await response.json();
   const hit = payload?.data?.[0];
   if (!hit?.score) return null;
-  return { score: hit.score, rank: hit.rank ?? null, id: hit.mal_id ?? null };
+  return { score: hit.score, rank: hit.rank ?? null, id: hit.mal_id ?? null, source: "MAL" };
 }
 
 export async function fetchMalRating(title) {
@@ -331,7 +331,7 @@ export async function fetchMalRating(title) {
       const response = await base44.functions.invoke("mal", { action: "search", q: title, limit: 3 });
       const data = response?.data;
       rating = data?.ok && data.items?.[0]
-        ? { score: data.items[0].malScore, rank: data.items[0].rank, id: data.items[0].id }
+        ? { score: data.items[0].malScore, rank: data.items[0].rank, id: data.items[0].id, source: "MAL" }
         : null;
     } catch {
       rating = null;
