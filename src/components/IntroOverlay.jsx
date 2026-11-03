@@ -4,7 +4,7 @@ const INTRO_SEEN_KEY = "prianime-intro-completed:v1";
 
 // Set VITE_R2_PUBLIC_BASE_URL in Vercel to the public Cloudflare R2
 // bucket domain (without a trailing slash). Local public assets remain fallback.
-const R2_PUBLIC_BASE_URL = (import.meta.env.VITE_R2_PUBLIC_BASE_URL || "").replace(/\\/+$/, "");
+const R2_PUBLIC_BASE_URL = (import.meta.env.VITE_R2_PUBLIC_BASE_URL || "").replace(/\/+$/, "");
 const introAsset = (filename) =>
   R2_PUBLIC_BASE_URL ? `${R2_PUBLIC_BASE_URL}/${filename}` : `/${filename}`;
 
