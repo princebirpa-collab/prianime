@@ -79,7 +79,7 @@ export default function AnimeDetail() {
 
             <div className="min-w-0">
               <p className="text-[11px] uppercase tracking-[0.28em] text-primary">
-                {item.format?.replace(/_/g, " ") || "Anime"} Â· {seasonLabel(item.season, item.seasonYear)}
+                {item.format?.replace(/_/g, " ") || "Anime"} · {seasonLabel(item.season, item.seasonYear)}
               </p>
               <h1 className="mt-3 font-display text-4xl font-medium leading-[1.05] tracking-tight sm:text-5xl">
                 {item.display}
@@ -106,7 +106,7 @@ export default function AnimeDetail() {
                   </span>
                 ) : (
                   <span className="rounded-full border border-border/50 px-3 py-1.5 text-xs text-muted-foreground">
-                    Checking MALâ€¦
+                    Checking MAL…
                   </span>
                 )}
                 {item.episodes ? (
