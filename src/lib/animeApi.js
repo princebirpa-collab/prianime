@@ -258,15 +258,20 @@ export async function callAniList(body) {
         const aliases = [...new Set(malHits.flatMap((hit) =>
           [hit.title, hit.title_english, hit.title_japanese, ...(hit.title_synonyms || [])]
             .filter(Boolean)
-        ))].slice(0, 4);
+        ))]
+          // MAL/Kitsu fallback may return unrelated fuzzy entries. Only query
+          // aliases that actually correspond to the user's typed title.
+          .filter((alias) => titleSearchScore({
+            display: alias, titleRomaji: alias, titleNative: alias,
+          }, variables.search) >= 50)
+          .slice(0, 4);
         for (const alias of aliases) {
           try {
             const data = await graphql(LIST_QUERY, { ...variables, search: alias });
             const normalizedAliasResults = (data?.Page?.media || []).map(normalize).filter(Boolean);
-            // MAL may return an official/alternate title that AniList indexes
-            // differently. Match against the alias used for this request,
-            // not only the user's original spelling.
-            const items = rankSearchResults(normalizedAliasResults, alias);
+            // Keep results tied to the original query; never trust the
+            // fallback provider's fuzzy alias as proof of relevance.
+            const items = rankSearchResults(normalizedAliasResults, variables.search);
             if (items.length) {
               result = { items, pageInfo: data?.Page?.pageInfo || null, item: null };
               break;
