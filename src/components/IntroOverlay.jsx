@@ -51,6 +51,17 @@ export default function IntroOverlay() {
     setVisible(false);
   };
 
+  // Keep the actual site behind the intro from being reached by scrolling.
+  // The intro + its feature details remain scrollable inside the fixed overlay.
+  useEffect(() => {
+    if (!visible) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [visible]);
+
   useEffect(() => {
     if (!visible) return undefined;
 
@@ -117,78 +128,81 @@ export default function IntroOverlay() {
   if (!visible) return null;
 
   return (
-    <>
-    <section className="relative z-[99999] isolate flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#050308] text-white">
-      {!backgroundFailed && (
+    <div className="fixed inset-0 z-[99999] overflow-y-auto overscroll-contain bg-[#050308] text-white">
+      <section className="relative isolate flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#050308] text-white">
+        {!backgroundFailed && (
+          <video
+            ref={backgroundVideoRef}
+            className="absolute inset-0 h-full w-full object-cover"
+            src={introAsset("bg.mp4.mp4")}
+            autoPlay
+            loop
+            playsInline
+            onError={() => setBackgroundFailed(true)}
+            aria-hidden="true"
+          />
+        )}
+        <div className="absolute inset-0 bg-black/50" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#050308]/90 via-transparent to-black/45" />
+
         <video
-          ref={backgroundVideoRef}
-          className="absolute inset-0 h-full w-full object-cover"
-          src={introAsset("bg.mp4.mp4")}
+          ref={textVideoRef}
+          className="pointer-events-none absolute h-px w-px opacity-0"
+          src={introAsset("text.mp4.mp4")}
           autoPlay
+          muted
           loop
           playsInline
-          onError={() => setBackgroundFailed(true)}
           aria-hidden="true"
         />
-      )}
-      <div className="absolute inset-0 bg-black/50" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#050308]/90 via-transparent to-black/45" />
 
-      <video
-        ref={textVideoRef}
-        className="pointer-events-none absolute h-px w-px opacity-0"
-        src={introAsset("text.mp4.mp4")}
-        autoPlay
-        muted
-        loop
-        playsInline
-        aria-hidden="true"
-      />
+        <div className="relative z-10 flex w-full flex-col items-center px-5 text-center">
+          <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.55em] text-[#d8b56d] sm:text-xs">
+            The Gilded Theater
+          </p>
+          <canvas
+            ref={canvasRef}
+            className="h-[24vh] w-[88vw] max-w-[1500px]"
+            aria-label="PRI-ANIME"
+            role="img"
+          />
+          <h1 className="sr-only">PRI-ANIME</h1>
+          <div className="mx-auto mt-2 h-px w-28 bg-gradient-to-r from-transparent via-[#d8b56d] to-transparent" />
+          <p className="mt-5 text-xs uppercase tracking-[0.28em] text-white/75 sm:text-sm">
+            Enter the world beyond imagination
+          </p>
 
-      <div className="relative z-10 flex w-full flex-col items-center px-5 text-center">
-        <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.55em] text-[#d8b56d] sm:text-xs">
-          The Gilded Theater
-        </p>
-        <canvas
-          ref={canvasRef}
-          className="h-[24vh] w-[88vw] max-w-[1500px]"
-          aria-label="PRI-ANIME"
-          role="img"
-        />
-        <h1 className="sr-only">PRI-ANIME</h1>
-        <div className="mx-auto mt-2 h-px w-28 bg-gradient-to-r from-transparent via-[#d8b56d] to-transparent" />
-        <p className="mt-5 text-xs uppercase tracking-[0.28em] text-white/75 sm:text-sm">
-          Enter the world beyond imagination
-        </p>
-
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
-          {!audioEnabled && (
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            {!audioEnabled && (
+              <button
+                type="button"
+                onClick={enableBackgroundAudio}
+                className="rounded-full border border-white/35 bg-black/35 px-6 py-3 text-xs uppercase tracking-[0.18em] text-white/90 backdrop-blur transition hover:border-[#d8b56d] hover:text-[#d8b56d]"
+              >
+                Enable Intro Sound
+              </button>
+            )}
             <button
               type="button"
-              onClick={enableBackgroundAudio}
-              className="rounded-full border border-white/35 bg-black/35 px-6 py-3 text-xs uppercase tracking-[0.18em] text-white/90 backdrop-blur transition hover:border-[#d8b56d] hover:text-[#d8b56d]"
+              onClick={dismiss}
+              className="rounded-full border border-[#d8b56d] bg-[#d8b56d] px-8 py-3 text-xs font-bold uppercase tracking-[0.22em] text-black transition hover:bg-white hover:border-white"
             >
-              Enable Intro Sound
+              Enter PRI-ANIME
             </button>
-          )}
-          <button
-            type="button"
-            onClick={dismiss}
-            className="rounded-full border border-[#d8b56d] bg-[#d8b56d] px-8 py-3 text-xs font-bold uppercase tracking-[0.22em] text-black transition hover:bg-white hover:border-white"
-          >
-            Enter PRI-ANIME
-          </button>
-          <button
-            type="button"
-            onClick={dismiss}
-            className="rounded-full border border-white/35 bg-black/30 px-6 py-3 text-xs uppercase tracking-[0.2em] text-white/85 backdrop-blur transition hover:border-[#d8b56d] hover:text-[#d8b56d]"
-          >
-            Skip intro
-          </button>
+            <button
+              type="button"
+              onClick={dismiss}
+              className="rounded-full border border-white/35 bg-black/30 px-6 py-3 text-xs uppercase tracking-[0.2em] text-white/85 backdrop-blur transition hover:border-[#d8b56d] hover:text-[#d8b56d]"
+            >
+              Skip intro
+            </button>
+          </div>
+          <p className="mt-5 text-[10px] uppercase tracking-[0.16em] text-white/45">
+            Scroll for the PRI-ANIME feature guide · Enter or Skip to open the website
+          </p>
         </div>
-      </div>
-    </section>
-    <IntroDetailsShowcase />
-    </>
+      </section>
+      <IntroDetailsShowcase />
+    </div>
   );
 }
