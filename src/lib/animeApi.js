@@ -186,7 +186,14 @@ function titleSearchScore(anime, query) {
 
 function rankSearchResults(items, query) {
   const unique = [...new Map((items || []).filter(Boolean).map((item) => [String(item.id), item])).values()];
-  return unique.sort((a, b) => titleSearchScore(b, query) - titleSearchScore(a, query));
+  // AniList can return fuzzy, unrelated matches for short or ambiguous terms.
+  // Do not display those as if they were the requested anime: require a real
+  // title/token match, then rank the strongest match first.
+  return unique
+    .map((item) => ({ item, score: titleSearchScore(item, query) }))
+    .filter(({ score }) => score >= 50)
+    .sort((a, b) => b.score - a.score)
+    .map(({ item }) => item);
 }
 
 async function searchMalTitles(query) {
