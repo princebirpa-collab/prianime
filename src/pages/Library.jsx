@@ -44,7 +44,8 @@ export default function Library() {
   }, [load]);
 
   const removeProgress = async (id) => {
-    await clearProgress(id);
+    const row = [...progress.video, ...progress.anime].find((entry) => entry.id === id);
+    await clearProgress(id, row?.kind, row?.ref_id);
     setProgress((prev) => ({
       video: prev.video.filter((row) => row.id !== id),
       anime: prev.anime.filter((row) => row.id !== id),
@@ -76,7 +77,7 @@ export default function Library() {
       <PageHeader
         eyebrow="Your library"
         title="Everything you keep"
-        description="Saved titles, playback history and scripts live on this device profile â€” no account required."
+        description="Saved titles, playback history and scripts live on this device profile — no account required."
       />
 
       <div className="mx-auto w-full max-w-[1600px] px-4 pt-6 sm:px-6 lg:px-10">
@@ -126,7 +127,7 @@ export default function Library() {
               <EmptyState
                 icon={BookOpen}
                 title="No saved scripts"
-                body="Generate a story in the AI atelier and save it â€” it will appear here."
+                body="Generate a story in the AI atelier and save it — it will appear here."
                 actionLabel="Open the atelier"
                 actionTo="/studio"
               />
@@ -135,7 +136,7 @@ export default function Library() {
                 {stories.map((story) => (
                   <article key={story.id} className="rounded-2xl border border-border/50 bg-card/40 p-4">
                     <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-                      {story.kind} Â· {story.language} Â· {relativeDate(story.created_date)}
+                      {story.kind} · {story.language} · {relativeDate(story.created_date)}
                     </p>
                     <h3 className="mt-1.5 font-display text-lg leading-snug">{story.title}</h3>
                     <p className="mt-2 line-clamp-4 whitespace-pre-line text-sm text-muted-foreground">{story.script}</p>
@@ -181,7 +182,7 @@ export default function Library() {
                     <span className="min-w-0 flex-1">
                       <span className="line-clamp-1 block text-sm text-foreground">{row.title}</span>
                       <span className="mt-0.5 block text-[10px] uppercase tracking-[0.12em] text-muted-foreground">
-                        {row.episode ? `Episode ${row.episode} Â· ` : ""}
+                        {row.episode ? `Episode ${row.episode} · ` : ""}
                         {row.duration ? `${Math.round(percent(row.position, row.duration))}% watched` : "Viewed"}
                       </span>
                       <span className="mt-1 block h-0.5 w-32 overflow-hidden rounded-full bg-white/15">
