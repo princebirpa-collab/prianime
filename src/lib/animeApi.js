@@ -130,7 +130,9 @@ function buildListVariables(body) {
     page: Math.min(Math.max(Number(body.page) || 1, 1), 50),
     perPage: Math.min(Math.max(Number(body.perPage) || 20, 1), 25),
     search: null,
-    genre: null,
+    // Preserve the Browse genre filter for popular/trending/top/seasonal
+    // catalogue requests as well as the dedicated genre action.
+    genre: body.genre || null,
     season: null,
     seasonYear: null,
     sort: ["POPULARITY_DESC"],
