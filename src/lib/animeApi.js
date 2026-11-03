@@ -211,11 +211,16 @@ export async function callAniList(body) {
     // valid query), then normalized variants are explored â€” at most 3 calls.
     const attempts = variants.length > 1 ? [variants[0], ...variants] : [variants[0], variants[0]];
     for (const variant of attempts) {
-      const data = await graphql(LIST_QUERY, { ...variables, search: variant });
-      const items = (data?.Page?.media || []).map(normalize).filter((anime) => anime && titleSearchScore(anime, variables.search) > 0);
-      if (items.length > 0) {
-        result = { items, pageInfo: data?.Page?.pageInfo || null, item: null };
-        break;
+      try {
+        const data = await graphql(LIST_QUERY, { ...variables, search: variant });
+        const items = (data?.Page?.media || []).map(normalize).filter((anime) => anime && titleSearchScore(anime, variables.search) > 0);
+        if (items.length > 0) {
+          result = { items, pageInfo: data?.Page?.pageInfo || null, item: null };
+          break;
+        }
+      } catch {
+        // AniList may be unavailable or rate-limited. Keep searching via MAL
+        // below instead of aborting the whole search screen.
       }
       await new Promise((resolve) => setTimeout(resolve, 250));
     }
@@ -231,13 +236,17 @@ export async function callAniList(body) {
             .filter(Boolean)
         ))].slice(0, 4);
         for (const alias of aliases) {
-          const data = await graphql(LIST_QUERY, { ...variables, search: alias });
-          const items = (data?.Page?.media || [])
-            .map(normalize)
-            .filter((anime) => anime && titleSearchScore(anime, alias) > 0);
-          if (items.length) {
-            result = { items, pageInfo: data?.Page?.pageInfo || null, item: null };
-            break;
+          try {
+            const data = await graphql(LIST_QUERY, { ...variables, search: alias });
+            const items = (data?.Page?.media || [])
+              .map(normalize)
+              .filter((anime) => anime && titleSearchScore(anime, alias) > 0);
+            if (items.length) {
+              result = { items, pageInfo: data?.Page?.pageInfo || null, item: null };
+              break;
+            }
+          } catch {
+            // A failed alias lookup should not hide other MAL-discovered names.
           }
         }
       } catch {
