@@ -98,15 +98,15 @@ export default function AnimeDetail() {
                 {mal?.score ? (
                   <span className="inline-flex items-center gap-1.5 rounded-full border border-border/70 px-3 py-1.5">
                     <Star className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
-                    {mal.score.toFixed(2)} MAL
+                    {mal.score.toFixed(2)} {mal.source || "MAL"}
                   </span>
                 ) : malChecked ? (
                   <span className="rounded-full border border-border/50 px-3 py-1.5 text-xs text-muted-foreground">
-                    MAL rating unavailable
+                    Rating unavailable
                   </span>
                 ) : (
                   <span className="rounded-full border border-border/50 px-3 py-1.5 text-xs text-muted-foreground">
-                    Checking MAL…
+                    Checking rating…
                   </span>
                 )}
                 {item.episodes ? (
