@@ -170,8 +170,16 @@ function titleSearchScore(anime, query) {
   if (titles.some((title) => title.includes(q) || q.includes(title))) return 80;
   const qTokens = q.split(/\s+/).filter(Boolean);
   return Math.max(0, ...titles.map((title) => {
-    const tokens = new Set(title.split(/\s+/));
-    const matched = qTokens.filter((token) => tokens.has(token)).length;
+    const tokens = title.split(/\s+/).filter(Boolean);
+    // Prefix matching supports common singular/plural and incomplete title
+    // variants (e.g. "Tokyo Revenge" matching "Tokyo Revengers").
+    const matched = qTokens.filter((queryToken) =>
+      tokens.some((titleToken) =>
+        titleToken === queryToken ||
+        titleToken.startsWith(queryToken) ||
+        queryToken.startsWith(titleToken)
+      )
+    ).length;
     return matched / Math.max(qTokens.length, 1) >= 0.75 ? 50 + matched : 0;
   }));
 }
