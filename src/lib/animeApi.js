@@ -171,16 +171,18 @@ function titleSearchScore(anime, query) {
   const qTokens = q.split(/\s+/).filter(Boolean);
   return Math.max(0, ...titles.map((title) => {
     const tokens = title.split(/\s+/).filter(Boolean);
-    // Prefix matching supports common singular/plural and incomplete title
-    // variants (e.g. "Tokyo Revenge" matching "Tokyo Revengers").
+    // Match full query phrase and token prefixes (e.g. "Tokyo Revenge"
+    // -> "Tokyo Revengers"), but do not admit results sharing only one
+    // common word when the query contains multiple meaningful words.
     const matched = qTokens.filter((queryToken) =>
       tokens.some((titleToken) =>
         titleToken === queryToken ||
         titleToken.startsWith(queryToken) ||
-        queryToken.startsWith(titleToken)
+        (queryToken.length >= 5 && titleToken.startsWith(queryToken.slice(0, -1)))
       )
     ).length;
-    return matched / Math.max(qTokens.length, 1) >= 0.75 ? 50 + matched : 0;
+    const coverage = matched / Math.max(qTokens.length, 1);
+    return coverage === 1 ? 70 + matched : coverage >= 0.75 ? 50 + matched : 0;
   }));
 }
 
@@ -340,25 +342,8 @@ export async function fetchMalRating(title) {
     }
   }
 
-  // If the MAL-specific sources are unavailable, provide a truthful AniList
-  // score fallback rather than leaving the rating area blank. UI labels its source.
-  if (!rating) {
-    try {
-      const found = await callAniList({ action: "search", q: title, perPage: 5 });
-      const best = (found.items || []).find((item) => item.score != null);
-      if (best) {
-        rating = {
-          score: best.score / 10,
-          rank: null,
-          id: null,
-          source: "AniList",
-        };
-      }
-    } catch {
-      rating = null;
-    }
-  }
-
+  // Never substitute AniList's score for a MyAnimeList rating.
+  // If MAL/Jikan cannot supply a rating, the UI truthfully shows unavailable.
   // Cache a missing result briefly only; upstream outages should self-recover.
   malCache.set(title, { value: rating, expires: Date.now() + (rating ? TTL : 30 * 1000) });
   return rating;
