@@ -1,39 +1,75 @@
 const features = [
   {
     number: "01",
-    title: "Discover your next anime",
-    description: "Explore anime worlds, trending picks, genres, movies, and detailed titles in one place.",
-    tags: ["Discover", "Browse", "Genres"],
+    title: "Anime discovery, made personal",
+    description: "Find your next favorite through trending picks, top titles, genres, seasonal highlights, and curated discovery shelves.",
+    tags: ["Discover", "Trending", "Top picks"],
   },
   {
     number: "02",
-    title: "Your watch journey",
-    description: "Keep your anime experience organized with your library and Continue Watching area.",
-    tags: ["Library", "Watch history"],
+    title: "Search that understands titles",
+    description: "Search by title and alternate names—English, Japanese, and romanized spellings—so a title is easier to find.",
+    tags: ["Smart search", "Alt titles", "Anime catalog"],
   },
   {
     number: "03",
-    title: "Reels & video stories",
-    description: "A dedicated space for short anime-style clips alongside longer video experiences.",
-    tags: ["Reels", "Videos"],
+    title: "Anime details in one place",
+    description: "Explore synopsis, genres, formats, release information, and community scores with source labels kept clear.",
+    tags: ["Anime info", "AniList", "MAL"],
   },
   {
     number: "04",
-    title: "Creator & AI Studio",
-    description: "Explore creative tools for stories, original concepts, and creator-focused projects.",
-    tags: ["Creator", "Studio"],
+    title: "Movies & series",
+    description: "Browse anime series and anime movies in dedicated spaces, with a catalog experience built for both.",
+    tags: ["Series", "Movies", "Browse"],
   },
   {
     number: "05",
-    title: "A world beyond one language",
-    description: "Designed around anime discovery with language choices and a growing viewing experience.",
-    tags: ["Language options", "Anime culture"],
+    title: "Continue your journey",
+    description: "Keep your viewing organized with a library, watch history, and a Continue Watching experience.",
+    tags: ["Library", "History", "Continue"],
   },
   {
     number: "06",
-    title: "A cinematic home",
-    description: "A dark, immersive interface with glass panels and a soft rose-gold glow that follows the intro’s mood.",
-    tags: ["Glass UI", "Cinematic design"],
+    title: "Reels & short stories",
+    description: "Discover quick anime-style clips and short-form stories alongside longer video experiences.",
+    tags: ["Reels", "Short videos"],
+  },
+  {
+    number: "07",
+    title: "Creator & AI Studio",
+    description: "A creative space concept for developing original story ideas, scripts, and creator projects.",
+    tags: ["Creator tools", "AI Studio"],
+  },
+  {
+    number: "08",
+    title: "Language-friendly experience",
+    description: "Make discovery easier with language choices and a viewing experience designed for a wider audience.",
+    tags: ["Language options", "Hindi", "English"],
+  },
+  {
+    number: "09",
+    title: "A cinematic glass interface",
+    description: "Deep dark surfaces, layered glass panels, subtle pink light, and smooth responsive layouts.",
+    tags: ["Glass UI", "Responsive", "Cinematic"],
+  },
+  {
+    number: "10",
+    title: "Your space, your profile",
+    description: "A home for account features, personal preferences, saved titles, and your anime journey.",
+    tags: ["Profile", "Preferences"],
+  },
+  {
+    number: "11",
+    title: "Monthly update rhythm",
+    description: "The goal is a fresh update every month—with improvements, polished experiences, and new ideas introduced over time. Exact releases may vary.",
+    tags: ["Monthly updates", "Improvements"],
+  },
+  {
+    number: "12",
+    title: "Built to keep improving",
+    description: "PRI-ANIME is an evolving project: feedback helps guide usability fixes, search improvements, and future feature work.",
+    tags: ["Feedback", "Evolution"],
   },
 ];
 
@@ -59,8 +95,9 @@ export default function IntroDetailsShowcase() {
               </span>
             </h2>
             <p className="mt-5 max-w-2xl text-sm leading-7 text-white/65 sm:text-base">
-              Your anime destination for discovery, watching, short-form stories, and creative
-              exploration—wrapped in a cinematic interface.
+              Discover anime, follow your watch journey, explore short-form stories, and
+              experience a cinematic anime-inspired home. PRI-ANIME keeps evolving with
+              community feedback and regular improvements.
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-3 self-start rounded-full border border-white/10 bg-white/[0.04] px-4 py-3 text-xs uppercase tracking-[0.18em] text-white/60 backdrop-blur-xl sm:self-auto">
@@ -100,10 +137,11 @@ export default function IntroDetailsShowcase() {
           ))}
         </div>
 
-        <div className="mt-12 rounded-3xl border border-white/10 bg-white/[0.035] px-6 py-7 text-center backdrop-blur-2xl sm:mt-16 sm:px-10">
+        <div className="mt-12 rounded-3xl border border-rose-300/15 bg-white/[0.035] px-6 py-7 text-center backdrop-blur-2xl sm:mt-16 sm:px-10">
           <p className="text-sm leading-6 text-white/65">
-            Keep scrolling to reach the PRI-ANIME website. Use <span className="font-semibold text-white">Enter PRI-ANIME</span> or
-            <span className="font-semibold text-white"> Skip intro</span> whenever you’re ready.
+            Explore this feature guide by scrolling. The website itself stays behind the intro
+            until you choose <span className="font-semibold text-white">Enter PRI-ANIME</span> or
+            <span className="font-semibold text-white"> Skip intro</span>.
           </p>
         </div>
       </div>
