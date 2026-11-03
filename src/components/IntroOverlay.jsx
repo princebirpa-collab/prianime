@@ -121,7 +121,7 @@ export default function IntroOverlay() {
         <video
           ref={backgroundVideoRef}
           className="absolute inset-0 h-full w-full object-cover"
-          src={introAsset("bg.mp4")}
+          src={introAsset("bg.mp4.mp4")}
           autoPlay
           loop
           playsInline
@@ -135,7 +135,7 @@ export default function IntroOverlay() {
       <video
         ref={textVideoRef}
         className="pointer-events-none absolute h-px w-px opacity-0"
-        src={introAsset("text.mp4")}
+        src={introAsset("text.mp4.mp4")}
         autoPlay
         muted
         loop
