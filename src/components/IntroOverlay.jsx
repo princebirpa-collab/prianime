@@ -13,8 +13,27 @@ function hasSeenIntro() {
 export default function IntroOverlay() {
   const [visible, setVisible] = useState(() => !hasSeenIntro());
   const [backgroundFailed, setBackgroundFailed] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(false);
+  const backgroundVideoRef = useRef(null);
   const canvasRef = useRef(null);
   const textVideoRef = useRef(null);
+
+  const enableBackgroundAudio = async () => {
+    const video = backgroundVideoRef.current;
+    if (!video) return;
+
+    // Browsers block audible autoplay until a user gesture. This button is
+    // that gesture; keep the source unmuted and start its original audio.
+    video.muted = false;
+    video.volume = 1;
+
+    try {
+      await video.play();
+      setAudioEnabled(true);
+    } catch {
+      setAudioEnabled(false);
+    }
+  };
 
   const dismiss = () => {
     try {
@@ -94,10 +113,10 @@ export default function IntroOverlay() {
     <div className="fixed inset-0 z-[99999] isolate flex items-center justify-center overflow-hidden bg-[#050308] text-white">
       {!backgroundFailed && (
         <video
+          ref={backgroundVideoRef}
           className="absolute inset-0 h-full w-full object-cover"
           src="/bg.mp4"
           autoPlay
-          muted
           loop
           playsInline
           onError={() => setBackgroundFailed(true)}
@@ -135,6 +154,15 @@ export default function IntroOverlay() {
         </p>
 
         <div className="mt-8 flex flex-wrap justify-center gap-3">
+          {!audioEnabled && (
+            <button
+              type="button"
+              onClick={enableBackgroundAudio}
+              className="rounded-full border border-white/35 bg-black/35 px-6 py-3 text-xs uppercase tracking-[0.18em] text-white/90 backdrop-blur transition hover:border-[#d8b56d] hover:text-[#d8b56d]"
+            >
+              Enable Intro Sound
+            </button>
+          )}
           <button
             type="button"
             onClick={dismiss}
