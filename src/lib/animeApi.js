@@ -184,6 +184,11 @@ function titleSearchScore(anime, query) {
   }));
 }
 
+function rankSearchResults(items, query) {
+  const unique = [...new Map((items || []).filter(Boolean).map((item) => [String(item.id), item])).values()];
+  return unique.sort((a, b) => titleSearchScore(b, query) - titleSearchScore(a, query));
+}
+
 async function searchMalTitles(query) {
   const response = await fetch(`/api/mal-search?q=${encodeURIComponent(query)}`, {
     headers: { Accept: "application/json" },
@@ -223,7 +228,7 @@ export async function callAniList(body) {
     for (const variant of attempts) {
       try {
         const data = await graphql(LIST_QUERY, { ...variables, search: variant });
-        const items = (data?.Page?.media || []).map(normalize).filter(Boolean);
+        const items = rankSearchResults((data?.Page?.media || []).map(normalize).filter(Boolean), variables.search);
         if (items.length > 0) {
           result = { items, pageInfo: data?.Page?.pageInfo || null, item: null };
           break;
@@ -248,8 +253,8 @@ export async function callAniList(body) {
         for (const alias of aliases) {
           try {
             const data = await graphql(LIST_QUERY, { ...variables, search: alias });
-            const items = (data?.Page?.media || [])
-              .map(normalize).filter(Boolean);
+            const items = rankSearchResults((data?.Page?.media || [])
+              .map(normalize).filter(Boolean), variables.search);
             if (items.length) {
               result = { items, pageInfo: data?.Page?.pageInfo || null, item: null };
               break;
