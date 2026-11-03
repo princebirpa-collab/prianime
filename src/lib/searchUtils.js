@@ -1,13 +1,13 @@
 /**
  * Pure helpers for the anime search pipeline: query variants, retryable
  * error classification and bounded exponential-backoff retries.
- * No platform imports â€” safe to unit-test in isolation.
+ * No platform imports — safe to unit-test in isolation.
  */
 
 /**
  * Builds normalized variants of a search term (used in order, first match wins).
  * Trims whitespace, collapses runs of spaces, strips punctuation and drops
- * leading articles â€” the original term is always the first variant.
+ * leading articles — the original term is always the first variant.
  */
 export function searchVariants(rawQuery) {
   const trimmed = String(rawQuery || "").trim();
@@ -46,7 +46,7 @@ const defaultSleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * Runs `run(attempt)` with bounded retries. Only retryable failures retry,
- * with exponential backoff (500ms, 1000ms, â€¦) and a longer, respectful pause
+ * with exponential backoff (500ms, 1000ms, …) and a longer, respectful pause
  * after rate limits. Non-retryable errors fail fast; retries are never
  * infinite.
  */
