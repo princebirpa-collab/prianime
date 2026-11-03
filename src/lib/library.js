@@ -1,64 +1,70 @@
-import { base44 } from "@/api/base44Client";
 import { getProfile } from "@/lib/profile";
 
 const PROGRESS_KEY = "pri-anime:watch-progress:v1";
+const SAVED_KEY = "pri-anime:saved-library:v1";
 
 const owner = () => getProfile().id;
 
-function readLocalProgress() {
+function readRows(key) {
   try {
-    const value = JSON.parse(window.localStorage.getItem(PROGRESS_KEY) || "[]");
+    const value = JSON.parse(window.localStorage.getItem(key) || "[]");
     return Array.isArray(value) ? value : [];
   } catch {
     return [];
   }
 }
 
-function writeLocalProgress(rows) {
+function writeRows(key, rows) {
   try {
-    window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(rows));
+    window.localStorage.setItem(key, JSON.stringify(rows));
   } catch {
-    // Playback should continue even if storage is full or unavailable.
+    // Keep the UI usable if browser storage is unavailable or full.
   }
 }
 
 function localRowsFor(kind) {
   const profileId = owner();
-  return readLocalProgress()
+  return readRows(PROGRESS_KEY)
     .filter((row) => row.owner_ref === profileId && (!kind || row.kind === kind))
     .sort((a, b) => String(b.updated_date || "").localeCompare(String(a.updated_date || "")));
 }
 
+// Watchlist and favorites are device-local; no Base44 service is required.
 export async function listSaved(kind) {
-  const page = await base44.entities.Watchlist.filter(
-    { owner_ref: owner(), kind },
-    { sort: "-created_date", limit: 200 }
-  );
-  return page.items || [];
+  return readRows(SAVED_KEY)
+    .filter((row) => row.owner_ref === owner() && row.kind === kind)
+    .sort((a, b) => String(b.created_date || "").localeCompare(String(a.created_date || "")));
 }
 
 export async function toggleSaved(anime, kind) {
-  const existing = await base44.entities.Watchlist.filter(
-    { owner_ref: owner(), anime_id: anime.id, kind },
-    { limit: 1 }
+  const profileId = owner();
+  const rows = readRows(SAVED_KEY);
+  const animeId = String(anime.id ?? anime.anime_id ?? "");
+  const index = rows.findIndex(
+    (row) => row.owner_ref === profileId && row.kind === kind && String(row.anime_id) === animeId
   );
-  const found = existing.items?.[0];
-  if (found) {
-    await base44.entities.Watchlist.delete(found.id);
+
+  if (index >= 0) {
+    rows.splice(index, 1);
+    writeRows(SAVED_KEY, rows);
     return false;
   }
-  await base44.entities.Watchlist.create({
-    owner_ref: owner(),
+
+  rows.push({
+    id: `local_saved_${profileId}_${kind}_${animeId}`,
+    owner_ref: profileId,
     kind,
-    anime_id: anime.id,
-    title: anime.display || anime.title,
+    anime_id: animeId,
+    title: anime.display || anime.title || "",
     cover: anime.cover || "",
     banner: anime.banner || "",
     score: anime.score ?? undefined,
     episodes: anime.episodes ?? undefined,
     format: anime.format || "",
     genres: (anime.genres || []).slice(0, 6),
+    created_date: new Date().toISOString(),
   });
+  writeRows(SAVED_KEY, rows);
   return true;
 }
 
@@ -69,7 +75,7 @@ export async function listProgress(kind) {
 export async function saveProgress(entry) {
   const profileId = owner();
   const refId = String(entry.ref_id);
-  const rows = readLocalProgress();
+  const rows = readRows(PROGRESS_KEY);
   const foundIndex = rows.findIndex(
     (row) => row.owner_ref === profileId && row.kind === entry.kind && String(row.ref_id) === refId
   );
@@ -92,19 +98,19 @@ export async function saveProgress(entry) {
 
   if (foundIndex >= 0) rows[foundIndex] = payload;
   else rows.push(payload);
-  writeLocalProgress(rows);
+  writeRows(PROGRESS_KEY, rows);
   return payload;
 }
 
 export async function clearProgress(entryId, kind, refId) {
   const profileId = owner();
-  const rows = readLocalProgress();
+  const rows = readRows(PROGRESS_KEY);
   const remaining = rows.filter((row) => {
     if (row.owner_ref !== profileId) return true;
     if (entryId && row.id === entryId) return false;
     return !(kind && refId != null && row.kind === kind && String(row.ref_id) === String(refId));
   });
-  writeLocalProgress(remaining);
+  writeRows(PROGRESS_KEY, remaining);
   return true;
 }
 
