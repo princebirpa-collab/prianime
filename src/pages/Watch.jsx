@@ -109,7 +109,7 @@ export default function Watch() {
               <p className="mt-2 text-xs uppercase tracking-[0.14em] text-muted-foreground">
                 {[video.creator_name, video.licence, relativeDate(video.created_date), video.duration ? formatClock(video.duration) : null]
                   .filter(Boolean)
-                  .join(" Â· ")}
+                  .join(" · ")}
               </p>
               {video.description && (
                 <p className="mt-4 whitespace-pre-line text-[15px] leading-relaxed text-foreground/85">{video.description}</p>
