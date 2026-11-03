@@ -260,8 +260,11 @@ export async function callAniList(body) {
         for (const alias of aliases) {
           try {
             const data = await graphql(LIST_QUERY, { ...variables, search: alias });
-            const items = rankSearchResults((data?.Page?.media || [])
-              .map(normalize).filter(Boolean), variables.search);
+            const normalizedAliasResults = (data?.Page?.media || []).map(normalize).filter(Boolean);
+            // MAL may return an official/alternate title that AniList indexes
+            // differently. Match against the alias used for this request,
+            // not only the user's original spelling.
+            const items = rankSearchResults(normalizedAliasResults, alias);
             if (items.length) {
               result = { items, pageInfo: data?.Page?.pageInfo || null, item: null };
               break;
