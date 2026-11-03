@@ -98,7 +98,7 @@ async function fetchGraphQL(query, variables) {
     payload = await response.json();
   } catch {
     // An HTTP 200 with an unreadable body (e.g. a proxy/CDN interstitial) is
-    // NOT a genuine zero-results answer â€” it is a transient failure.
+    // NOT a genuine zero-results answer — it is a transient failure.
     const error = new Error("AniList returned an unreadable response.");
     error.retryable = true;
     throw error;
@@ -214,16 +214,16 @@ export async function callAniList(body) {
     // AniList's search intermittently answers a valid query with an empty
     // page. Each attempt is validated (payload.data.Page), then normalized
     // variants of the same term are tried before accepting a genuine
-    // zero-result search. Same provider, same filters â€” no ID mismatch.
+    // zero-result search. Same provider, same filters — no ID mismatch.
     result = { items: [], pageInfo: null, item: null };
     const variants = searchVariants(variables.search);
     // The original term gets one extra attempt (AniList can empty a single
-    // valid query), then normalized variants are explored â€” at most 3 calls.
+    // valid query), then normalized variants are explored — at most 3 calls.
     const attempts = variants.length > 1 ? [variants[0], ...variants] : [variants[0], variants[0]];
     for (const variant of attempts) {
       try {
         const data = await graphql(LIST_QUERY, { ...variables, search: variant });
-        const items = (data?.Page?.media || []).map(normalize).filter((anime) => anime && titleSearchScore(anime, variables.search) > 0);
+        const items = (data?.Page?.media || []).map(normalize).filter(Boolean);
         if (items.length > 0) {
           result = { items, pageInfo: data?.Page?.pageInfo || null, item: null };
           break;
@@ -249,8 +249,7 @@ export async function callAniList(body) {
           try {
             const data = await graphql(LIST_QUERY, { ...variables, search: alias });
             const items = (data?.Page?.media || [])
-              .map(normalize)
-              .filter((anime) => anime && titleSearchScore(anime, alias) > 0);
+              .map(normalize).filter(Boolean);
             if (items.length) {
               result = { items, pageInfo: data?.Page?.pageInfo || null, item: null };
               break;
