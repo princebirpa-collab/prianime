@@ -2,6 +2,12 @@ import { useEffect, useRef, useState } from "react";
 
 const INTRO_SEEN_KEY = "prianime-intro-completed:v1";
 
+// Set VITE_R2_PUBLIC_BASE_URL in Vercel to the public Cloudflare R2
+// bucket domain (without a trailing slash). Local public assets remain fallback.
+const R2_PUBLIC_BASE_URL = (import.meta.env.VITE_R2_PUBLIC_BASE_URL || "").replace(/\\/+$/, "");
+const introAsset = (filename) =>
+  R2_PUBLIC_BASE_URL ? `${R2_PUBLIC_BASE_URL}/${filename}` : `/${filename}`;
+
 function hasSeenIntro() {
   try {
     return window.localStorage.getItem(INTRO_SEEN_KEY) === "1";
@@ -115,7 +121,7 @@ export default function IntroOverlay() {
         <video
           ref={backgroundVideoRef}
           className="absolute inset-0 h-full w-full object-cover"
-          src="/bg.mp4"
+          src={introAsset("bg.mp4")}
           autoPlay
           loop
           playsInline
@@ -129,7 +135,7 @@ export default function IntroOverlay() {
       <video
         ref={textVideoRef}
         className="pointer-events-none absolute h-px w-px opacity-0"
-        src="/text.mp4"
+        src={introAsset("text.mp4")}
         autoPlay
         muted
         loop
