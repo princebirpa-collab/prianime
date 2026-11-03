@@ -317,7 +317,7 @@ async function jikanRating(title) {
 
 export async function fetchMalRating(title) {
   if (!title) return null;
-  if (malCache.has(title)) return malCache.get(title);
+  const cached = malCache.get(title);\n  if (cached && cached.expires > Date.now()) return cached.value;\n  if (cached) malCache.delete(title);
 
   let rating = null;
   try {
@@ -338,7 +338,27 @@ export async function fetchMalRating(title) {
     }
   }
 
-  malCache.set(title, rating);
+  // If the MAL-specific sources are unavailable, provide a truthful AniList
+  // score fallback rather than leaving the rating area blank. UI labels its source.
+  if (!rating) {
+    try {
+      const found = await callAniList({ action: "search", q: title, perPage: 5 });
+      const best = (found.items || []).find((item) => item.score != null);
+      if (best) {
+        rating = {
+          score: best.score / 10,
+          rank: null,
+          id: null,
+          source: "AniList",
+        };
+      }
+    } catch {
+      rating = null;
+    }
+  }
+
+  // Cache a missing result briefly only; upstream outages should self-recover.
+  malCache.set(title, { value: rating, expires: Date.now() + (rating ? TTL : 30 * 1000) });
   return rating;
 }
 
