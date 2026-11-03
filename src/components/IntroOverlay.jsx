@@ -128,7 +128,7 @@ export default function IntroOverlay() {
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-0 z-[99999] overflow-y-auto overscroll-contain bg-[#050308] text-white">
+    <div className="fixed inset-0 z-[99999] h-[100dvh] w-full overflow-y-auto overscroll-contain bg-[#050308] text-white">
       <section className="relative isolate flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#050308] text-white">
         {!backgroundFailed && (
           <video
@@ -198,7 +198,7 @@ export default function IntroOverlay() {
             </button>
           </div>
           <p className="mt-5 text-[10px] uppercase tracking-[0.16em] text-white/45">
-            Scroll for the PRI-ANIME feature guide · Enter or Skip to open the website
+            Scroll down to explore features · Only Enter or Skip opens the website
           </p>
         </div>
       </section>
