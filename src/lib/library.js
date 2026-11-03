@@ -67,7 +67,7 @@ export async function saveProgress(entry) {
   });
 }
 
-export async function clearProgress(entryId) {
+export async function clearProgress(entryId, kind, refId) {
   return base44.entities.Progress.delete(entryId);
 }
 
