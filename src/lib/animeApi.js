@@ -317,7 +317,8 @@ async function jikanRating(title) {
 
 export async function fetchMalRating(title) {
   if (!title) return null;
-  const cached = malCache.get(title);\n  if (cached && cached.expires > Date.now()) return cached.value;\n  if (cached) malCache.delete(title);
+  const cached = malCache.get(title);
+  if (cached && cached.expires > Date.now()) return cached.value;\n  if (cached) malCache.delete(title);
 
   let rating = null;
   try {
