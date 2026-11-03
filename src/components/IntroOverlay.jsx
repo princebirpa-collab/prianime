@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import IntroDetailsShowcase from "@/components/IntroDetailsShowcase";
 
 const INTRO_SEEN_KEY = "prianime-intro-completed:session:v1";
 
@@ -116,7 +117,8 @@ export default function IntroOverlay() {
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-0 z-[99999] isolate flex items-center justify-center overflow-hidden bg-[#050308] text-white">
+    <>
+    <section className="relative z-[99999] isolate flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#050308] text-white">
       {!backgroundFailed && (
         <video
           ref={backgroundVideoRef}
@@ -185,6 +187,8 @@ export default function IntroOverlay() {
           </button>
         </div>
       </div>
-    </div>
+    </section>
+    <IntroDetailsShowcase />
+    </>
   );
 }
