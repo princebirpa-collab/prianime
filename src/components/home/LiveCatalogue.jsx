@@ -1,4 +1,5 @@
 import AnimeRowRemote from "@/components/anime/AnimeRowRemote";
+import FeaturedTrendingCarousel from "@/components/home/FeaturedTrendingCarousel";
 import { currentSeason } from "@/lib/animeApi";
 
 export default function LiveCatalogue() {
@@ -18,7 +19,7 @@ export default function LiveCatalogue() {
         </p>
       </div>
 
-      <AnimeRowRemote title="Trending now" subtitle="What the world is watching this hour" body={{ action: "trending", perPage: 20 }} viewAll="/browse?sort=trending" />
+      <FeaturedTrendingCarousel />
       <AnimeRowRemote title="All-time popular" subtitle="The canon, ranked by followers" body={{ action: "popular", perPage: 20 }} viewAll="/browse?sort=popular" rank />
       <AnimeRowRemote
         title={`${seasonTitle} ${season.year} season`}
