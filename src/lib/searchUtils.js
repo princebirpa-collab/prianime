@@ -24,6 +24,13 @@ export function searchVariants(rawQuery) {
     .replace(/\s+/g, " ")
     .trim();
   if (withoutArticles && !variants.includes(withoutArticles)) variants.push(withoutArticles);
+
+  // Recover a common joined final-letter spelling such as "ballz" -> "ball z".
+  // Keep the user's exact query first; this is only a fallback API variant.
+  const splitTrailingZ = collapsed.replace(/\\b([\\p{L}]{3,})z\\b/giu, "$1 z");
+  if (splitTrailingZ !== collapsed && !variants.includes(splitTrailingZ)) {
+    variants.push(splitTrailingZ);
+  }
   return variants;
 }
 
