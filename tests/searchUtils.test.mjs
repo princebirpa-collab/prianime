@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { searchVariants, isRetryableFetchError, withRetries } from "../src/lib/searchUtils.js";
+import { searchVariants, scoreTitleMatch, isRetryableFetchError, withRetries } from "../src/lib/searchUtils.js";
 
 test("trims leading and trailing spaces from a search term", () => {
   assert.deepEqual(searchVariants("  Wind Breaker  "), ["Wind Breaker"]);
@@ -145,4 +145,21 @@ test("withRetries throws after bounded retries and never retries forever", async
 test("out-of-order and duplicate terms produce stable variant sets", () => {
   assert.deepEqual(searchVariants("Wind Breaker"), searchVariants("Wind Breaker"));
   assert.deepEqual(searchVariants("  wind breaker "), searchVariants("wind breaker"));
+});
+
+
+test("matches merged typo spelling dragon ballz to Dragon Ball Z", () => {
+  assert.ok(scoreTitleMatch(["Dragon Ball Z"], "dragon ballz") >= 80);
+});
+
+test("matches common missing-letter title typo Tokyo Revenge to Tokyo Revengers", () => {
+  assert.ok(scoreTitleMatch(["Tokyo Revengers"], "Tokyo Revenge") >= 80);
+});
+
+test("matches alternate English, romaji and native titles", () => {
+  assert.ok(scoreTitleMatch(["Boku no Hero Academia", "My Hero Academia"], "my hero academia") >= 80);
+});
+
+test("does not match unrelated titles from one shared common word", () => {
+  assert.equal(scoreTitleMatch(["Dragon Ball Z"], "Dragon Slayer"), 0);
 });
