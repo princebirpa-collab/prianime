@@ -165,6 +165,10 @@ test("does not match unrelated titles from one shared common word", () => {
 });
 
 
-test("adds a split-letter fallback for joined final-letter anime spelling", () => {
-  assert.deepEqual(searchVariants("dragon ballz"), ["dragon ballz", "dragon ball z"]);
+test("adds split-letter and franchise-stem fallbacks for joined franchise spelling", () => {
+  assert.deepEqual(searchVariants("dragon ballz"), ["dragon ballz", "dragon ball z", "dragon ball"]);
+});
+
+test("adds a franchise-stem fallback for multiword titles", () => {
+  assert.deepEqual(searchVariants("Dragon Ball Z"), ["Dragon Ball Z", "Dragon Ball"]);
 });
