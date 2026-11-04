@@ -163,3 +163,8 @@ test("matches alternate English, romaji and native titles", () => {
 test("does not match unrelated titles from one shared common word", () => {
   assert.equal(scoreTitleMatch(["Dragon Ball Z"], "Dragon Slayer"), 0);
 });
+
+
+test("adds a split-letter fallback for joined final-letter anime spelling", () => {
+  assert.deepEqual(searchVariants("dragon ballz"), ["dragon ballz", "dragon ball z"]);
+});
