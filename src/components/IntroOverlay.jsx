@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import IntroDetailsShowcase from "@/components/IntroDetailsShowcase";
+import InteractiveSmoke from "@/components/effects/InteractiveSmoke";
 
 const INTRO_SEEN_KEY = "prianime-intro-completed:session:v1";
 
@@ -145,6 +146,7 @@ export default function IntroOverlay() {
         )}
         <div className="absolute inset-0 bg-black/50" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#050308]/90 via-transparent to-black/45" />
+        <InteractiveSmoke className="absolute inset-0 z-[2]" />
 
         <video
           ref={textVideoRef}
