@@ -1,5 +1,5 @@
 import { base44 } from "@/api/base44Client";
-import { searchVariants, withRetries } from "@/lib/searchUtils";
+import { searchVariants, scoreTitleMatch, withRetries } from "@/lib/searchUtils";
 
 const DIRECT_URL = "/api/anilist";
 const TTL = 5 * 60 * 1000;
@@ -159,31 +159,10 @@ function buildListVariables(body) {
 }
 
 function titleSearchScore(anime, query) {
-  const clean = (value) => String(value || "").toLocaleLowerCase().normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^\p{L}\p{N}]+/gu, " ")
-    .trim();
-  const q = clean(query);
-  if (!q) return 0;
-  const titles = [anime?.display, anime?.titleRomaji, anime?.titleNative].map(clean).filter(Boolean);
-  if (titles.some((title) => title === q)) return 100;
-  if (titles.some((title) => title.includes(q) || q.includes(title))) return 80;
-  const qTokens = q.split(/\s+/).filter(Boolean);
-  return Math.max(0, ...titles.map((title) => {
-    const tokens = title.split(/\s+/).filter(Boolean);
-    // Match full query phrase and token prefixes (e.g. "Tokyo Revenge"
-    // -> "Tokyo Revengers"), but do not admit results sharing only one
-    // common word when the query contains multiple meaningful words.
-    const matched = qTokens.filter((queryToken) =>
-      tokens.some((titleToken) =>
-        titleToken === queryToken ||
-        titleToken.startsWith(queryToken) ||
-        (queryToken.length >= 5 && titleToken.startsWith(queryToken.slice(0, -1)))
-      )
-    ).length;
-    const coverage = matched / Math.max(qTokens.length, 1);
-    return coverage === 1 ? 70 + matched : coverage >= 0.75 ? 50 + matched : 0;
-  }));
+  return scoreTitleMatch(
+    [anime?.display, anime?.titleRomaji, anime?.titleNative],
+    query
+  );
 }
 
 function rankSearchResults(items, query) {
