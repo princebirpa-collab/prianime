@@ -6,7 +6,7 @@ const TTL = 5 * 60 * 1000;
 const SERVER_KEY = "pri:anilist:server-mode";
 const cache = new Map();
 
-const CORE = `id title { romaji english native } coverImage { extraLarge large color } bannerImage description(asHtml: false) genres averageScore meanScore popularity episodes duration status format season seasonYear startDate { year month day } studios(isMain: true) { nodes { name } } trailer { id site } nextAiringEpisode { episode timeUntilAiring }`;
+const CORE = `id title { romaji english native } synonyms coverImage { extraLarge large color } bannerImage description(asHtml: false) genres averageScore meanScore popularity episodes duration status format season seasonYear startDate { year month day } studios(isMain: true) { nodes { name } } trailer { id site } nextAiringEpisode { episode timeUntilAiring }`;
 
 const LIST_QUERY = `query ($page: Int, $perPage: Int, $search: String, $genre: String, $season: MediaSeason, $seasonYear: Int, $sort: [MediaSort]) {
   Page(page: $page, perPage: $perPage) {
@@ -40,6 +40,7 @@ export function normalize(media) {
     display: media.title?.english || media.title?.romaji || "Untitled",
     titleRomaji: media.title?.romaji || "",
     titleNative: media.title?.native || "",
+    titleAliases: Array.isArray(media.synonyms) ? media.synonyms : [],
     cover: media.coverImage?.extraLarge || media.coverImage?.large || "",
     accent: media.coverImage?.color || "",
     banner: media.bannerImage || media.coverImage?.extraLarge || "",
@@ -160,7 +161,7 @@ function buildListVariables(body) {
 
 function titleSearchScore(anime, query) {
   return scoreTitleMatch(
-    [anime?.display, anime?.titleRomaji, anime?.titleNative],
+    [anime?.display, anime?.titleRomaji, anime?.titleNative, ...(anime?.titleAliases || [])],
     query
   );
 }
