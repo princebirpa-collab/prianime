@@ -63,3 +63,77 @@ export async function withRetries(run, { retries = 2, sleep = defaultSleep } = {
   }
   throw lastError;
 }
+
+
+/**
+ * Scores a catalogue title against a user's query without requiring exact
+ * spacing. Supports merged/split tokens and one-character typos while
+ * requiring most meaningful query tokens to match.
+ */
+export function scoreTitleMatch(titleValues, rawQuery) {
+  const clean = (value) => String(value || "").toLocaleLowerCase().normalize("NFKD")
+    .replace(/[\\u0300-\\u036f]/g, "")
+    .replace(/[^\\p{L}\\p{N}]+/gu, " ")
+    .trim();
+  const query = clean(rawQuery);
+  if (!query) return 0;
+
+  const titles = [...new Set((Array.isArray(titleValues) ? titleValues : [titleValues])
+    .map(clean).filter(Boolean))];
+  if (!titles.length) return 0;
+
+  const compactQuery = query.replace(/\\s+/g, "");
+  const queryTokens = query.split(/\\s+/).filter(Boolean);
+
+  const editDistanceAtMostOne = (a, b) => {
+    if (a === b) return true;
+    if (Math.abs(a.length - b.length) > 1) return false;
+    if (a.length === b.length) {
+      let differences = 0;
+      for (let i = 0; i < a.length; i += 1) {
+        if (a[i] !== b[i] && ++differences > 1) return false;
+      }
+      return true;
+    }
+    const shorter = a.length < b.length ? a : b;
+    const longer = a.length < b.length ? b : a;
+    let i = 0;
+    let j = 0;
+    let skipped = false;
+    while (i < shorter.length && j < longer.length) {
+      if (shorter[i] === longer[j]) { i += 1; j += 1; }
+      else if (skipped) return false;
+      else { skipped = true; j += 1; }
+    }
+    return true;
+  };
+
+  let best = 0;
+  for (const title of titles) {
+    if (title === query) return 120;
+    const compactTitle = title.replace(/\\s+/g, "");
+    if (compactTitle === compactQuery) best = Math.max(best, 115);
+    else if (compactTitle.includes(compactQuery) || compactQuery.includes(compactTitle)) best = Math.max(best, 95);
+    else if (title.includes(query) || query.includes(title)) best = Math.max(best, 90);
+
+    const titleTokens = title.split(/\\s+/).filter(Boolean);
+    const matched = queryTokens.filter((token) => {
+      if (titleTokens.some((candidate) =>
+        candidate === token ||
+        candidate.startsWith(token) ||
+        (token.length >= 4 && editDistanceAtMostOne(candidate, token))
+      )) return true;
+
+      // Also match a misspelled/merged query token against adjacent title
+      // tokens, e.g. "ballz" against "ball z".
+      return titleTokens.some((_, index) => {
+        const joined = titleTokens.slice(index, index + 2).join("");
+        return joined.length >= 4 && editDistanceAtMostOne(joined, token);
+      });
+    }).length;
+    const coverage = matched / Math.max(queryTokens.length, 1);
+    if (coverage === 1) best = Math.max(best, 80 + matched);
+    else if (coverage >= 0.75) best = Math.max(best, 55 + matched);
+  }
+  return best;
+}
