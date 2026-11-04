@@ -64,7 +64,7 @@ function makeSprite(channel) {
   return sprite;
 }
 
-export default function InteractiveSmoke() {
+export default function InteractiveSmoke({ className = "fixed inset-0 z-40" } = {}) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -216,5 +216,5 @@ export default function InteractiveSmoke() {
     };
   }, []);
 
-  return <canvas ref={canvasRef} aria-hidden="true" className="pointer-events-none fixed inset-0 z-40" />;
+  return <canvas ref={canvasRef} aria-hidden="true" className={`pointer-events-none ${className}`} />;
 }
