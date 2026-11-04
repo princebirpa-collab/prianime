@@ -9,12 +9,58 @@ function makeSprite(channel) {
   const sprite = document.createElement("canvas");
   sprite.width = sprite.height = SPRITE_SIZE;
   const ctx = sprite.getContext("2d");
-  const gradient = ctx.createRadialGradient(SPRITE_SIZE / 2, SPRITE_SIZE / 2, 0, SPRITE_SIZE / 2, SPRITE_SIZE / 2, SPRITE_SIZE / 2);
-  gradient.addColorStop(0, `hsl(${value} / 0.5)`);
-  gradient.addColorStop(0.45, `hsl(${value} / 0.2)`);
-  gradient.addColorStop(1, `hsl(${value} / 0)`);
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, SPRITE_SIZE, SPRITE_SIZE);
+  const color = (alpha) => `hsl(${value} / ${alpha})`;
+
+  // Soft jellyfish-shaped smoke: a glowing curved bell with flowing,
+  // translucent tentacles. The whole sprite drifts with the cursor.
+  const glow = ctx.createRadialGradient(80, 52, 2, 80, 58, 54);
+  glow.addColorStop(0, color(0.46));
+  glow.addColorStop(0.58, color(0.24));
+  glow.addColorStop(1, color(0));
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.moveTo(27, 61);
+  ctx.bezierCurveTo(28, 27, 50, 10, 80, 10);
+  ctx.bezierCurveTo(110, 10, 132, 27, 133, 61);
+  ctx.bezierCurveTo(119, 70, 105, 66, 92, 70);
+  ctx.bezierCurveTo(77, 74, 62, 67, 48, 70);
+  ctx.bezierCurveTo(39, 69, 32, 66, 27, 61);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.save();
+  ctx.lineCap = "round";
+  const tentacles = [
+    [43, 65, 28, 91, 49, 112, 35, 145],
+    [59, 69, 72, 91, 48, 112, 62, 151],
+    [76, 70, 61, 94, 91, 111, 80, 148],
+    [94, 69, 111, 91, 87, 117, 108, 146],
+    [113, 65, 130, 89, 111, 111, 126, 139],
+  ];
+  tentacles.forEach(([x, y, c1x, c1y, c2x, c2y, endX, endY], index) => {
+    const strand = ctx.createLinearGradient(x, y, endX, endY);
+    strand.addColorStop(0, color(0.34));
+    strand.addColorStop(0.55, color(0.18));
+    strand.addColorStop(1, color(0));
+    ctx.strokeStyle = strand;
+    ctx.lineWidth = index === 2 ? 5 : 3.5;
+    ctx.shadowColor = color(0.25);
+    ctx.shadowBlur = 12;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.bezierCurveTo(c1x, c1y, c2x, c2y, endX, endY);
+    ctx.stroke();
+  });
+  ctx.restore();
+
+  // A fine luminous rim makes the curved bell visible without looking solid.
+  ctx.strokeStyle = color(0.22);
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(29, 60);
+  ctx.bezierCurveTo(42, 70, 58, 65, 76, 69);
+  ctx.bezierCurveTo(96, 72, 116, 66, 131, 60);
+  ctx.stroke();
   return sprite;
 }
 
@@ -118,8 +164,12 @@ export default function InteractiveSmoke() {
         const k = p.life / p.maxLife;
         const fade = k < 0.25 ? k / 0.25 : 1 - (k - 0.25) / 0.75;
         const size = p.r * 2;
-        ctx.globalAlpha = fade * 0.5;
-        ctx.drawImage(sprites[p.sprite], p.x - size / 2, p.y - size / 2, size, size);
+        ctx.globalAlpha = fade * 0.62;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(Math.sin(p.phase) * 0.12);
+        ctx.drawImage(sprites[p.sprite], -size / 2, -size / 2, size, size);
+        ctx.restore();
       }
       ctx.globalAlpha = 1;
     };
