@@ -23,6 +23,9 @@ import Library from '@/pages/Library';
 import Settings from '@/pages/Settings';
 import Admin from '@/pages/Admin';
 import Policy from '@/pages/Policy';
+import Community from '@/pages/Community';
+import Missions from '@/pages/Missions';
+import Arena from '@/pages/Arena';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -64,6 +67,9 @@ const AuthenticatedApp = () => {
         <Route path="/settings" element={<Settings />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/policy" element={<Policy />} />
+        <Route path="/community" element={<Community />} />
+        <Route path="/missions" element={<Missions />} />
+        <Route path="/arena" element={<Arena />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
