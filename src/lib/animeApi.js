@@ -231,7 +231,14 @@ export async function callAniList(body) {
         // A failed spelling variant must not prevent other variants from
         // returning useful matches or trigger a false "no anime found".
       }
-      if (variants.length > 1) await new Promise((resolve) => setTimeout(resolve, 180));
+      // AniList rate-limits aggressively. A short 180ms pause caused
+      // fallback title variants to be throttled, leaving only the first
+      // fuzzy result (for example, a Dragon Ball Z special) on screen.
+      // Space variant requests by about one second so the canonical franchise
+      // search can complete reliably.
+      if (variants.length > 1 && variant !== variants[variants.length - 1]) {
+        await new Promise((resolve) => setTimeout(resolve, 1100));
+      }
     }
     const ranked = rankSearchResults([...merged.values()], variables.search);
     if (ranked.length) {
