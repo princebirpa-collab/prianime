@@ -7,6 +7,8 @@ export const THEMES = [
   { id: "jade", name: "Jade Empire", note: "Spirit forest", mode: "dark", dots: ["#38C98F", "#12352A", "#04120C"] },
   { id: "parchment", name: "Parchment", note: "Ivory archive", mode: "light", dots: ["#8A6A22", "#E7DCC8", "#F7F3EB"] },
   { id: "frost", name: "Frost Ivory", note: "Daylit theatre", mode: "light", dots: ["#1D6FA8", "#DCE7F1", "#F4F8FC"] },
+  { id: "obsidian", name: "Obsidian Black", note: "Pure black cinema", mode: "dark", dots: ["#050505", "#242424", "#777777"] },
+  { id: "jojo", name: "JoJo Pop Grey", note: "Monochrome pop-art", mode: "dark", dots: ["#B8B8B8", "#555555", "#111111"] },
 ];
 
 const STORAGE_KEY = "pri-anime:theme";
