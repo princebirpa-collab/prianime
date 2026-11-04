@@ -31,6 +31,15 @@ export function searchVariants(rawQuery) {
   if (splitTrailingZ !== collapsed && !variants.includes(splitTrailingZ)) {
     variants.push(splitTrailingZ);
   }
+
+  // For a three-part franchise title, also search the franchise stem.
+  // The final ranking still checks the FULL original query, so "Dragon Ball"
+  // can retrieve "Dragon Ball Z" without admitting unrelated Dragon Ball entries.
+  const broadSource = splitTrailingZ !== collapsed ? splitTrailingZ : collapsed;
+  const broadStem = broadSource.split(" ").slice(0, -1).join(" ").trim();
+  if (broadSource.split(" ").length >= 3 && broadStem && !variants.includes(broadStem)) {
+    variants.push(broadStem);
+  }
   return variants;
 }
 
