@@ -152,6 +152,10 @@ function buildListVariables(body) {
   } else if (action === "search") {
     variables.search = (body.q || "").trim() || null;
     if (!variables.search) return null;
+    // AniList's fuzzy search can bury the canonical franchise entry beyond
+    // the default small page. Search up to its supported page size; the UI
+    // still paginates subsequent pages normally.
+    variables.perPage = 50;
     variables.sort = ["SEARCH_MATCH"];
     if (body.genre) variables.genre = body.genre;
   }
@@ -210,7 +214,7 @@ export async function callAniList(body) {
     // could hide the requested title when AniList's fuzzy ranking returned
     // an incomplete first page for the original spelling.
     result = { items: [], pageInfo: null, item: null };
-    const variants = [...new Set(searchVariants(variables.search))].slice(0, 4);
+    const variants = [...new Set(searchVariants(variables.search))].slice(0, 5);
     const merged = new Map();
     const pageInfos = [];
     for (const variant of variants) {
