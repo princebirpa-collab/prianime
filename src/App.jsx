@@ -26,6 +26,7 @@ import Policy from '@/pages/Policy';
 import Community from '@/pages/Community';
 import Missions from '@/pages/Missions';
 import Arena from '@/pages/Arena';
+import WorldMap from '@/pages/WorldMap';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -70,6 +71,7 @@ const AuthenticatedApp = () => {
         <Route path="/community" element={<Community />} />
         <Route path="/missions" element={<Missions />} />
         <Route path="/arena" element={<Arena />} />
+        <Route path="/world-map" element={<WorldMap />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
