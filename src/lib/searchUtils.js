@@ -27,7 +27,7 @@ export function searchVariants(rawQuery) {
 
   // Recover a common joined final-letter spelling such as "ballz" -> "ball z".
   // Keep the user's exact query first; this is only a fallback API variant.
-  const splitTrailingZ = collapsed.replace(/\\b([\\p{L}]{3,})z\\b/giu, "$1 z");
+  const splitTrailingZ = collapsed.replace(/\b([\p{L}]{3,})z\b/giu, "$1 z");
   if (splitTrailingZ !== collapsed && !variants.includes(splitTrailingZ)) {
     variants.push(splitTrailingZ);
   }
@@ -79,8 +79,8 @@ export async function withRetries(run, { retries = 2, sleep = defaultSleep } = {
  */
 export function scoreTitleMatch(titleValues, rawQuery) {
   const clean = (value) => String(value || "").toLocaleLowerCase().normalize("NFKD")
-    .replace(/[\\u0300-\\u036f]/g, "")
-    .replace(/[^\\p{L}\\p{N}]+/gu, " ")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
     .trim();
   const query = clean(rawQuery);
   if (!query) return 0;
@@ -89,8 +89,8 @@ export function scoreTitleMatch(titleValues, rawQuery) {
     .map(clean).filter(Boolean))];
   if (!titles.length) return 0;
 
-  const compactQuery = query.replace(/\\s+/g, "");
-  const queryTokens = query.split(/\\s+/).filter(Boolean);
+  const compactQuery = query.replace(/\s+/g, "");
+  const queryTokens = query.split(/\s+/).filter(Boolean);
 
   const editDistanceAtMostOne = (a, b) => {
     if (a === b) return true;
@@ -118,12 +118,12 @@ export function scoreTitleMatch(titleValues, rawQuery) {
   let best = 0;
   for (const title of titles) {
     if (title === query) return 120;
-    const compactTitle = title.replace(/\\s+/g, "");
+    const compactTitle = title.replace(/\s+/g, "");
     if (compactTitle === compactQuery) best = Math.max(best, 115);
     else if (compactTitle.includes(compactQuery) || compactQuery.includes(compactTitle)) best = Math.max(best, 95);
     else if (title.includes(query) || query.includes(title)) best = Math.max(best, 90);
 
-    const titleTokens = title.split(/\\s+/).filter(Boolean);
+    const titleTokens = title.split(/\s+/).filter(Boolean);
     const matched = queryTokens.filter((token) => {
       if (titleTokens.some((candidate) =>
         candidate === token ||
