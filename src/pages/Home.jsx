@@ -1,4 +1,4 @@
-import HeroSection from "@/components/home/HeroSection";
+import FeaturedTrendingCarousel from "@/components/home/FeaturedTrendingCarousel";
 import ThemeRibbon from "@/components/home/ThemeRibbon";
 import ContinueWatching from "@/components/home/ContinueWatching";
 import LiveCatalogue from "@/components/home/LiveCatalogue";
@@ -8,7 +8,7 @@ import ExperiencePanel from "@/components/home/ExperiencePanel";
 export default function Home() {
   return (
     <div className="pb-8">
-      <HeroSection />
+      <FeaturedTrendingCarousel />
       <ThemeRibbon />
       <ContinueWatching />
       <LiveCatalogue />
