@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import IntroDetailsShowcase from "@/components/IntroDetailsShowcase";
 
 const INTRO_SEEN_KEY = "prianime-intro-completed:session:v1";
@@ -127,8 +128,8 @@ export default function IntroOverlay() {
 
   if (!visible) return null;
 
-  return (
-    <div className="fixed inset-0 z-[99999] h-[100dvh] w-full overflow-y-auto overscroll-contain bg-[#050308] text-white">
+  return createPortal(
+    <div className="fixed inset-0 z-[2147483647] h-[100dvh] w-full overflow-y-auto overscroll-contain bg-[#050308] text-white">
       <section className="relative isolate flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#050308] text-white">
         {!backgroundFailed && (
           <video
@@ -203,6 +204,7 @@ export default function IntroOverlay() {
         </div>
       </section>
       <IntroDetailsShowcase />
-    </div>
+    </div>,
+    document.body
   );
 }
