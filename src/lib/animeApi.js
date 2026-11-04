@@ -205,28 +205,42 @@ export async function callAniList(body) {
   } else if (body.action === "search") {
     const variables = buildListVariables(body);
     if (!variables) return { items: [], pageInfo: null, item: null };
-    // AniList's search intermittently answers a valid query with an empty
-    // page. Each attempt is validated (payload.data.Page), then normalized
-    // variants of the same term are tried before accepting a genuine
-    // zero-result search. Same provider, same filters — no ID mismatch.
+    // Search every distinct spelling variant and MERGE the matching results.
+    // Previously the loop stopped after the first non-empty response, which
+    // could hide the requested title when AniList's fuzzy ranking returned
+    // an incomplete first page for the original spelling.
     result = { items: [], pageInfo: null, item: null };
-    const variants = searchVariants(variables.search);
-    // The original term gets one extra attempt (AniList can empty a single
-    // valid query), then normalized variants are explored — at most 3 calls.
-    const attempts = variants.length > 1 ? [variants[0], ...variants] : [variants[0], variants[0]];
-    for (const variant of attempts) {
+    const variants = [...new Set(searchVariants(variables.search))].slice(0, 4);
+    const merged = new Map();
+    const pageInfos = [];
+    for (const variant of variants) {
       try {
         const data = await graphql(LIST_QUERY, { ...variables, search: variant });
-        const items = rankSearchResults((data?.Page?.media || []).map(normalize).filter(Boolean), variables.search);
-        if (items.length > 0) {
-          result = { items, pageInfo: data?.Page?.pageInfo || null, item: null };
-          break;
+        const page = data?.Page;
+        if (!page) continue;
+        if (page.pageInfo) pageInfos.push(page.pageInfo);
+        for (const anime of (page.media || []).map(normalize).filter(Boolean)) {
+          const score = titleSearchScore(anime, variables.search);
+          if (score >= 50) merged.set(String(anime.id), anime);
         }
       } catch {
-        // AniList may be unavailable or rate-limited. Keep searching via MAL
-        // below instead of aborting the whole search screen.
+        // A failed spelling variant must not prevent other variants from
+        // returning useful matches or trigger a false "no anime found".
       }
-      await new Promise((resolve) => setTimeout(resolve, 250));
+      if (variants.length > 1) await new Promise((resolve) => setTimeout(resolve, 180));
+    }
+    const ranked = rankSearchResults([...merged.values()], variables.search);
+    if (ranked.length) {
+      const bestPageInfo = pageInfos.sort((a, b) => (b.total || 0) - (a.total || 0))[0] || null;
+      result = {
+        items: ranked,
+        pageInfo: bestPageInfo ? {
+          ...bestPageInfo,
+          total: Math.max(...pageInfos.map((info) => info.total || 0)),
+          hasNextPage: pageInfos.some((info) => Boolean(info.hasNextPage)),
+        } : null,
+        item: null,
+      };
     }
 
     // MAL/Jikan is a title-discovery fallback only. Resolve any discovered
