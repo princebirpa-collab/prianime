@@ -1,0 +1,47 @@
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import { Globe2, Plus, Send, Users, Hash, Sparkles, RefreshCw, ShieldCheck } from "lucide-react";
+import PageHeader from "@/components/common/PageHeader";
+import { useProfile } from "@/lib/profile";
+import { communityRequest } from "@/lib/communityApi";
+
+export default function Community() {
+  const [profile] = useProfile();
+  const [servers,setServers]=useState([]);
+  const [channels,setChannels]=useState([{id:"world-general",name:"world-chat"},{id:"world-introductions",name:"introductions"},{id:"world-recommendations",name:"anime-recommendations"}]);
+  const [active,setActive]=useState("world-general");
+  const [messages,setMessages]=useState([]);
+  const [draft,setDraft]=useState("");
+  const [serverName,setServerName]=useState("");
+  const [serverDesc,setServerDesc]=useState("");
+  const [busy,setBusy]=useState(false);
+  const [error,setError]=useState("");
+  const bottom=useRef(null);
+  const loadServers=useCallback(async()=>{try{const r=await communityRequest("/servers");setServers(r.servers||[]);}catch(e){setError(e.message);}},[]);
+  const loadMessages=useCallback(async()=>{try{const r=await communityRequest("/messages?channel="+encodeURIComponent(active));setMessages(r.messages||[]);setError("");}catch(e){setError(e.message);}},[active]);
+  useEffect(()=>{loadServers();},[loadServers]);
+  useEffect(()=>{let live=true;const run=async()=>{try{const r=await communityRequest("/messages?channel="+encodeURIComponent(active));if(live)setMessages(r.messages||[]);}catch(e){if(live)setError(e.message);}};run();const t=setInterval(run,5000);return()=>{live=false;clearInterval(t);};},[active]);
+  useEffect(()=>{bottom.current?.scrollIntoView({behavior:"smooth"});},[messages]);
+  const joinWorld=async()=>{try{await communityRequest("/servers/join",{method:"POST",body:{profileId:profile.id,serverId:"pri-world"}});}catch(e){setError(e.message);}};
+  useEffect(()=>{joinWorld();},[profile.id]);
+  const send=async(e)=>{e.preventDefault();if(!draft.trim())return;setBusy(true);try{await communityRequest("/messages",{method:"POST",body:{profileId:profile.id,displayName:profile.name,channelId:active,message:draft}});setDraft("");await loadMessages();}catch(e){setError(e.message);}finally{setBusy(false);}};
+  const createServer=async(e)=>{e.preventDefault();setBusy(true);try{const r=await communityRequest("/servers",{method:"POST",body:{profileId:profile.id,displayName:profile.name,name:serverName,description:serverDesc}});setServers(v=>[r.server,...v]);setChannels([r.channel]);setActive(r.channel.id);setServerName("");setServerDesc("");}catch(e){setError(e.message);}finally{setBusy(false);}};
+  const joinServer=async(s)=>{try{const r=await communityRequest("/servers/join",{method:"POST",body:{profileId:profile.id,serverId:s.id}});setChannels(r.channels||[]);if(r.channels?.[0])setActive(r.channels[0].id);setError("");}catch(e){setError(e.message);}};
+  return <div className="pb-16"><PageHeader eyebrow="PRI-ANIME SOCIAL" title="The Anime Community" description="Meet anime fans, create your own servers and talk in the global lounge."/>
+    <div className="mx-auto grid w-full max-w-[1500px] gap-5 px-4 pt-7 lg:grid-cols-[260px_minmax(0,1fr)_300px] sm:px-6 lg:px-10">
+      <aside className="space-y-4">
+        <section className="rounded-2xl border border-border/60 bg-card/50 p-4"><p className="mb-3 text-[10px] font-semibold tracking-[.2em] text-primary">YOUR SPACES</p>
+          <button onClick={()=>{setActive("world-general");setChannels([{id:"world-general",name:"world-chat"},{id:"world-introductions",name:"introductions"},{id:"world-recommendations",name:"anime-recommendations"}]);}} className={"flex w-full items-center gap-2 rounded-xl p-3 text-left text-sm "+(active.startsWith("world-")?"bg-primary/15 text-primary":"hover:bg-foreground/5")}><Globe2 className="h-4 w-4"/> PRI-ANIME World</button>
+          <div className="mt-3 space-y-1">{servers.filter(s=>s.id!=="pri-world").map(s=><button key={s.id} onClick={()=>joinServer(s)} className="flex w-full items-center gap-2 rounded-xl p-3 text-left text-sm text-muted-foreground hover:bg-foreground/5"><Users className="h-4 w-4"/><span className="truncate">{s.name}</span></button>)}</div>
+        </section>
+        <form onSubmit={createServer} className="rounded-2xl border border-border/60 bg-card/50 p-4"><h3 className="flex items-center gap-2 font-display"><Plus className="h-4 w-4 text-primary"/> Create a server</h3><input value={serverName} onChange={e=>setServerName(e.target.value)} placeholder="Server name" maxLength={40} className="mt-3 w-full rounded-xl border border-border bg-background/70 px-3 py-2 text-sm"/><input value={serverDesc} onChange={e=>setServerDesc(e.target.value)} placeholder="Short description" maxLength={180} className="mt-2 w-full rounded-xl border border-border bg-background/70 px-3 py-2 text-sm"/><button disabled={busy||serverName.trim().length<3} className="mt-3 w-full rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50">Create server</button></form>
+      </aside>
+      <section className="flex min-h-[620px] flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/45">
+        <header className="flex items-center justify-between border-b border-border/60 px-4 py-4"><div><p className="text-[10px] tracking-[.2em] text-primary">LIVE COMMUNITY</p><h2 className="mt-1 flex items-center gap-2 font-display text-lg"><Hash className="h-4 w-4 text-muted-foreground"/>{channels.find(c=>c.id===active)?.name||"server-chat"}</h2></div><button onClick={loadMessages} className="rounded-full p-2 text-muted-foreground hover:bg-foreground/5" aria-label="Refresh chat"><RefreshCw className="h-4 w-4"/></button></header>
+        <div className="flex-1 space-y-4 overflow-y-auto p-4">{messages.length===0?<div className="grid h-full min-h-64 place-items-center text-center"><div><Globe2 className="mx-auto h-9 w-9 text-primary/70"/><p className="mt-3 font-display text-lg">Start the conversation</p><p className="mt-1 text-xs text-muted-foreground">Be kind. Keep spoilers marked and respect other fans.</p></div></div>:messages.map(m=><article key={m.id} className="flex gap-3"><div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary/15 text-sm font-bold text-primary">{(m.display_name||"A").slice(0,1).toUpperCase()}</div><div className="min-w-0"><div className="flex flex-wrap items-baseline gap-2"><b className="text-sm">{m.display_name}</b><time className="text-[10px] text-muted-foreground">{new Date(m.created_at).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}</time></div><p className="mt-1 whitespace-pre-wrap break-words text-sm text-foreground/85">{m.body}</p></div></article>)}<div ref={bottom}/></div>
+        <form onSubmit={send} className="flex gap-2 border-t border-border/60 p-3"><input value={draft} onChange={e=>setDraft(e.target.value)} placeholder="Message the community…" maxLength={500} className="min-w-0 flex-1 rounded-xl border border-border bg-background/80 px-4 py-3 text-sm outline-none focus:border-primary/60"/><button disabled={busy||!draft.trim()} aria-label="Send message" className="grid h-11 w-11 place-items-center rounded-xl bg-primary text-primary-foreground disabled:opacity-50"><Send className="h-4 w-4"/></button></form>
+      </section>
+      <aside className="space-y-4"><section className="rounded-2xl border border-border/60 bg-card/50 p-4"><div className="flex items-center justify-between"><h3 className="font-display">Public servers</h3><Users className="h-4 w-4 text-primary"/></div><div className="mt-3 space-y-2">{servers.map(s=><div key={s.id} className="rounded-xl border border-border/50 bg-background/40 p-3"><p className="font-medium text-sm">{s.name}</p><p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{s.description}</p><div className="mt-2 flex items-center justify-between"><span className="text-[10px] text-muted-foreground">{s.members||0} members</span><button onClick={()=>joinServer(s)} className="text-xs font-semibold text-primary">Join</button></div></div>)}</div></section><section className="rounded-2xl border border-primary/20 bg-primary/[.06] p-4"><ShieldCheck className="h-5 w-5 text-primary"/><p className="mt-2 text-sm font-semibold">Community safety</p><p className="mt-1 text-xs leading-5 text-muted-foreground">Never share passwords, personal details or private contact information. Report harmful messages to the moderators.</p></section><Link to="/missions" className="block rounded-2xl border border-border/60 bg-card/50 p-4 text-sm hover:border-primary/50"><Sparkles className="mb-2 h-5 w-5 text-primary"/>Earn XP with missions <span className="block text-xs text-muted-foreground">Unlock Anime World Map and Arena</span></Link></aside>
+    </div>{error&&<p role="alert" className="mx-auto mt-4 max-w-3xl rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive">{error}</p>}
+  </div>;
+}
