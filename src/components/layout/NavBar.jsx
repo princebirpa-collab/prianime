@@ -25,6 +25,7 @@ export default function NavBar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
+  const [suggestionsError, setSuggestionsError] = useState(false);
   const [suggestionsVisible, setSuggestionsVisible] = useState(false);
   const navigate = useNavigate();
   const [profile] = useProfile();
@@ -34,14 +35,16 @@ export default function NavBar() {
     if (term.length < 2 || !suggestionsVisible) {
       setSuggestions([]);
       setSuggestionsLoading(false);
+      setSuggestionsError(false);
       return undefined;
     }
     let active = true;
     const timer = setTimeout(() => {
       setSuggestionsLoading(true);
+      setSuggestionsError(false);
       callAniList({ action: "search", q: term, perPage: 6 })
         .then((data) => { if (active) setSuggestions((data.items || []).slice(0, 6)); })
-        .catch(() => { if (active) setSuggestions([]); })
+        .catch(() => { if (active) { setSuggestions([]); setSuggestionsError(true); } })
         .finally(() => { if (active) setSuggestionsLoading(false); });
     }, 250);
     return () => { active = false; clearTimeout(timer); };
@@ -83,7 +86,7 @@ export default function NavBar() {
           {suggestionsLoading && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" aria-label="Searching" />}
         </div>
       </form>
-      {suggestionsVisible && query.trim().length >= 2 && (suggestions.length > 0 || suggestionsLoading) && (
+      {suggestionsVisible && query.trim().length >= 2 && (
         <div id={mobile ? "nav-search-suggestions-mobile" : "nav-search-suggestions"} role="listbox" className="absolute right-0 top-full z-[70] mt-2 max-h-[min(70vh,420px)] w-[min(92vw,360px)] overflow-y-auto rounded-2xl border border-border/70 bg-background/95 p-2 shadow-2xl backdrop-blur-xl">
           {suggestions.map((anime) => (
             <button type="button" role="option" aria-selected="false" key={anime.id}
@@ -101,7 +104,8 @@ export default function NavBar() {
               {anime.score != null && <span className="shrink-0 text-xs text-primary">{anime.score}%</span>}
             </button>
           ))}
-          {suggestionsLoading && <div className="px-3 py-2 text-xs text-muted-foreground">Finding anime…</div>}
+          {suggestionsLoading && <div className="px-3 py-2 text-xs text-muted-foreground">Searching AniList and title aliases…</div>}
+          {!suggestionsLoading && suggestions.length === 0 && <div className="px-3 py-2 text-xs text-muted-foreground">{suggestionsError ? "Suggestions are temporarily unavailable. Press Enter to retry on the full results page." : "No quick matches yet. Press Enter to search the full catalogue."}</div>}
           <button type="button" onClick={submit} className="mt-1 w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-primary transition hover:bg-primary/10">
             See all results for “{query.trim()}”
           </button>
