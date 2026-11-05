@@ -6,11 +6,15 @@ import { useTheme } from "@/lib/theme";
 import { usePref, LANGUAGES } from "@/lib/prefs";
 
 
-const PRESET_AVATARS = ["rose","ice","gold","violet","mint","ember"].map((tone, index) => {
-  const colors = ["#fb4d78","#63d8ff","#e9b45d","#b68cff","#64d6a5","#ff805f"];
-  const hair = colors[index];
-  const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="bg"><stop stop-color="' + hair + '" stop-opacity=".45"/><stop offset="1" stop-color="#100d1b"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(#bg)"/><path d="M13 100Q18 70 50 70Q82 70 87 100" fill="#30213e"/><path d="M29 47Q27 23 50 22Q73 23 71 48L66 66Q60 78 50 78Q39 78 33 66Z" fill="#f0c4ad"/><path d="M23 49Q17 8 51 8Q85 8 77 52L68 34Q49 44 31 32Z" fill="' + hair + '"/><path d="M36 52h10m8 0h10" stroke="#24162d" stroke-width="3" stroke-linecap="round"/><circle cx="41" cy="54" r="2" fill="#fff"/><circle cx="59" cy="54" r="2" fill="#fff"/><path d="M44 68q6 5 12 0" fill="none" stroke="#a64b68" stroke-width="2"/></svg>';
-  return { name: tone, src: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg) };
+const AVATAR_STYLES = [
+  ["Crimson Ronin","#ef476f","#21101d","spiky"],["Azure Striker","#45b8e8","#101b32","swept"],["Shadow Prince","#a78bfa","#171329","long"],["Golden Captain","#eab65e","#2b1c12","spiky"],
+  ["Emerald Rogue","#5bc69a","#10251e","messy"],["Frost Samurai","#9ed9ee","#142432","swept"],["Violet Phantom","#bd8cff","#21152f","long"],["Ash Wanderer","#aab0bd","#20212a","messy"],
+  ["Scarlet Ace","#ff765e","#2a1517","swept"],["Midnight Mage","#7585ef","#12182d","long"],["Silver Hunter","#c5cbd6","#20212a","spiky"],["Neon Shinobi","#66d9ce","#102426","messy"]
+];
+const PRESET_AVATARS = AVATAR_STYLES.map(([name, hair, bg, style], index) => {
+  const fringe = style === "spiky" ? "M20 48 25 12 38 29 48 5 57 28 76 13 79 51 67 37 57 45 43 34 31 45Z" : style === "long" ? "M21 53Q10 5 50 7Q91 7 79 55L73 80 63 57 35 57 27 82Z" : style === "swept" ? "M19 48Q12 8 49 8Q82 8 81 42L65 33Q48 43 29 34Z" : "M18 49Q17 12 48 9Q84 8 81 48L70 39 61 47 50 34 39 47 29 39Z";
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="g"><stop stop-color="' + hair + '" stop-opacity=".48"/><stop offset="1" stop-color="' + bg + '"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(#g)"/><path d="M9 100Q14 68 50 68Q86 68 91 100" fill="#263044"/><path d="M37 68V59H63V68L58 78H42Z" fill="#d6a58f"/><path d="M24 45Q24 24 50 22Q76 24 76 46L70 65Q63 77 50 77Q37 77 30 65Z" fill="#e8b99f"/><path d="' + fringe + '" fill="' + hair + '"/><path d="M35 52h10m10 0h10" stroke="#172033" stroke-width="3" stroke-linecap="round"/><ellipse cx="41" cy="54" rx="2.2" ry="3" fill="#f7f7ff"/><ellipse cx="59" cy="54" rx="2.2" ry="3" fill="#f7f7ff"/><path d="M45 68q5 3 10 0" fill="none" stroke="#985e68" stroke-width="2" stroke-linecap="round"/><path d="M31 83 50 92 69 83" fill="none" stroke="' + hair + '" stroke-opacity=".8" stroke-width="3"/></svg>';
+  return { name, src: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg) };
 });
 
 const TOGGLES = [
@@ -83,9 +87,9 @@ export default function Settings() {
           </div>
 
           <div className="mt-5">
-            <p className="mb-3 text-xs uppercase tracking-[0.16em] text-muted-foreground">Choose your anime avatar</p>
+            <p className="mb-3 text-xs uppercase tracking-[0.16em] text-muted-foreground">Choose your male anime character</p>
             <div className="grid grid-cols-6 gap-2">{PRESET_AVATARS.map((avatar) => <button key={avatar.name} type="button" onClick={() => updateProfile({ avatar: avatar.src })} aria-label={"Choose " + avatar.name + " avatar"} aria-pressed={profile.avatar === avatar.src} className={"rounded-full p-0.5 transition " + (profile.avatar === avatar.src ? "bg-primary ring-2 ring-primary/50" : "bg-border hover:bg-primary/50")}><img src={avatar.src} alt={avatar.name + " anime avatar"} className="aspect-square w-full rounded-full object-cover" /></button>)}</div>
-            <p className="mt-2 text-[11px] text-muted-foreground">Choose a preset above or upload your own image. Changes save automatically.</p>
+            <p className="mt-2 text-[11px] text-muted-foreground">12 original male anime-style avatars. Choose one or upload your own image. Changes save automatically.</p>
             {avatarError && <p role="alert" className="mt-2 text-xs text-destructive">{avatarError}</p>}
           </div>
 
