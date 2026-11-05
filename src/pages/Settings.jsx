@@ -38,6 +38,15 @@ export default function Settings() {
   const [name, setName] = useState(profile.name);
   const [bio, setBio] = useState(profile.bio || "");
   const [saved, setSaved] = useState(false);
+  const [avatarError, setAvatarError] = useState("");
+  const chooseAvatar = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || file.size > 5 * 1024 * 1024) { setAvatarError("Choose a JPG, PNG or WebP image under 5 MB."); event.target.value = ""; return; }
+    const reader = new FileReader();
+    reader.onload = () => { const image = new Image(); image.onload = () => { const canvas = document.createElement("canvas"); const scale = Math.min(1, 320 / Math.max(image.width, image.height)); canvas.width = Math.max(1, Math.round(image.width * scale)); canvas.height = Math.max(1, Math.round(image.height * scale)); canvas.getContext("2d")?.drawImage(image, 0, 0, canvas.width, canvas.height); updateProfile({ avatar: canvas.toDataURL("image/webp", 0.82) }); setAvatarError(""); }; image.onerror = () => setAvatarError("This image could not be opened."); image.src = reader.result; };
+    reader.onerror = () => setAvatarError("This image could not be read."); reader.readAsDataURL(file);
+  };
   const [language, setLanguage] = usePref("language");
 
   const save = (event) => {
