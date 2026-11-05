@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Menu, Search, X, Compass, Clapperboard, Film, Sparkles, Wand2, Library, Settings, Loader2, Users, Trophy } from "lucide-react";
+import { Menu, Search, X, Compass, Clapperboard, Film, Sparkles, Wand2, Library, Settings, Loader2, Users, Trophy, Users2 } from "lucide-react";
 import { useProfile } from "@/lib/profile";
 import { callAniList } from "@/lib/animeApi";
 import ThemeMenu from "@/components/layout/ThemeMenu";
@@ -15,6 +15,7 @@ export const NAV_LINKS = [
   { to: "/creator", label: "Creator", icon: Wand2 },
   { to: "/library", label: "Library", icon: Library },
   { to: "/community", label: "Community", icon: Users },
+  { to: "/watch-party", label: "Watch Party", icon: Users2 },
   { to: "/missions", label: "Missions", icon: Trophy },
 ];
 
