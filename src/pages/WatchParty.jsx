@@ -4,6 +4,8 @@ import { Users, Plus, Send, Copy, Radio, Link2, RefreshCw, ShieldCheck } from "l
 import PageHeader from "@/components/common/PageHeader";
 import { useProfile } from "@/lib/profile";
 import { communityRequest } from "@/lib/communityApi";
+import ServerVideoPlayer from "@/components/video/ServerVideoPlayer";
+import { parseVidstuckUrl } from "@/components/video/vidstuckUrls";
 
 export default function WatchParty() {
   const [profile] = useProfile();
@@ -16,6 +18,8 @@ export default function WatchParty() {
   const [description, setDescription] = useState("");
   const [draft, setDraft] = useState("");
   const [watchUrl, setWatchUrl] = useState("");
+  const [watchTitle, setWatchTitle] = useState("");
+  const [partyVideo, setPartyVideo] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const bottom = useRef(null);
@@ -85,13 +89,29 @@ export default function WatchParty() {
     finally { setBusy(false); }
   };
 
+  const loadPartyVideo = () => {
+    const parsed = parseVidstuckUrl(watchUrl.trim());
+    if (!parsed) {
+      setError("Paste a valid Vidstuck movie or TV episode embed URL. The player server code is unchanged.");
+      return;
+    }
+    setPartyVideo({ src: parsed.url.href, title: watchTitle.trim() || room?.name || "PRI-ANIME Watch Party" });
+    setError("");
+  };
+
   const shareWatchLink = async () => {
+    const parsed = parseVidstuckUrl(watchUrl.trim());
+    if (!parsed) {
+      setError("Paste a valid Vidstuck embed URL before sharing it with the party.");
+      return;
+    }
     try {
-      const url = new URL(watchUrl);
-      if (!["https:", "http:"].includes(url.protocol)) throw new Error("Use a valid http or https video page URL.");
-      await communityRequest("/messages", { method: "POST", body: { profileId: profile.id, displayName: profile.name, channelId: channel, message: "🎬 Now watching: " + url.href } });
-      setWatchUrl(""); await loadMessages(channel);
-    } catch (e) { setError(e.message || "Enter a valid video URL."); }
+      const title = watchTitle.trim() || room?.name || "Watch Party";
+      await communityRequest("/messages", { method: "POST", body: { profileId: profile.id, displayName: profile.name, channelId: channel, message: "🎬 PARTY VIDEO | " + title + " | " + parsed.url.href } });
+      setPartyVideo({ src: parsed.url.href, title });
+      setWatchUrl("");
+      await loadMessages(channel);
+    } catch (e) { setError(e.message || "Could not share this video with the party."); }
   };
 
   const invite = typeof window !== "undefined" && room ? window.location.origin + "/watch-party?room=" + encodeURIComponent(room.id) : "";
@@ -114,9 +134,11 @@ export default function WatchParty() {
         <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 p-4"><div><p className="flex items-center gap-2 text-[10px] tracking-[.2em] text-primary"><Radio className="h-3 w-3"/> PARTY LOUNGE</p><h2 className="mt-1 font-display text-xl">{room?.name || "Choose or create a room"}</h2></div>{room && <button onClick={()=>navigator.clipboard?.writeText(invite)} className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-2 text-xs hover:border-primary/50"><Copy className="h-3.5 w-3.5"/> Copy invite link</button>}</header>
         {!room ? <div className="grid flex-1 place-items-center p-8 text-center"><div><Users className="mx-auto h-10 w-10 text-primary/70"/><p className="mt-3 font-display text-xl">Your watch room is waiting</p><p className="mt-1 max-w-sm text-sm text-muted-foreground">Create a room or join a public party to open the group chat.</p></div></div> : <>
           <div className="border-b border-border/50 bg-primary/[.04] p-4">
-            <p className="text-xs font-semibold">Share what you're watching</p>
-            <div className="mt-2 flex flex-wrap gap-2"><input value={watchUrl} onChange={(e)=>setWatchUrl(e.target.value)} placeholder="Paste a video page URL…" className="min-w-0 flex-1 rounded-xl border border-border bg-background px-3 py-2 text-sm"/><button onClick={shareWatchLink} disabled={!watchUrl.trim()||busy} className="rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground disabled:opacity-50"><Link2 className="mr-1 inline h-3.5 w-3.5"/> Share link</button></div>
-            <p className="mt-2 text-[11px] text-muted-foreground">Playback is opened separately on each device. Synchronized play/pause and seek are not enabled yet.</p>
+            <p className="text-xs font-semibold">Party screening · Vidstuck + backups</p>
+            <input value={watchTitle} onChange={(e)=>setWatchTitle(e.target.value)} placeholder="Anime / movie title (optional)" maxLength={100} className="mt-2 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm"/>
+            <div className="mt-2 flex flex-wrap gap-2"><input value={watchUrl} onChange={(e)=>setWatchUrl(e.target.value)} placeholder="Paste Vidstuck movie / episode embed URL…" className="min-w-0 flex-1 rounded-xl border border-border bg-background px-3 py-2 text-sm"/><button type="button" onClick={loadPartyVideo} disabled={!watchUrl.trim()} className="rounded-xl border border-primary/40 px-4 py-2 text-xs font-semibold text-primary disabled:opacity-50">Load player</button><button type="button" onClick={shareWatchLink} disabled={!watchUrl.trim()||busy} className="rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground disabled:opacity-50"><Link2 className="mr-1 inline h-3.5 w-3.5"/> Share with party</button></div>
+            <p className="mt-2 text-[11px] text-muted-foreground">Vidstuck is the main server. AnimeSalt and AniKoto are available as selectable backup options in the player. Everyone opens playback on their own device; synced play/pause and seeking are not enabled.</p>
+            {partyVideo && <div className="mt-4 space-y-2"><p className="text-sm font-semibold">{partyVideo.title}</p><ServerVideoPlayer key={partyVideo.src} src={partyVideo.src} title={partyVideo.title}/></div>}
           </div>
           <div className="flex-1 space-y-4 overflow-y-auto p-4">{messages.length ? messages.map((m)=><article key={m.id} className="flex gap-3"><div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary/15 text-sm font-bold text-primary">{(m.display_name||"A").slice(0,1).toUpperCase()}</div><div className="min-w-0"><div className="flex items-baseline gap-2"><b className="text-sm">{m.display_name}</b><time className="text-[10px] text-muted-foreground">{new Date(m.created_at).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}</time></div><p className="mt-1 whitespace-pre-wrap break-words text-sm text-foreground/85">{m.body}</p></div></article>) : <p className="py-12 text-center text-sm text-muted-foreground">Say hello to start the party chat.</p>}<div ref={bottom}/></div>
           <form onSubmit={sendMessage} className="flex gap-2 border-t border-border/60 p-3"><input value={draft} onChange={(e)=>setDraft(e.target.value)} placeholder="Chat with your party…" maxLength={500} className="min-w-0 flex-1 rounded-xl border border-border bg-background px-4 py-3 text-sm"/><button disabled={busy||!draft.trim()} aria-label="Send party message" className="grid h-11 w-11 place-items-center rounded-xl bg-primary text-primary-foreground disabled:opacity-50"><Send className="h-4 w-4"/></button></form>
