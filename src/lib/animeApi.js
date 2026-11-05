@@ -195,7 +195,7 @@ async function searchMalTitles(query) {
 function expandedSearchVariants(query) {
   const base = searchVariants(query);
   const normalized = String(query || "").toLocaleLowerCase().normalize("NFKD")
-    .replace(/[\\u0300-\\u036f]/g, "").replace(/[^\\p{L}\\p{N}]+/gu, " ").trim();
+    .replace(/[\u0300-\u036f]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
   const knownAliases = {
     "tokyo revenge": ["Tokyo Revengers"],
     "tokyo revenger": ["Tokyo Revengers"],
