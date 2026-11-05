@@ -192,6 +192,22 @@ async function searchMalTitles(query) {
   return Array.isArray(payload?.data) ? payload.data : [];
 }
 
+function expandedSearchVariants(query) {
+  const base = searchVariants(query);
+  const normalized = String(query || "").toLocaleLowerCase().normalize("NFKD")
+    .replace(/[\\u0300-\\u036f]/g, "").replace(/[^\\p{L}\\p{N}]+/gu, " ").trim();
+  const knownAliases = {
+    "tokyo revenge": ["Tokyo Revengers"],
+    "tokyo revenger": ["Tokyo Revengers"],
+    "dragon ballz": ["Dragon Ball Z"],
+    "boku no hero": ["Boku no Hero Academia", "My Hero Academia"],
+    "my hero": ["My Hero Academia"],
+    "kimetsu no yaiba": ["Demon Slayer Kimetsu no Yaiba"],
+    "shingeki no kyojin": ["Attack on Titan"],
+  };
+  return [...new Set([...base, ...(knownAliases[normalized] || [])])].slice(0, 6);
+}
+
 export async function callAniList(body) {
   const key = JSON.stringify(body);
   const hit = cache.get(key);
@@ -214,7 +230,7 @@ export async function callAniList(body) {
     // could hide the requested title when AniList's fuzzy ranking returned
     // an incomplete first page for the original spelling.
     result = { items: [], pageInfo: null, item: null };
-    const variants = [...new Set(searchVariants(variables.search))].slice(0, 5);
+    const variants = expandedSearchVariants(variables.search);
     const merged = new Map();
     const pageInfos = [];
     for (const variant of variants) {
