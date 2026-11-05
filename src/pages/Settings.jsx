@@ -5,6 +5,14 @@ import { useProfile } from "@/lib/profile";
 import { useTheme } from "@/lib/theme";
 import { usePref, LANGUAGES } from "@/lib/prefs";
 
+
+const PRESET_AVATARS = ["rose","ice","gold","violet","mint","ember"].map((tone, index) => {
+  const colors = ["#fb4d78","#63d8ff","#e9b45d","#b68cff","#64d6a5","#ff805f"];
+  const hair = colors[index];
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="bg"><stop stop-color="' + hair + '" stop-opacity=".45"/><stop offset="1" stop-color="#100d1b"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(#bg)"/><path d="M13 100Q18 70 50 70Q82 70 87 100" fill="#30213e"/><path d="M29 47Q27 23 50 22Q73 23 71 48L66 66Q60 78 50 78Q39 78 33 66Z" fill="#f0c4ad"/><path d="M23 49Q17 8 51 8Q85 8 77 52L68 34Q49 44 31 32Z" fill="' + hair + '"/><path d="M36 52h10m8 0h10" stroke="#24162d" stroke-width="3" stroke-linecap="round"/><circle cx="41" cy="54" r="2" fill="#fff"/><circle cx="59" cy="54" r="2" fill="#fff"/><path d="M44 68q6 5 12 0" fill="none" stroke="#a64b68" stroke-width="2"/></svg>';
+  return { name: tone, src: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg) };
+});
+
 const TOGGLES = [
   { key: "autoplayReels", label: "Autoplay reels", hint: "Play the next adjacent reel when it scrolls into view." },
   { key: "reelMuted", label: "Start reels muted", hint: "Unmute manually â€” browsers require it anyway." },
@@ -72,6 +80,13 @@ export default function Settings() {
             <p className="text-xs text-muted-foreground">
               This profile names your comments and saved scripts. No password, no email â€” it lives in this browser.
             </p>
+          </div>
+
+          <div className="mt-5">
+            <p className="mb-3 text-xs uppercase tracking-[0.16em] text-muted-foreground">Choose your anime avatar</p>
+            <div className="grid grid-cols-6 gap-2">{PRESET_AVATARS.map((avatar) => <button key={avatar.name} type="button" onClick={() => updateProfile({ avatar: avatar.src })} aria-label={"Choose " + avatar.name + " avatar"} aria-pressed={profile.avatar === avatar.src} className={"rounded-full p-0.5 transition " + (profile.avatar === avatar.src ? "bg-primary ring-2 ring-primary/50" : "bg-border hover:bg-primary/50")}><img src={avatar.src} alt={avatar.name + " anime avatar"} className="aspect-square w-full rounded-full object-cover" /></button>)}</div>
+            <p className="mt-2 text-[11px] text-muted-foreground">Choose a preset above or upload your own image. Changes save automatically.</p>
+            {avatarError && <p role="alert" className="mt-2 text-xs text-destructive">{avatarError}</p>}
           </div>
 
           <div className="mt-5">
