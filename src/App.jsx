@@ -27,6 +27,7 @@ import Community from '@/pages/Community';
 import Missions from '@/pages/Missions';
 import Arena from '@/pages/Arena';
 import WorldMap from '@/pages/WorldMap';
+import WatchParty from '@/pages/WatchParty';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
