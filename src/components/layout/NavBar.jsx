@@ -135,8 +135,8 @@ export default function NavBar() {
           </button>
           <NotificationsBell />
           <ThemeMenu />
-          <Link to="/settings" className="ml-1 grid h-9 w-9 place-items-center rounded-full border border-primary/40 bg-primary/15 text-sm font-semibold text-primary transition hover:bg-primary/25" aria-label={"Profile settings for " + profile.name}>
-            {profile.name.slice(0, 1).toUpperCase()}
+          <Link to="/settings" className="ml-1 grid h-9 w-9 place-items-center overflow-hidden rounded-full border border-primary/50 bg-primary/15 text-sm font-semibold text-primary shadow-[0_0_16px_rgba(244,63,94,.18)] transition hover:scale-105" aria-label={"Profile settings for " + profile.name}>
+            {profile.avatar ? <img src={profile.avatar} alt="" className="h-full w-full object-cover" /> : profile.name.slice(0, 1).toUpperCase()}
           </Link>
           <button type="button" onClick={() => setMobileOpen((value) => !value)} aria-label={mobileOpen ? "Close menu" : "Open menu"} aria-expanded={mobileOpen}
             className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition hover:bg-foreground/5 hover:text-foreground lg:hidden">
