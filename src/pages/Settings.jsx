@@ -68,9 +68,7 @@ export default function Settings() {
         <form onSubmit={save} className="rounded-2xl border border-border/60 bg-card/40 p-5">
           <h2 className="font-display text-xl">Viewer profile</h2>
           <div className="mt-4 flex items-center gap-4">
-            <span className="grid h-16 w-16 place-items-center rounded-full border border-primary/40 bg-primary/15 font-display text-2xl text-primary">
-              {(name || "G").slice(0, 1).toUpperCase()}
-            </span>
+            <div className="relative"><img src={profile.avatar || "/avatar-default.svg"} alt="Profile avatar" className="h-20 w-20 rounded-full border-2 border-primary/70 object-cover" /><label htmlFor="profile-avatar-upload" className="absolute -bottom-1 -right-1 cursor-pointer rounded-full bg-primary px-2 py-1 text-white">＋</label><input id="profile-avatar-upload" type="file" accept="image/png,image/jpeg,image/webp" onChange={chooseAvatar} className="sr-only" /></div>
             <p className="text-xs text-muted-foreground">
               This profile names your comments and saved scripts. No password, no email â€” it lives in this browser.
             </p>
