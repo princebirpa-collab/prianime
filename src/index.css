@@ -346,3 +346,60 @@
     text-wrap: balance;
   }
 }
+
+
+/* PRI-ANIME ambient dark glow — global, lightweight and non-interactive */
+@keyframes priAmbientDrift {
+  0% { transform: translate3d(-3%, -2%, 0) scale(1); }
+  35% { transform: translate3d(2%, 1.5%, 0) scale(1.06); }
+  70% { transform: translate3d(1%, -2%, 0) scale(0.98); }
+  100% { transform: translate3d(-3%, -2%, 0) scale(1); }
+}
+
+@keyframes priGlowPulse {
+  0%, 100% { opacity: 0.48; filter: blur(58px); }
+  50% { opacity: 0.72; filter: blur(76px); }
+}
+
+body {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  background-color: hsl(var(--background));
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: -12%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 12% 18%, hsl(342 88% 34% / 0.22), transparent 34%),
+    radial-gradient(ellipse at 82% 22%, hsl(275 78% 42% / 0.18), transparent 32%),
+    radial-gradient(ellipse at 72% 82%, hsl(330 82% 32% / 0.16), transparent 36%),
+    radial-gradient(ellipse at 24% 78%, hsl(258 72% 35% / 0.13), transparent 34%),
+    linear-gradient(135deg, hsl(var(--background)) 0%, hsl(258 34% 5%) 48%, hsl(var(--background)) 100%);
+  background-size: 150% 150%;
+  animation: priAmbientDrift 34s ease-in-out infinite;
+  will-change: transform;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.13;
+  background-image: radial-gradient(hsl(0 0% 100% / 0.22) 0.55px, transparent 0.7px);
+  background-size: 5px 5px;
+  mask-image: linear-gradient(to bottom, black, transparent 88%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
+    transform: none;
+  }
+}
