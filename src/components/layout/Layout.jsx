@@ -4,6 +4,7 @@ import NavBar from "@/components/layout/NavBar";
 import Footer from "@/components/layout/Footer";
 import InteractiveSmoke from "@/components/effects/InteractiveSmoke";
 import CursorGlow from "@/components/effects/CursorGlow";
+import AnimeGuide from "@/components/AnimeGuide";
 
 export default function Layout() {
   const { pathname } = useLocation();
@@ -34,6 +35,7 @@ export default function Layout() {
       <Footer />
       <CursorGlow />
       <InteractiveSmoke />
+      <AnimeGuide />
     </div>
   );
 }
