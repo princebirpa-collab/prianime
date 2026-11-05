@@ -35,7 +35,7 @@ export default function Community() {
           <a href="https://discord.gg/2meCrBHQw" target="_blank" rel="noreferrer" className="rounded-xl border border-[#5865F2]/50 bg-[#5865F2]/15 px-3 py-2 text-xs font-semibold text-[#aab3ff] hover:bg-[#5865F2]/25">Open Discord invite</a>
         </div>
       </div>
-      <div className="mx-auto grid max-w-[1600px] gap-0 px-2 pt-4 sm:px-4 lg:grid-cols-[64px_250px_minmax(0,1fr)_230px]">
+      <div className="mx-auto grid max-w-[1600px] gap-0 px-2 pt-4 sm:px-4 lg:grid-cols-[64px_250px_minmax(0,1fr)] xl:grid-cols-[64px_250px_minmax(0,1fr)_230px]">
         <aside className="hidden flex-col items-center gap-3 rounded-l-2xl border border-white/10 bg-[#11131d] py-4 lg:flex">
           <button type="button" onClick={()=>{setActive("world-general");setChannels([{id:"world-general",name:"world-chat"},{id:"world-introductions",name:"introductions"},{id:"world-recommendations",name:"anime-recommendations"}]);}} title="PRI-ANIME World" className={"grid h-11 w-11 place-items-center rounded-2xl text-sm font-black transition "+(active.startsWith("world-")?"bg-[#5865F2] text-white":"bg-white/10 text-slate-200 hover:rounded-xl hover:bg-[#5865F2]")}>PA</button>
           <div className="h-px w-7 bg-white/10"/>
