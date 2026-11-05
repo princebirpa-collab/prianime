@@ -66,13 +66,21 @@ export default function WorldMap() {
           </div>
         ) : (
           <>
-            <div className="relative mb-8 overflow-hidden rounded-3xl border border-rose-200/15 bg-[#090d13] p-6 sm:p-9">
-              <div aria-hidden="true" className="absolute inset-0 opacity-70" style={{ backgroundImage: "radial-gradient(circle at 18% 25%,rgba(176,52,70,.3),transparent 28%),radial-gradient(circle at 82% 80%,rgba(186,132,63,.16),transparent 30%),linear-gradient(120deg,transparent 30%,rgba(255,255,255,.035),transparent 70%)" }} />
-              <div className="relative"><div className="flex items-center gap-2 text-rose-200/80"><Compass className="h-4 w-4" /><span className="text-[10px] tracking-[.28em]">THE HUNTER'S ATLAS</span></div>
-                <h2 className="mt-4 max-w-2xl font-display text-3xl text-white sm:text-5xl">Six realms. <span className="text-rose-200">One journey.</span></h2>
-                <p className="mt-3 max-w-xl text-sm leading-6 text-slate-300/70">Follow the ember trail and uncover each universe, one region at a time.</p>
-                <div className="mt-6 flex items-center gap-2 text-xs text-amber-200/80"><Flame className="h-4 w-4" /> Scroll to reveal the map <Sparkles className="h-4 w-4" /></div>
+            <div className="group relative mb-8 isolate overflow-hidden rounded-[30px] border border-rose-200/20 bg-[#080711] p-5 shadow-[0_25px_90px_rgba(0,0,0,.55),0_0_55px_rgba(190,40,90,.12)] sm:p-9">
+              <div aria-hidden="true" className="absolute inset-0 -z-10" style={{backgroundImage:"radial-gradient(ellipse at 12% 15%,rgba(190,40,90,.32),transparent 36%),radial-gradient(ellipse at 86% 80%,rgba(115,75,190,.25),transparent 38%),linear-gradient(135deg,rgba(255,255,255,.05),transparent 45%,rgba(245,158,11,.04))"}} />
+              <div className="relative flex flex-wrap items-end justify-between gap-4"><div><div className="flex items-center gap-2 text-rose-200/80"><Compass className="h-4 w-4"/><span className="text-[10px] tracking-[.32em]">PRI-ANIME • MULTIVERSE ATLAS</span></div><h2 className="mt-4 font-display text-3xl text-white sm:text-5xl">Beyond the <span className="bg-gradient-to-r from-rose-200 via-fuchsia-200 to-amber-100 bg-clip-text text-transparent">known worlds.</span></h2><p className="mt-3 max-w-xl text-sm leading-6 text-slate-300/70">A hand-crafted realm chart. Trace the luminous paths and choose a universe to explore.</p></div><div className="rounded-2xl border border-white/10 bg-black/35 px-4 py-3 text-right backdrop-blur"><p className="text-[9px] tracking-[.24em] text-rose-200/70">DISCOVERED REALMS</p><p className="mt-1 font-display text-2xl text-white">06 <span className="text-xs text-slate-400">/ 06</span></p></div></div>
+              <div className="relative mt-7 overflow-hidden rounded-2xl border border-white/10 bg-[#0c0b18]/80 p-2 sm:p-4">
+                <svg viewBox="0 0 900 420" role="img" aria-label="Illustrated fantasy atlas connecting six anime-inspired realms" className="h-auto w-full">
+                  <defs><linearGradient id="atlasTrail" x1="0" x2="1"><stop stopColor="#fb7185"/><stop offset=".5" stopColor="#c084fc"/><stop offset="1" stopColor="#fbbf24"/></linearGradient><radialGradient id="atlasLand"><stop stopColor="#4b315e"/><stop offset="1" stopColor="#171426"/></radialGradient><filter id="atlasGlow"><feGaussianBlur stdDeviation="5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                  <path d="M60 145 115 85 225 65 285 95 350 55 455 75 520 48 625 90 710 68 830 145 805 250 735 300 650 280 575 355 470 330 390 375 275 320 190 345 105 275Z" fill="url(#atlasLand)" stroke="#a78bfa" strokeOpacity=".38" strokeWidth="2"/>
+                  <path d="M90 205Q165 100 260 155T430 190T590 130T805 220M145 270Q260 210 350 260T535 250T735 285" fill="none" stroke="#c4b5fd" strokeOpacity=".14" strokeWidth="2"/>
+                  <path d="M135 210Q220 95 330 145T485 235T650 135T775 235" fill="none" stroke="url(#atlasTrail)" strokeWidth="3" strokeDasharray="5 10" filter="url(#atlasGlow)"/>
+                  {worlds.map((w,i)=>{const pts=[{x:135,y:210},{x:260,y:125},{x:390,y:255},{x:520,y:155},{x:650,y:135},{x:775,y:235}];const p=pts[i];return <g key={w.name}><circle cx={p.x} cy={p.y} r="34" fill={["#9f1239","#6d28d9","#b45309","#1d4ed8","#047857","#7c2d12"][i]} opacity=".34"/><circle cx={p.x} cy={p.y} r="13" fill="#120f20" stroke={["#fda4af","#c4b5fd","#fcd34d","#93c5fd","#6ee7b7","#fdba74"][i]} strokeWidth="3" filter="url(#atlasGlow)"/><text x={p.x} y={p.y+4} textAnchor="middle" fontSize="12" fill="#fff">{w.symbol}</text><text x={p.x} y={p.y+52} textAnchor="middle" fontSize="12" fill="#f8eaf0">{w.name}</text></g>})}
+                  <g fill="#fbbf24" opacity=".65"><path d="m80 65 4 10 10 4-10 4-4 10-4-10-10-4 10-4Z"/><path d="m830 330 3 8 8 3-8 3-3 8-3-8-8-3 8-3Z"/></g>
+                </svg>
+                <div className="flex flex-wrap items-center justify-between gap-2 px-2 pb-2 text-[10px] tracking-[.15em] text-slate-400"><span>✦ THE EMBER ROUTE</span><span>6 WORLDS • 18 LOCATIONS</span></div>
               </div>
+              <div className="relative mt-5 flex items-center gap-2 text-xs text-amber-100/80"><Flame className="h-4 w-4"/> Select a realm below to uncover its locations <Sparkles className="h-4 w-4"/></div>
             </div>
             <div className="grid gap-5 md:grid-cols-2">{worlds.map((world, index) => <RevealCard key={world.name} world={world} index={index} />)}</div>
           </>
