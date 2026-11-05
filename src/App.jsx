@@ -72,6 +72,7 @@ const AuthenticatedApp = () => {
         <Route path="/missions" element={<Missions />} />
         <Route path="/arena" element={<Arena />} />
         <Route path="/world-map" element={<WorldMap />} />
+        <Route path="/watch-party" element={<WatchParty />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
