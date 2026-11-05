@@ -361,6 +361,11 @@
   50% { opacity: 0.72; filter: blur(76px); }
 }
 
+@keyframes priSnowDrift {
+  0% { background-position: 0 -180px, 70px -260px, 130px -340px, 0 0; }
+  100% { background-position: 90px 900px, -40px 1040px, 210px 1180px, 0 0; }
+}
+
 body {
   position: relative;
   isolation: isolate;
@@ -391,14 +396,21 @@ body::after {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  opacity: 0.13;
-  background-image: radial-gradient(hsl(0 0% 100% / 0.22) 0.55px, transparent 0.7px);
-  background-size: 5px 5px;
-  mask-image: linear-gradient(to bottom, black, transparent 88%);
+  opacity: 0.3;
+  background-image:
+    radial-gradient(circle, hsl(0 0% 100% / 0.9) 0 1px, transparent 1.8px),
+    radial-gradient(circle, hsl(190 90% 92% / 0.75) 0 1.2px, transparent 2px),
+    radial-gradient(circle, hsl(275 90% 94% / 0.7) 0 0.8px, transparent 1.8px),
+    radial-gradient(hsl(0 0% 100% / 0.12) 0.55px, transparent 0.7px);
+  background-size: 170px 170px, 230px 230px, 310px 310px, 5px 5px;
+  background-position: 0 -180px, 70px -260px, 130px -340px, 0 0;
+  animation: priSnowDrift 42s linear infinite;
+  mask-image: linear-gradient(to bottom, black, transparent 94%);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body::before {
+  body::before,
+  body::after {
     animation: none;
     transform: none;
   }
