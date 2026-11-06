@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 
 export default function ReelUploadDialog({ open, onOpenChange, onUploaded }) {
   const [title, setTitle] = useState("");
+  const [animeTitle, setAnimeTitle] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState("");
   const [videoFile, setVideoFile] = useState(null);
@@ -18,6 +19,7 @@ export default function ReelUploadDialog({ open, onOpenChange, onUploaded }) {
 
   const reset = () => {
     setTitle("");
+    setAnimeTitle("");
     setDescription("");
     setTags("");
     setVideoFile(null);
@@ -41,6 +43,10 @@ export default function ReelUploadDialog({ open, onOpenChange, onUploaded }) {
     setStatus("saving");
     setError("");
     try {
+      setProgressLabel("Checking anime relevanceâ€¦");
+      const analysisResponse = await fetch("/api/reel-analyzer", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, animeTitle, description, tags: tags.split(",").map((tag) => tag.trim()).filter(Boolean) }) });
+      const analysis = await analysisResponse.json();
+      if (!analysisResponse.ok || !analysis.ok) throw new Error(analysis.error || "This reel could not be verified as anime-related.");
       setProgressLabel("Uploading videoâ€¦");
       const video = await base44.integrations.Core.UploadPublicFile({ file: videoFile });
       let thumbnailUrl = "";
@@ -53,6 +59,10 @@ export default function ReelUploadDialog({ open, onOpenChange, onUploaded }) {
       const profile = getProfile();
       await base44.entities.Reel.create({
         title: title.trim().slice(0, 120),
+        anime_title: animeTitle.trim().slice(0, 120),
+        category: "anime",
+        analyzer_confidence: analysis.confidence,
+        analyzer_tags: analysis.tags,
         description: description.trim().slice(0, 500),
         video_url: video.file_url,
         thumbnail_url: thumbnailUrl,
@@ -100,6 +110,11 @@ export default function ReelUploadDialog({ open, onOpenChange, onUploaded }) {
             />
           </div>
 
+          <div>
+            <label htmlFor="reel-anime-title" className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Anime / series related to this reel</label>
+            <input id="reel-anime-title" value={animeTitle} onChange={(event) => setAnimeTitle(event.target.value)} required maxLength={120} placeholder="e.g. original anime-inspired short or series name" className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" />
+            <p className="mt-1 text-[11px] text-muted-foreground">A server-side metadata check runs before upload. It checks title and tags, not the actual video frames.</p>
+          </div>
           <div>
             <label htmlFor="reel-description" className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
               Caption
