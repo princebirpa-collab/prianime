@@ -1,0 +1,110 @@
+import { useMemo } from "react";
+import { Link } from "react-router-dom";
+import { ArrowUpRight, CalendarClock, Clock3, RadioTower } from "lucide-react";
+import { useAnimeList } from "@/hooks/useAnime";
+import { currentSeason } from "@/lib/animeApi";
+
+const REFERENCES = [
+  { label: "AnimeSchedule", href: "https://animeschedule.net/" },
+  { label: "LiveChart", href: "https://www.livechart.me/schedule" },
+  { label: "Anime-Planet", href: "https://www.anime-planet.com/" },
+  { label: "AnimeCorner", href: "https://animecorner.me/db/anime/calendar" },
+];
+
+function airingDate(seconds) {
+  if (!Number.isFinite(seconds)) return "Time unavailable";
+  return new Intl.DateTimeFormat(undefined, {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(Date.now() + seconds * 1000));
+}
+
+function countdown(seconds) {
+  if (!Number.isFinite(seconds) || seconds < 0) return "Schedule updating";
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  if (days) return `In ${days}d ${hours}h`;
+  if (hours) return `In ${hours}h ${minutes}m`;
+  return `In ${Math.max(1, minutes)}m`;
+}
+
+export default function AiringRadar() {
+  const season = currentSeason();
+  const { items, loading, error } = useAnimeList({
+    action: "seasonal",
+    season: season.season,
+    year: season.year,
+    perPage: 25,
+  });
+
+  const upcoming = useMemo(
+    () => items
+      .filter((anime) => anime?.id && anime?.nextEpisode?.timeUntilAiring != null)
+      .sort((a, b) => a.nextEpisode.timeUntilAiring - b.nextEpisode.timeUntilAiring)
+      .slice(0, 6),
+    [items]
+  );
+
+  return (
+    <section className="mx-auto w-full max-w-[1600px] px-4 pt-14 sm:px-6 lg:px-10">
+      <div className="overflow-hidden rounded-[1.75rem] border border-primary/20 bg-[radial-gradient(ellipse_at_92%_0%,hsl(var(--primary)/.13),transparent_42%),linear-gradient(135deg,hsl(var(--card)/.96),hsl(var(--background)))]">
+        <div className="flex flex-wrap items-end justify-between gap-4 border-b border-white/[0.07] px-5 py-6 sm:px-8">
+          <div>
+            <p className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.3em] text-primary">
+              <RadioTower className="h-3.5 w-3.5" /> Live release intelligence
+            </p>
+            <h2 className="mt-2 font-display text-3xl text-foreground sm:text-4xl">Airing radar</h2>
+            <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
+              Upcoming episodes for the current season, ordered by their next scheduled release.
+            </p>
+          </div>
+          <Link to="/browse?sort=seasonal" className="inline-flex items-center gap-2 rounded-full border border-primary/30 px-4 py-2.5 text-xs font-semibold text-primary transition hover:bg-primary/10">
+            Explore this season <ArrowUpRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+
+        {loading ? (
+          <div className="grid grid-cols-2 gap-3 p-5 sm:grid-cols-3 sm:p-8">
+            {Array.from({ length: 6 }).map((_, index) => <div key={index} className="h-32 animate-pulse rounded-xl bg-white/[0.04]" />)}
+          </div>
+        ) : error ? (
+          <div className="px-6 py-8 text-sm text-muted-foreground">The airing feed is temporarily unavailable. Browse the seasonal catalogue instead.</div>
+        ) : upcoming.length ? (
+          <div className="grid gap-3 p-4 sm:grid-cols-2 sm:p-6 lg:grid-cols-3">
+            {upcoming.map((anime) => (
+              <Link key={anime.id} to={`/anime/${anime.id}`} className="group flex min-w-0 gap-3 rounded-xl border border-white/[0.07] bg-black/20 p-3 transition hover:border-primary/35 hover:bg-primary/[0.05]">
+                <img src={anime.cover} alt="" loading="lazy" className="h-24 w-16 shrink-0 rounded-lg object-cover" />
+                <span className="min-w-0 flex-1 py-1">
+                  <span className="block line-clamp-2 text-sm font-semibold leading-snug text-foreground group-hover:text-primary">{anime.display}</span>
+                  <span className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-semibold text-primary">
+                    <CalendarClock className="h-3.5 w-3.5" /> Episode {anime.nextEpisode.episode}
+                  </span>
+                  <span className="mt-1 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                    <Clock3 className="h-3.5 w-3.5" /> {countdown(anime.nextEpisode.timeUntilAiring)}
+                  </span>
+                  <span className="mt-1 block truncate text-[10px] text-muted-foreground/75">{airingDate(anime.nextEpisode.timeUntilAiring)}</span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="px-6 py-8 text-sm text-muted-foreground">No upcoming episode times are available in the current-season feed right now.</div>
+        )}
+
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-white/[0.07] px-5 py-4 sm:px-8">
+          <span className="text-[10px] font-semibold uppercase tracking-[.2em] text-muted-foreground">Schedule references</span>
+          {REFERENCES.map((source) => (
+            <a key={source.label} href={source.href} target="_blank" rel="noreferrer" className="text-[11px] text-muted-foreground underline decoration-white/20 underline-offset-4 transition hover:text-primary">
+              {source.label}
+            </a>
+          ))}
+          <span className="ml-auto text-[10px] text-muted-foreground/60">Times shown in your device timezone · AniList feed</span>
+        </div>
+      </div>
+    </section>
+  );
+}
