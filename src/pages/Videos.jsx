@@ -5,7 +5,6 @@ import { base44 } from "@/api/base44Client";
 import PageHeader from "@/components/common/PageHeader";
 import VideoCard from "@/components/video/VideoCard";
 import VidstuckSource from "@/components/video/VidstuckSource";
-import AkaSource from "@/components/video/AkaSource";
 import AnimeScreening from "@/components/video/AnimeScreening";
 import EmptyState from "@/components/common/EmptyState";
 import { listProgress } from "@/lib/library";
@@ -21,7 +20,7 @@ export default function Videos() {
   const [error, setError] = useState("");
   const [progress, setProgress] = useState({});
   const [showVidstuck, setShowVidstuck] = useState(() => new URLSearchParams(window.location.search).get("source") === "vidstuck");
-  const [showAka, setShowAka] = useState(() => new URLSearchParams(window.location.search).get("source") === "aka");
+  const [showOfficial, setShowOfficial] = useState(() => new URLSearchParams(window.location.search).get("source") === "official");
 
   useEffect(() => {
     if (animeId) return;
@@ -77,11 +76,11 @@ export default function Videos() {
         </button>
         <button
           type="button"
-          aria-pressed={showAka}
-          onClick={() => setShowAka((visible) => !visible)}
-          className={`inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition ${showAka ? "border-primary bg-primary/10 text-primary" : "border-border/70 text-muted-foreground hover:border-primary/60 hover:text-primary"}`}
+          aria-pressed={showOfficial}
+          onClick={() => setShowOfficial((visible) => !visible)}
+          className={`inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition ${showOfficial ? "border-primary bg-primary/10 text-primary" : "border-border/70 text-muted-foreground hover:border-primary/60 hover:text-primary"}`}
         >
-          Aka source
+          Licensed platforms
         </button>
         <Link
           to="/creator"
@@ -106,7 +105,7 @@ export default function Videos() {
 
       <div className="mx-auto w-full max-w-[1600px] px-4 pt-8 sm:px-6 lg:px-10">
         {showVidstuck && <VidstuckSource />}
-        {showAka && <AkaSource />}
+        {showOfficial && <div className="mb-6 rounded-2xl border border-border/60 bg-card/40 p-5"><h2 className="font-display text-xl">Official viewing platforms</h2><p className="mt-1 text-xs text-muted-foreground">Search for titles on licensed services. Regional catalogues vary.</p><div className="mt-3 flex flex-wrap gap-4 text-sm"><a className="text-primary hover:underline" href="https://www.crunchyroll.com/" target="_blank" rel="noopener noreferrer">Crunchyroll</a><a className="text-primary hover:underline" href="https://www.netflix.com/" target="_blank" rel="noopener noreferrer">Netflix</a><a className="text-primary hover:underline" href="https://www.primevideo.com/" target="_blank" rel="noopener noreferrer">Prime Video</a></div></div>}
         {error ? (
           <EmptyState title="The theatre could not be loaded" body={error} />
         ) : loading ? (
