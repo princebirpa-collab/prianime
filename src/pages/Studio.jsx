@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Copy, Loader2, Save, Send, Sparkles, Trash2, Check } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { communityRequest } from "@/lib/communityApi";
 import PageHeader from "@/components/common/PageHeader";
 import { getProfile } from "@/lib/profile";
 import { usePref, LANGUAGES } from "@/lib/prefs";
@@ -28,9 +29,21 @@ export default function Studio() {
   const [copied, setCopied] = useState(null);
 
   useEffect(() => {
-    base44.entities.Story.filter({ owner_ref: getProfile().id }, { sort: "-created_date", limit: 20 })
-      .then((page) => setStories(page.items || []))
-      .catch(() => setStories([]));
+    let alive = true;
+    const profileId = getProfile().id;
+    Promise.all([
+      communityRequest(`/stories?profileId=${encodeURIComponent(profileId)}`)
+        .then((data) => (data.stories || []).map((story) => ({ ...story, storage: "cloudflare" })))
+        .catch(() => []),
+      base44.entities.Story.filter({ owner_ref: profileId }, { sort: "-created_date", limit: 20 })
+        .then((page) => (page.items || []).map((story) => ({ ...story, storage: "base44" })))
+        .catch(() => []),
+    ]).then(([cloudStories, legacyStories]) => {
+      if (!alive) return;
+      const ids = new Set(cloudStories.map((story) => String(story.id)));
+      setStories([...cloudStories, ...legacyStories.filter((story) => !ids.has(String(story.id)))]);
+    });
+    return () => { alive = false; };
   }, []);
 
   const send = async (event) => {
@@ -76,16 +89,20 @@ export default function Studio() {
   const saveStory = async (content, id) => {
     const asked = [...messages].reverse().find((message) => message.role === "user")?.content || "Untitled";
     try {
-      const created = await base44.entities.Story.create({
-        owner_ref: getProfile().id,
-        title: asked.slice(0, 90),
-        kind: mode === "chat" ? "story" : mode,
-        language,
-        style,
-        script: content,
-        prompt: asked,
+      const result = await communityRequest("/stories", {
+        method: "POST",
+        body: {
+          profileId: getProfile().id,
+          title: asked.slice(0, 90),
+          kind: mode === "chat" ? "story" : mode,
+          language,
+          style,
+          script: content,
+          prompt: asked,
+        },
       });
-      setStories((prev) => [created, ...prev]);
+      if (!result.story) throw new Error("The Cloudflare story service did not confirm the save.");
+      setStories((prev) => [{ ...result.story, storage: "cloudflare" }, ...prev]);
     } catch (saveError) {
       setError(saveError.message || "Could not save the script.");
     }
@@ -93,8 +110,13 @@ export default function Studio() {
 
   const removeStory = async (id) => {
     try {
-      await base44.entities.Story.delete(id);
-      setStories((prev) => prev.filter((story) => story.id !== id));
+      const story = stories.find((item) => item.id === id);
+      if (story?.storage === "cloudflare") {
+        await communityRequest(`/stories?profileId=${encodeURIComponent(getProfile().id)}&id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      } else {
+        await base44.entities.Story.delete(id);
+      }
+      setStories((prev) => prev.filter((item) => item.id !== id));
     } catch (deleteError) {
       setError(deleteError.message || "Could not delete the script.");
     }
