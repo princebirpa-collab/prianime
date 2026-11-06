@@ -172,6 +172,25 @@ export default function AnimeDetail() {
                       </dd>
                     </div>
                   )}
+                  {(item.startDate?.year || item.endDate?.year) && (
+                    <div>
+                      <dt className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Release dates</dt>
+                      <dd className="mt-1">
+                        {item.startDate?.year ? `Premiere: ${[item.startDate.year, item.startDate.month, item.startDate.day].filter(Boolean).join("-")}` : "Premiere date unavailable"}
+                        {item.endDate?.year ? ` · Finale: ${[item.endDate.year, item.endDate.month, item.endDate.day].filter(Boolean).join("-")}` : ""}
+                      </dd>
+                    </div>
+                  )}
+                  {item.airingSchedule?.length > 0 && (
+                    <div>
+                      <dt className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Episode release schedule</dt>
+                      <dd className="mt-1 space-y-1">
+                        {item.airingSchedule.slice(0, 5).map((entry) => (
+                          <p key={entry.episode}>Episode {entry.episode}: {new Date(entry.airingAt * 1000).toLocaleString()}</p>
+                        ))}
+                      </dd>
+                    </div>
+                  )}
                   {item.studios?.length > 0 && (
                     <div>
                       <dt className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Studio</dt>
