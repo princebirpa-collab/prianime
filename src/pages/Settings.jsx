@@ -60,6 +60,8 @@ export default function Settings() {
     reader.onerror = () => setAvatarError("This image could not be read."); reader.readAsDataURL(file);
   };
   const [language, setLanguage] = usePref("language");
+  const [catalogMode, setCatalogMode] = useState(() => localStorage.getItem("pri-anime:catalog-source-mode") || "automatic");
+  const updateCatalogMode = (value) => { setCatalogMode(value); localStorage.setItem("pri-anime:catalog-source-mode", value); };
 
   const save = (event) => {
     event.preventDefault();
