@@ -18,6 +18,10 @@ export default function CursorGlow() {
       pos.x += (target.x - pos.x) * 0.14;
       pos.y += (target.y - pos.y) * 0.14;
       el.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) translate(-50%, -50%)`;
+      if (Math.abs(target.x - pos.x) < 0.25 && Math.abs(target.y - pos.y) < 0.25) {
+        running = false;
+        return;
+      }
       raf = requestAnimationFrame(tick);
     };
     const start = () => {
