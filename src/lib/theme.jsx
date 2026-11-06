@@ -4,6 +4,7 @@ export const THEMES = [
   { id: "royal", name: "Royal Gold", note: "Gilded midnight", mode: "dark", dots: ["#D4AF37", "#3D1D5A", "#07050A"] },
   { id: "void", name: "Void Cyan", note: "Starlit abyss", mode: "dark", dots: ["#38D9E8", "#3B2A6B", "#050418"] },
   { id: "crimson", name: "Crimson Dusk", note: "Ember court", mode: "dark", dots: ["#E0455F", "#5A1B2A", "#120406"] },
+  { id: "sakura", name: "Sakura Midnight", note: "Cherry blossom after dark", mode: "dark", dots: ["#F2A9C2", "#57243F", "#100812"] },
   { id: "jade", name: "Jade Empire", note: "Spirit forest", mode: "dark", dots: ["#38C98F", "#12352A", "#04120C"] },
   { id: "parchment", name: "Parchment", note: "Ivory archive", mode: "light", dots: ["#8A6A22", "#E7DCC8", "#F7F3EB"] },
   { id: "frost", name: "Frost Ivory", note: "Daylit theatre", mode: "light", dots: ["#1D6FA8", "#DCE7F1", "#F4F8FC"] },
