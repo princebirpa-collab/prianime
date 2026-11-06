@@ -21,6 +21,7 @@ export default function AnimeDetail() {
   const [mal, setMal] = useState(null);
   const [malChecked, setMalChecked] = useState(false);
   const [reference, setReference] = useState(null);
+  const [communityRatings, setCommunityRatings] = useState([]);
 
   useEffect(() => {
     if (!item) return;
@@ -28,6 +29,11 @@ export default function AnimeDetail() {
     let alive = true;
     setMalChecked(false);
     setReference(null);
+    setCommunityRatings([]);
+    fetch(`/api/catalog-ratings?q=${encodeURIComponent(item.titleRomaji || item.display)}`)
+      .then((response) => response.ok ? response.json() : null)
+      .then((data) => { if (alive) setCommunityRatings(data?.ratings || []); })
+      .catch(() => {});
     fetch(`/api/reference-metadata?q=${encodeURIComponent(item.titleRomaji || item.display)}`)
       .then((response) => response.ok ? response.json() : null)
       .then((data) => { if (alive) setReference(data); })
@@ -106,11 +112,7 @@ export default function AnimeDetail() {
                     <Star className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
                     {mal.score.toFixed(2)} {mal.source || "MAL"}
                   </span>
-                ) : malChecked ? (
-                  <span className="rounded-full border border-border/50 px-3 py-1.5 text-xs text-muted-foreground">
-                    Rating unavailable
-                  </span>
-                ) : (
+                ) : malChecked ? null : (
                   <span className="rounded-full border border-border/50 px-3 py-1.5 text-xs text-muted-foreground">
                     Checking rating…
                   </span>
@@ -130,6 +132,17 @@ export default function AnimeDetail() {
                 </span>
               </div>
 
+              {(communityRatings.length > 0 || reference?.imdbUrl) && (
+                <div className="mt-4 rounded-2xl border border-border/60 bg-card/45 p-4">
+                  <p className="text-[10px] uppercase tracking-[.22em] text-muted-foreground">Community rating sources</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {communityRatings.map((rating) => <a key={rating.id} href={rating.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-border/70 px-3 py-1.5 text-xs transition hover:border-primary/60"><Star className="h-3 w-3 text-primary" /> {rating.rating.toFixed(1)} / 100 · {rating.source}</a>)}
+                    {reference?.imdbUrl && <a href={reference.imdbUrl} target="_blank" rel="noopener noreferrer" className="rounded-full border border-border/70 px-3 py-1.5 text-xs transition hover:border-primary/60">IMDb title lookup ↗</a>}
+                    <a href={`https://www.google.com/search?q=${encodeURIComponent((item.titleRomaji || item.display) + " anime rating")}`} target="_blank" rel="noopener noreferrer" className="rounded-full border border-border/70 px-3 py-1.5 text-xs transition hover:border-primary/60">Google sources ↗</a>
+                  </div>
+                  <p className="mt-2 text-[10px] text-muted-foreground">Each numeric score is shown with its provider. External search links are references, not verified ratings.</p>
+                </div>
+              )}
               <div className="mt-6 flex flex-wrap items-center gap-2">
                 {item.source === "anilist" && <AnimeStreamLink anime={item} />}
                 <button
