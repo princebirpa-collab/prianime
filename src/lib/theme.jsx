@@ -12,7 +12,7 @@ export const THEMES = [
   { id: "jojo", name: "JoJo Pop Grey", note: "Monochrome pop-art", mode: "dark", dots: ["#B8B8B8", "#555555", "#111111"] },
 ];
 
-const STORAGE_KEY = "pri-anime:theme";
+const STORAGE_KEY = "pri-anime:theme-v2";
 const ThemeContext = createContext(null);
 
 function applyTheme(id) {
@@ -25,8 +25,8 @@ function applyTheme(id) {
 
 export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState(() => {
-    if (typeof window === "undefined") return "royal";
-    return localStorage.getItem(STORAGE_KEY) || "royal";
+    if (typeof window === "undefined") return "sakura";
+    return localStorage.getItem(STORAGE_KEY) || "sakura";
   });
 
   useEffect(() => {
