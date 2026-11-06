@@ -205,7 +205,12 @@ function expandedSearchVariants(query) {
     "kimetsu no yaiba": ["Demon Slayer Kimetsu no Yaiba"],
     "shingeki no kyojin": ["Attack on Titan"],
   };
-  return [...new Set([...base, ...(knownAliases[normalized] || [])])].slice(0, 6);
+  // Keep the user's exact spelling first, then put a known canonical title
+  // immediately after it. This prevents generic punctuation/stem variants
+  // from pushing important aliases (e.g. "Tokyo Revenge" -> "Tokyo Revengers")
+  // out of the request budget and keeps quick search responsive.
+  const canonical = knownAliases[normalized] || [];
+  return [...new Set([base[0], ...canonical, ...base.slice(1)])].slice(0, 2);
 }
 
 export async function callAniList(body) {
