@@ -16,7 +16,7 @@ export default function AnimePlayback({ anime, match }) {
         <a href={match.tmdbUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-primary hover:underline">TMDB {match.tmdbId} <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" /></a>
       </div>
       {playback.historyError && <p role="status" className="text-xs text-muted-foreground">Watch progress could not be restored or saved. Playback is still available.</p>}
-      <p className="text-xs leading-relaxed text-muted-foreground">If playback stalls, switch to AnimeSalt Â· Backup above or reload the selected player. Each provider controls its own availability, quality and subtitles.</p>
+      <p className="text-xs leading-relaxed text-muted-foreground">If playback stalls, retry the verified player or check an official licensed viewing service. Provider availability, quality and subtitles are controlled by each service.</p>
     </div>
   );
 }
