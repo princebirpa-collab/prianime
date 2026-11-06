@@ -6,7 +6,7 @@ const TTL = 5 * 60 * 1000;
 const SERVER_KEY = "pri:anilist:server-mode";
 const cache = new Map();
 
-const CORE = `id title { romaji english native } synonyms coverImage { extraLarge large color } bannerImage description(asHtml: false) genres averageScore meanScore popularity episodes duration status format season seasonYear startDate { year month day } endDate { year month day } airingSchedule(notYetAired: true, perPage: 100) { nodes { episode airingAt timeUntilAiring } } studios(isMain: true) { nodes { name } } trailer { id site } nextAiringEpisode { episode timeUntilAiring }`;
+const CORE = `id title { romaji english native } synonyms coverImage { extraLarge large color } bannerImage description(asHtml: false) genres averageScore meanScore popularity episodes duration status format season seasonYear startDate { year month day } endDate { year month day } studios(isMain: true) { nodes { name } } trailer { id site } nextAiringEpisode { episode timeUntilAiring }`;
 
 const LIST_QUERY = `query ($page: Int, $perPage: Int, $search: String, $genre: String, $season: MediaSeason, $seasonYear: Int, $sort: [MediaSort]) {
   Page(page: $page, perPage: $perPage) {
@@ -18,6 +18,7 @@ const LIST_QUERY = `query ($page: Int, $perPage: Int, $search: String, $genre: S
 const DETAIL_QUERY = `query ($id: Int) {
   Media(id: $id, type: ANIME) {
     ${CORE}
+    airingSchedule(notYetAired: false, perPage: 100) { nodes { episode airingAt timeUntilAiring } }
     duration
     source
     characters(sort: [ROLE, RELEVANCE], perPage: 8) { nodes { id name { full } image { large } } }
