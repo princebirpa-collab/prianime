@@ -176,6 +176,29 @@ export default function Settings() {
           </div>
         </section>
 
+        <section className="relative overflow-hidden rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/[0.10] via-card/70 to-background p-5 shadow-[0_20px_70px_-38px_hsl(var(--primary)/.5)] lg:col-span-2">
+          <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-16 h-48 w-48 rounded-full bg-primary/10 blur-3xl" />
+          <div className="relative">
+            <p className="text-[10px] uppercase tracking-[.26em] text-primary">Catalogue intelligence</p>
+            <h2 className="mt-1 font-display text-2xl">Live anime data & failover</h2>
+            <p className="mt-2 max-w-3xl text-xs leading-relaxed text-muted-foreground">AniList is the primary catalogue. If it is offline or has no matching result, PRI-ANIME searches MyAnimeList through Jikan and then Kitsu. Backup results are clearly identified and never sent to AniList or VidStuck as if they were AniList IDs.</p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <button type="button" onClick={() => updateCatalogMode("automatic")} aria-pressed={catalogMode === "automatic"} className={`rounded-xl border p-4 text-left transition ${catalogMode === "automatic" ? "border-primary bg-primary/10 shadow-[0_0_24px_-12px_hsl(var(--primary)/.8)]" : "border-border/60 bg-background/40 hover:border-primary/50"}`}>
+                <span className="flex items-center gap-2 text-sm font-semibold"><span className="h-2 w-2 rounded-full bg-emerald-400" /> Automatic failover</span>
+                <span className="mt-1 block text-[11px] text-muted-foreground">AniList → MAL/Jikan → Kitsu. Recommended.</span>
+              </button>
+              <button type="button" onClick={() => updateCatalogMode("anilist-only")} aria-pressed={catalogMode === "anilist-only"} className={`rounded-xl border p-4 text-left transition ${catalogMode === "anilist-only" ? "border-primary bg-primary/10" : "border-border/60 bg-background/40 hover:border-primary/50"}`}>
+                <span className="text-sm font-semibold">AniList only</span>
+                <span className="mt-1 block text-[11px] text-muted-foreground">Disable independent catalogue fallback.</span>
+              </button>
+            </div>
+            <div className="mt-4 grid gap-2 sm:grid-cols-3">
+              <div className="rounded-xl border border-border/60 bg-background/50 p-3"><p className="text-xs font-semibold">AniList</p><p className="mt-1 text-[11px] text-muted-foreground">Main catalogue, premiere dates and episode airing schedule.</p></div>
+              <div className="rounded-xl border border-border/60 bg-background/50 p-3"><p className="text-xs font-semibold">MAL / Jikan + Kitsu</p><p className="mt-1 text-[11px] text-muted-foreground">Independent search and backup title details.</p></div>
+              <div className="rounded-xl border border-border/60 bg-background/50 p-3"><p className="text-xs font-semibold">Wikipedia / IMDb</p><p className="mt-1 text-[11px] text-muted-foreground">Wikipedia live reference summary; IMDb title search (no public full-data API assumed).</p></div>
+            </div>
+          </div>
+        </section>
         <section className="rounded-2xl border border-border/60 bg-card/40 p-5 lg:col-span-2">
           <h2 className="font-display text-xl">Playback & privacy</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
