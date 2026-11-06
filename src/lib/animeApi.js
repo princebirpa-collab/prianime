@@ -366,13 +366,33 @@ export async function callAniList(body) {
   } else {
     const variables = buildListVariables(body);
     if (!variables) return { items: [], pageInfo: null, item: null };
-    const data = await graphql(LIST_QUERY, variables);
-    if (!data?.Page) throw new Error("AniList returned an invalid catalogue response.");
-    result = {
-      items: (data.Page.media || []).map(normalize).filter(Boolean),
-      pageInfo: data.Page.pageInfo || null,
-      item: null,
-    };
+    try {
+      const data = await graphql(LIST_QUERY, variables);
+      if (!data?.Page) throw new Error("AniList returned an invalid catalogue response.");
+      result = {
+        items: (data.Page.media || []).map(normalize).filter(Boolean),
+        pageInfo: data.Page.pageInfo || null,
+        item: null,
+      };
+    } catch (primaryError) {
+      // Keep browse/home useful during AniList outages by switching to an
+      // independent anime-only feed. Preserve the source ID so detail routes
+      // resolve through the matching catalogue instead of mixing IDs.
+      const response = await fetch(`/api/catalog-feed?mode=${encodeURIComponent(body.action || "popular")}&page=${variables.page}`, {
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(9000),
+      });
+      if (!response.ok) throw primaryError;
+      const payload = await response.json();
+      const source = payload.source === "kitsu" ? "kitsu" : "mal";
+      const items = (payload.data || []).map((row) => normalizeExternalMedia(row, source)).filter(Boolean);
+      if (!items.length) throw primaryError;
+      result = {
+        items,
+        pageInfo: { total: items.length * 10, currentPage: variables.page, lastPage: 50, hasNextPage: true },
+        item: null,
+      };
+    }
   }
 
   if (cache.size > 200) cache.clear();
