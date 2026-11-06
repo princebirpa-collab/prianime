@@ -1,6 +1,5 @@
 import { useRef, useState } from "react";
 import VidstuckPlayer from "@/components/video/VidstuckPlayer";
-import AnimeSaltBackup from "@/components/video/AnimeSaltBackup";
 import AnikotoBackup from "@/components/video/AnikotoBackup";
 import { parseVidstuckUrl } from "@/components/video/vidstuckUrls";
 
@@ -14,26 +13,13 @@ function readBackup(key) {
 
 export default function ServerVideoPlayer({ src, title, startAt = 0, onProgress }) {
   const source = parseVidstuckUrl(src);
-  const storageKey = source
-    ? `pri-anime:animesalt:${source.mediaType}:${source.tmdbId}`
-    : "pri-anime:animesalt:invalid-source";
   const [server, setServer] = useState("vidstuck");
   const progress = useRef(null);
   const [resume, setResume] = useState(null);
-  const [backupLink, setBackupLink] = useState(() => readBackup(storageKey));
-
-  const selectBackup = (value) => {
-    try {
-      if (typeof window !== "undefined") window.localStorage.setItem(storageKey, value);
-    } catch {
-      // Playback should still work if browser storage is blocked or full.
-    }
-    setBackupLink(value);
-  };
 
   const switchServer = (next) => {
     if (next === server) return;
-    if (next === "animesalt" && progress.current?.src === src) setResume(progress.current);
+    if (next !== "vidstuck" && progress.current?.src === src) setResume(progress.current);
     setServer(next);
   };
 
@@ -57,14 +43,14 @@ export default function ServerVideoPlayer({ src, title, startAt = 0, onProgress 
     <div className="space-y-3">
       <div role="group" aria-label="Playback server" className="flex flex-wrap items-center gap-2">
         <span className="mr-1 text-xs text-muted-foreground">Server</span>
-        {[{ id: "vidstuck", label: "Vidstuck · Main" }, { id: "animesalt", label: "AnimeSalt · Backup" }, { id: "anikoto", label: "AniKoto · Extra Backup" }].map((item) => (
+        {[{ id: "vidstuck", label: "Vidstuck · Main" }, { id: "official", label: "Licensed platforms" }, { id: "anikoto", label: "AniKoto · Extra Backup" }].map((item) => (
           <button key={item.id} type="button" aria-pressed={server === item.id} onClick={() => switchServer(item.id)} className={`rounded-full border px-4 py-2 text-xs font-semibold transition ${server === item.id ? "border-primary bg-primary/10 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60 hover:text-primary"}`}>{item.label}</button>
         ))}
       </div>
       {server === "vidstuck"
         ? <VidstuckPlayer src={src} startAt={resume?.src === src ? resume.position : startAt} onProgress={rememberProgress} />
-        : server === "animesalt"
-          ? <AnimeSaltBackup key={src} title={title} pageUrl={backupLink} onSelect={selectBackup} mediaType={source.mediaType} season={source.season} episode={source.episode} />
+        : server === "official"
+          ? <div className="rounded-xl border border-border/60 bg-card/40 p-5"><p className="font-display text-lg">Official viewing platforms</p><p className="mt-1 text-xs text-muted-foreground">Choose a licensed service and search for this title there. Availability varies by country.</p><div className="mt-3 flex flex-wrap gap-4 text-sm"><a className="text-primary hover:underline" href="https://www.crunchyroll.com/" target="_blank" rel="noopener noreferrer">Crunchyroll</a><a className="text-primary hover:underline" href="https://www.netflix.com/" target="_blank" rel="noopener noreferrer">Netflix</a><a className="text-primary hover:underline" href="https://www.primevideo.com/" target="_blank" rel="noopener noreferrer">Prime Video</a></div></div>
           : <AnikotoBackup key={src} title={title} season={source.season} episode={source.episode} />}
     </div>
   );
