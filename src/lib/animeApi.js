@@ -305,7 +305,7 @@ export async function callAniList(body) {
       // Space variant requests by about one second so the canonical franchise
       // search can complete reliably.
       if (variants.length > 1 && variant !== variants[variants.length - 1]) {
-        await new Promise((resolve) => setTimeout(resolve, 1100));
+        await new Promise((resolve) => setTimeout(resolve, 350));
       }
     }
     const ranked = rankSearchResults([...merged.values()], variables.search);
