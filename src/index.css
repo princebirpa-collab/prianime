@@ -462,3 +462,7 @@ body::after {
   animation: priSnowDrift 34s linear infinite, priPetalFall 28s ease-in-out infinite;
   filter: drop-shadow(0 0 5px hsl(337 90% 82% / .45));
 }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="sakura"] body::after { animation: none; }
+}
