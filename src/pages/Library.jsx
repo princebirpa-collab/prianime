@@ -27,16 +27,25 @@ export default function Library() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [watchlist, favorite, videos, anime, storyPage] = await Promise.all([
+    const [watchlist, favorite, videos, anime, storySources] = await Promise.all([
       listSaved("watchlist").catch(() => []),
       listSaved("favorite").catch(() => []),
       listProgress("video").catch(() => []),
       communityRequest(`/watch-history?profileId=${encodeURIComponent(getProfile().id)}`).then((data) => (data.history || []).map((row) => ({ id: `cloud_${row.anime_id}`, owner_ref: getProfile().id, kind: "anime", ref_id: row.anime_id, title: row.title, cover: row.cover, episode: row.episode, season: row.season, position: Number(row.position) || 0, duration: Number(row.duration) || 0, link: row.link, updated_date: row.updated_at }))).catch(() => listProgress("anime").catch(() => [])),
-      base44.entities.Story.filter({ owner_ref: getProfile().id }, { sort: "-created_date", limit: 40 }).catch(() => ({ items: [] })),
+      Promise.all([
+        communityRequest(`/stories?profileId=${encodeURIComponent(getProfile().id)}`)
+          .then((data) => (data.stories || []).map((story) => ({ ...story, storage: "cloudflare" })))
+          .catch(() => []),
+        base44.entities.Story.filter({ owner_ref: getProfile().id }, { sort: "-created_date", limit: 40 })
+          .then((page) => (page.items || []).map((story) => ({ ...story, storage: "base44" })))
+          .catch(() => []),
+      ]),
     ]);
     setSaved({ watchlist, favorite });
     setProgress({ video: videos, anime });
-    setStories(storyPage.items || []);
+    const cloudStories = storySources[0] || [];
+    const cloudIds = new Set(cloudStories.map((story) => String(story.id)));
+    setStories([...cloudStories, ...(storySources[1] || []).filter((story) => !cloudIds.has(String(story.id)))]);
     setLoading(false);
   }, []);
 
@@ -54,8 +63,13 @@ export default function Library() {
   };
 
   const removeStory = async (id) => {
-    await base44.entities.Story.delete(id);
-    setStories((prev) => prev.filter((story) => story.id !== id));
+    const story = stories.find((item) => item.id === id);
+    if (story?.storage === "cloudflare") {
+      await communityRequest(`/stories?profileId=${encodeURIComponent(getProfile().id)}&id=${encodeURIComponent(id)}`, { method: "DELETE" });
+    } else {
+      await base44.entities.Story.delete(id);
+    }
+    setStories((prev) => prev.filter((item) => item.id !== id));
   };
 
   const toCard = (row) => ({
