@@ -4,13 +4,6 @@ import { ArrowUpRight, CalendarClock, Clock3, RadioTower } from "lucide-react";
 import { useAnimeList } from "@/hooks/useAnime";
 import { currentSeason } from "@/lib/animeApi";
 
-const REFERENCES = [
-  { label: "AnimeSchedule", href: "https://animeschedule.net/" },
-  { label: "LiveChart", href: "https://www.livechart.me/schedule" },
-  { label: "Anime-Planet", href: "https://www.anime-planet.com/" },
-  { label: "AnimeCorner", href: "https://animecorner.me/db/anime/calendar" },
-];
-
 function airingDate(seconds) {
   if (!Number.isFinite(seconds)) return "Time unavailable";
   return new Intl.DateTimeFormat(undefined, {
@@ -35,7 +28,6 @@ function countdown(seconds) {
 export default function AiringRadar() {
   const [jikanItems, setJikanItems] = useState([]);
   const [jikanLoading, setJikanLoading] = useState(false);
-  const [jikanSource, setJikanSource] = useState("");
   const season = currentSeason();
   const { items, loading } = useAnimeList({
     action: "seasonal",
@@ -59,7 +51,6 @@ export default function AiringRadar() {
           return response.json();
         });
         let entries = Array.isArray(payload?.data) ? payload.data : [];
-        let source = "Jikan current season";
         if (!entries.length) {
           payload = await fetch("/api/jikan-anime?action=upcoming&page=1", {
             headers: { Accept: "application/json" },
@@ -69,16 +60,13 @@ export default function AiringRadar() {
             return response.json();
           });
           entries = Array.isArray(payload?.data) ? payload.data : [];
-          source = "Jikan upcoming season";
         }
         if (active) {
           setJikanItems(entries.filter((entry) => Number.isSafeInteger(Number(entry?.mal_id)) && entry?.mal_id > 0).slice(0, 6));
-          setJikanSource(source);
         }
       } catch {
         if (active && !controller.signal.aborted) {
           setJikanItems([]);
-          setJikanSource("");
         }
       } finally {
         if (active) setJikanLoading(false);
@@ -164,15 +152,6 @@ export default function AiringRadar() {
           <div className="px-6 py-8 text-sm text-muted-foreground">{jikanLoading ? "Checking the Jikan backup schedule…" : "The airing feed is temporarily unavailable. Browse the seasonal catalogue instead."}</div>
         )}
 
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-white/[0.07] px-5 py-4 sm:px-8">
-          <span className="text-[10px] font-semibold uppercase tracking-[.2em] text-muted-foreground">Schedule references</span>
-          {REFERENCES.map((source) => (
-            <a key={source.label} href={source.href} target="_blank" rel="noreferrer" className="text-[11px] text-muted-foreground underline decoration-white/20 underline-offset-4 transition hover:text-primary">
-              {source.label}
-            </a>
-          ))}
-          <span className="ml-auto text-[10px] text-muted-foreground/60">Times shown in your device timezone · {upcoming.length ? "AniList feed" : jikanSource || "Schedule feeds"}</span>
-        </div>
       </div>
     </section>
   );
