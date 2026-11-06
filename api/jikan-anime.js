@@ -53,6 +53,22 @@ export default async function handler(req, res) {
       return send(res, 200, { ok: true, data: payload.data || [], pagination: payload.pagination || null });
     }
 
+    if (action === "seasonal" || action === "upcoming" || action === "schedule") {
+      const page = Math.min(Math.max(Number(req.query?.page) || 1, 1), 10);
+      const filter = String(req.query?.filter || "").toLowerCase();
+      const allowedFilters = new Set(["tv", "movie", "ova", "special", "ona", "music"]);
+      if (action === "schedule" && filter && !allowedFilters.has(filter)) {
+        return send(res, 400, { ok: false, error: "Unsupported schedule filter." }, "no-store");
+      }
+      const path = action === "seasonal"
+        ? `/seasons/now?page=${page}`
+        : action === "upcoming"
+          ? `/seasons/upcoming?page=${page}`
+          : `/schedules?page=${page}${filter ? `&filter=${encodeURIComponent(filter)}` : ""}`;
+      const payload = await jikan(path);
+      return send(res, 200, { ok: true, data: payload.data || [], pagination: payload.pagination || null });
+    }
+
     const id = validId(req.query?.id);
     if (!id) return send(res, 400, { ok: false, error: "A valid MAL anime ID is required." }, "no-store");
 
@@ -63,7 +79,7 @@ export default async function handler(req, res) {
       streaming: "/streaming",
     };
     if (!(action in suffixes)) {
-      return send(res, 400, { ok: false, error: "Supported actions: search, detail, episodes, videos, streaming." }, "no-store");
+      return send(res, 400, { ok: false, error: "Supported actions: search, detail, episodes, videos, streaming, seasonal, upcoming, schedule." }, "no-store");
     }
 
     const payload = await jikan(`/anime/${id}${suffixes[action]}`);
