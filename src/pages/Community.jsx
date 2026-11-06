@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
-import { Globe2, Plus, Send, Users, Hash, Sparkles, RefreshCw, ShieldCheck, MessageCircle } from "lucide-react";
-import PageHeader from "@/components/common/PageHeader";
+import { Plus, Send, Users, Hash, RefreshCw, ShieldCheck, MessageCircle } from "lucide-react";
 import { useProfile } from "@/lib/profile";
 import { communityRequest } from "@/lib/communityApi";
 
