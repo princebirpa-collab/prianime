@@ -95,6 +95,34 @@
     --chart-5: 152 45% 45%;
   }
 
+  [data-theme="sakura"] {
+    --background: 315 32% 4%;
+    --foreground: 330 30% 97%;
+    --card: 316 28% 7%;
+    --card-foreground: 330 30% 97%;
+    --popover: 316 30% 8%;
+    --popover-foreground: 330 30% 97%;
+    --primary: 337 78% 76%;
+    --primary-foreground: 316 45% 8%;
+    --secondary: 322 34% 16%;
+    --secondary-foreground: 330 25% 96%;
+    --muted: 315 22% 12%;
+    --muted-foreground: 326 14% 72%;
+    --accent: 330 42% 23%;
+    --accent-foreground: 337 85% 88%;
+    --border: 330 30% 23%;
+    --input: 315 24% 17%;
+    --ring: 337 78% 76%;
+    --gold: 337 78% 76%;
+    --amethyst: 322 38% 22%;
+    --surface: 316 28% 9%;
+    --chart-1: 337 78% 76%;
+    --chart-2: 285 48% 62%;
+    --chart-3: 190 65% 58%;
+    --chart-4: 44 62% 62%;
+    --chart-5: 152 45% 55%;
+  }
+
   [data-theme="jade"] {
     --background: 168 32% 4%;
     --foreground: 150 15% 96%;
@@ -414,4 +442,23 @@ body::after {
     animation: none;
     transform: none;
   }
+}
+
+
+/* Sakura season: soft illuminated petals layered over the existing snow drift. */
+@keyframes priPetalFall {
+  0% { transform: translate3d(0,-12vh,0) rotate(0deg); }
+  50% { transform: translate3d(5vw,52vh,0) rotate(190deg); }
+  100% { transform: translate3d(-4vw,112vh,0) rotate(390deg); }
+}
+[data-theme="sakura"] body::after {
+  opacity: .46;
+  background-image:
+    radial-gradient(ellipse 5px 3px at 20px 20px, hsl(340 95% 88% / .9) 0 75%, transparent 80%),
+    radial-gradient(ellipse 4px 2.5px at 80px 90px, hsl(326 90% 82% / .8) 0 75%, transparent 80%),
+    radial-gradient(circle, hsl(0 0% 100% / .72) 0 1px, transparent 1.8px),
+    radial-gradient(hsl(337 90% 88% / .12) .6px, transparent .8px);
+  background-size: 190px 210px, 260px 280px, 170px 170px, 5px 5px;
+  animation: priSnowDrift 34s linear infinite, priPetalFall 28s ease-in-out infinite;
+  filter: drop-shadow(0 0 5px hsl(337 90% 82% / .45));
 }
