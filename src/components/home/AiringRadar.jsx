@@ -37,7 +37,7 @@ export default function AiringRadar() {
   const [jikanLoading, setJikanLoading] = useState(false);
   const [jikanSource, setJikanSource] = useState("");
   const season = currentSeason();
-  const { items, loading, error } = useAnimeList({
+  const { items, loading } = useAnimeList({
     action: "seasonal",
     season: season.season,
     year: season.year,
