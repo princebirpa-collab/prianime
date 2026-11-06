@@ -50,7 +50,7 @@ export default function AiringRadar() {
   );
 
   return (
-    <section className="mx-auto w-full max-w-[1600px] px-4 pt-14 sm:px-6 lg:px-10">
+    <section id="airing-radar" className="mx-auto w-full max-w-[1600px] scroll-mt-24 px-4 pt-14 sm:px-6 lg:px-10">
       <div className="overflow-hidden rounded-[1.75rem] border border-primary/20 bg-[radial-gradient(ellipse_at_92%_0%,hsl(var(--primary)/.13),transparent_42%),linear-gradient(135deg,hsl(var(--card)/.96),hsl(var(--background)))]">
         <div className="flex flex-wrap items-end justify-between gap-4 border-b border-white/[0.07] px-5 py-6 sm:px-8">
           <div>
