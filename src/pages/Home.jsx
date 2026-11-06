@@ -10,11 +10,11 @@ export default function Home() {
   return (
     <div className="pb-8">
       <FeaturedTrendingCarousel />
+      <ThemeRibbon />
       <AiringRadar />
       <ContinueWatching />
       <LiveCatalogue />
       <RealmGrid />
-      <ThemeRibbon />
       <ExperiencePanel />
     </div>
   );
