@@ -76,6 +76,8 @@ const AuthenticatedApp = () => {
         <Route path="/arena" element={<Arena />} />
         <Route path="/world-map" element={<WorldMap />} />
         <Route path="/watch-party" element={<WatchParty />} />
+        <Route path="/channels" element={<Channels />} />
+        <Route path="/manhwa" element={<Manhwa />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
