@@ -359,9 +359,41 @@ export async function callAniList(body) {
         // valid empty result rather than turning an upstream outage into error.
       }
     }
-    if (result.items.length === 0 && catalogMode === "automatic") {
+    // Search Jikan/MAL (or its Kitsu fallback) alongside AniList on every
+    // query, not only when AniList returns zero results. This makes the main
+    // search a genuinely multi-catalogue search while retaining source IDs.
+    if (catalogMode === "automatic") {
       const externalItems = await searchExternalCatalog(variables.search);
-      if (externalItems.length) result = { items: externalItems, pageInfo: { total: externalItems.length, currentPage: 1, lastPage: 1, hasNextPage: false }, item: null };
+      if (externalItems.length) {
+        const merged = [...result.items];
+        const titleKey = (item) => String(item?.display || item?.titleRomaji || "")
+          .toLocaleLowerCase().normalize("NFKD").replace(/[\\u0300-\\u036f]/g, "")
+          .replace(/[^\\p{L}\\p{N}]+/gu, " ").trim();
+        for (const external of externalItems) {
+          const key = titleKey(external);
+          const existingIndex = merged.findIndex((item) =>
+            String(item.id) === String(external.id) ||
+            (key && [item.display, item.titleRomaji, ...(item.titleAliases || [])]
+              .some((title) => titleKey({ display: title }) === key))
+          );
+          if (existingIndex >= 0) {
+            const existing = merged[existingIndex];
+            merged[existingIndex] = {
+              ...existing,
+              sources: [...new Set([...(existing.sources || [existing.source]), external.source])],
+            };
+          } else {
+            merged.push({ ...external, sources: [external.source] });
+          }
+        }
+        result = {
+          ...result,
+          items: merged,
+          pageInfo: result.pageInfo || {
+            total: merged.length, currentPage: 1, lastPage: 1, hasNextPage: false,
+          },
+        };
+      }
     }
   } else {
     const variables = buildListVariables(body);
