@@ -11,7 +11,7 @@ function send(res, status, payload) {
 
 async function searchJikan(query) {
   const response = await fetch(
-    `${JIKAN_SEARCH}?q=${encodeURIComponent(query)}&limit=5&sfw=true`,
+    `${JIKAN_SEARCH}?q=${encodeURIComponent(query)}&limit=12&sfw=true`,
     { headers: { Accept: "application/json" }, signal: AbortSignal.timeout(4500) },
   );
   if (!response.ok) return [];
@@ -36,6 +36,10 @@ async function searchKitsu(query) {
       ...(Array.isArray(attrs.abbreviatedTitles) ? attrs.abbreviatedTitles : []),
     ].filter((title) => typeof title === "string" && title.trim());
     return {
+      kitsu_id: entry.id,
+      images: { webp: { large_image_url: attrs.posterImage?.large || attrs.posterImage?.original || "" } },
+      startDate: attrs.startDate, endDate: attrs.endDate, synopsis: attrs.synopsis || attrs.description,
+      episodeCount: attrs.episodeCount, episodeLength: attrs.episodeLength, averageRating: attrs.averageRating, showType: attrs.showType, status: attrs.status,
       title: attrs.canonicalTitle || synonyms[0] || "",
       title_english: titles.en || attrs.canonicalTitle || "",
       title_japanese: titles.ja_jp || titles.en_jp || "",
