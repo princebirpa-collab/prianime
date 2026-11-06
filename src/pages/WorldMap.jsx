@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Lock, Map, Compass, Sparkles, Flame, Mountain, Trees, Castle } from "lucide-react";
+import { Lock, Compass, Sparkles, Flame, Mountain, Trees, Castle } from "lucide-react";
 import { Link } from "react-router-dom";
 import PageHeader from "@/components/common/PageHeader";
 import { useProfile } from "@/lib/profile";
