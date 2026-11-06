@@ -73,8 +73,8 @@ export default function AnikotoBackup({ title, season, episode }) {
     let cancelled = false;
     setBusy(true);
     setError("");
-    Promise.all([1, 2, 3].map((page) =>
-      fetch(`/api/anikoto?action=recent&page=${page}&per_page=50`)
+    Promise.all([1].map((page) =>
+      fetch(`/api/anikoto?action=recent&page=${page}&per_page=30`, { signal: AbortSignal.timeout(9000) })
         .then(async (response) => {
           const payload = await response.json().catch(() => ({}));
           if (!response.ok || !payload?.ok) throw new Error(payload?.error || "AniKoto list is unavailable.");
@@ -108,7 +108,7 @@ export default function AnikotoBackup({ title, season, episode }) {
     setBusy(true);
     setError("");
     setSeriesData(null);
-    fetch(`/api/anikoto?action=series&id=${encodeURIComponent(selectedId)}`)
+    fetch(`/api/anikoto?action=series&id=${encodeURIComponent(selectedId)}`, { signal: AbortSignal.timeout(9000) })
       .then(async (response) => {
         const payload = await response.json().catch(() => ({}));
         if (!response.ok || !payload?.ok) throw new Error(payload?.error || "Could not load this series.");
@@ -153,7 +153,7 @@ export default function AnikotoBackup({ title, season, episode }) {
             <input id="anikoto-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Type an anime title…" autoComplete="off" className="w-full rounded-xl border border-border bg-background py-3 pl-9 pr-10 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20" />
             {query && <button type="button" onClick={() => setQuery("")} aria-label="Clear anime search" className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"><X className="h-4 w-4" aria-hidden="true" /></button>}
           </div>
-          <p className="text-[11px] text-muted-foreground">Searches the anime currently loaded from AniKoto.</p>
+          <p className="text-[11px] text-muted-foreground">Searches the latest anime list returned by AniKoto.</p>
           <select value={selectedId} onChange={(event) => setSelectedId(event.target.value)} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm">
             <option value="">Select anime</option>
             {filteredItems.map((item, index) => {
