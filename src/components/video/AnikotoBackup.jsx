@@ -144,7 +144,7 @@ export default function AnikotoBackup({ title, season, episode }) {
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-muted-foreground">AniKoto · Extra backup. It tries to match the current title and episode; Vidstuck and AnimeSalt remain unchanged.</p>
+      <p className="text-sm text-muted-foreground">AniKoto · Extra backup. It tries to match the current title and episode; the Vidstuck player remains separate.</p>
       <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(180px,0.7fr)]">
         <div className="space-y-1.5">
           <label htmlFor="anikoto-search" className="block text-xs font-semibold text-foreground">Search anime</label>
