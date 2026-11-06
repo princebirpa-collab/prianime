@@ -4,6 +4,7 @@ import { useAnimeDetail } from "@/hooks/useAnime";
 import useAnimeSource from "@/components/video/useAnimeSource";
 import AnimePlayback from "@/components/video/AnimePlayback";
 import VidstuckSource from "@/components/video/VidstuckSource";
+import JikanAnimePanel from "@/components/video/JikanAnimePanel";
 import EmptyState from "@/components/common/EmptyState";
 
 export default function AnimeScreening({ animeId }) {
@@ -25,6 +26,7 @@ export default function AnimeScreening({ animeId }) {
           <VidstuckSource />
           <div className="rounded-xl border border-border/60 bg-card/40 p-4"><h2 className="font-display text-lg">Official viewing options</h2><p className="mt-1 text-xs text-muted-foreground">Check licensed availability on official services. A listing does not guarantee regional availability.</p><div className="mt-3 flex flex-wrap gap-3 text-sm"><a className="text-primary hover:underline" href="https://www.crunchyroll.com/" target="_blank" rel="noopener noreferrer">Crunchyroll</a><a className="text-primary hover:underline" href="https://www.netflix.com/" target="_blank" rel="noopener noreferrer">Netflix</a><a className="text-primary hover:underline" href="https://www.primevideo.com/" target="_blank" rel="noopener noreferrer">Prime Video</a></div></div>
         </>}
+        {anime.item?.display && <JikanAnimePanel title={anime.item.display} />}
       </>}
     </div>
   );
