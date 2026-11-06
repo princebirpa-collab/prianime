@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
@@ -10,24 +11,24 @@ import { ThemeProvider } from '@/lib/theme';
 import Layout from '@/components/layout/Layout';
 import IntroOverlay from '@/components/IntroOverlay';
 // Add page imports here
-import Home from '@/pages/Home';
-import Browse from '@/pages/Browse';
-import Category from '@/pages/Category';
-import AnimeDetail from '@/pages/AnimeDetail';
-import Reels from '@/pages/Reels';
-import Videos from '@/pages/Videos';
-import Watch from '@/pages/Watch';
-import Studio from '@/pages/Studio';
-import Creator from '@/pages/Creator';
-import Library from '@/pages/Library';
-import Settings from '@/pages/Settings';
-import Admin from '@/pages/Admin';
-import Policy from '@/pages/Policy';
-import Community from '@/pages/Community';
-import Missions from '@/pages/Missions';
-import Arena from '@/pages/Arena';
-import WorldMap from '@/pages/WorldMap';
-import WatchParty from '@/pages/WatchParty';
+const Home = lazy(() => import('@/pages/Home'));
+const Browse = lazy(() => import('@/pages/Browse'));
+const Category = lazy(() => import('@/pages/Category'));
+const AnimeDetail = lazy(() => import('@/pages/AnimeDetail'));
+const Reels = lazy(() => import('@/pages/Reels'));
+const Videos = lazy(() => import('@/pages/Videos'));
+const Watch = lazy(() => import('@/pages/Watch'));
+const Studio = lazy(() => import('@/pages/Studio'));
+const Creator = lazy(() => import('@/pages/Creator'));
+const Library = lazy(() => import('@/pages/Library'));
+const Settings = lazy(() => import('@/pages/Settings'));
+const Admin = lazy(() => import('@/pages/Admin'));
+const Policy = lazy(() => import('@/pages/Policy'));
+const Community = lazy(() => import('@/pages/Community'));
+const Missions = lazy(() => import('@/pages/Missions'));
+const Arena = lazy(() => import('@/pages/Arena'));
+const WorldMap = lazy(() => import('@/pages/WorldMap'));
+const WatchParty = lazy(() => import('@/pages/WatchParty'));
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -54,6 +55,7 @@ const AuthenticatedApp = () => {
 
   // Render the main app
   return (
+    <Suspense fallback={<div role="status" className="grid min-h-[50vh] place-items-center text-sm text-muted-foreground">Loading PRI-ANIME…</div>}>
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
@@ -77,6 +79,7 @@ const AuthenticatedApp = () => {
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
+    </Suspense>
   );
 };
 
