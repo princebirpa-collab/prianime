@@ -3,14 +3,6 @@ import VidstuckPlayer from "@/components/video/VidstuckPlayer";
 import AnikotoBackup from "@/components/video/AnikotoBackup";
 import { parseVidstuckUrl } from "@/components/video/vidstuckUrls";
 
-function readBackup(key) {
-  try {
-    return typeof window === "undefined" ? "" : window.localStorage.getItem(key) || "";
-  } catch {
-    return "";
-  }
-}
-
 export default function ServerVideoPlayer({ src, title, startAt = 0, onProgress }) {
   const source = parseVidstuckUrl(src);
   const [server, setServer] = useState("vidstuck");
