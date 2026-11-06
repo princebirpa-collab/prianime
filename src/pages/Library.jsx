@@ -7,6 +7,7 @@ import AnimeCard from "@/components/anime/AnimeCard";
 import EmptyState from "@/components/common/EmptyState";
 import { listSaved, listProgress, clearProgress } from "@/lib/library";
 import { getProfile } from "@/lib/profile";
+import { communityRequest } from "@/lib/communityApi";
 import { percent, relativeDate } from "@/lib/format";
 
 const TABS = [
@@ -30,7 +31,7 @@ export default function Library() {
       listSaved("watchlist").catch(() => []),
       listSaved("favorite").catch(() => []),
       listProgress("video").catch(() => []),
-      listProgress("anime").catch(() => []),
+      communityRequest(`/watch-history?profileId=${encodeURIComponent(getProfile().id)}`).then((data) => (data.history || []).map((row) => ({ id: `cloud_${row.anime_id}`, owner_ref: getProfile().id, kind: "anime", ref_id: row.anime_id, title: row.title, cover: row.cover, episode: row.episode, season: row.season, position: Number(row.position) || 0, duration: Number(row.duration) || 0, link: row.link, updated_date: row.updated_at }))).catch(() => listProgress("anime").catch(() => [])),
       base44.entities.Story.filter({ owner_ref: getProfile().id }, { sort: "-created_date", limit: 40 }).catch(() => ({ items: [] })),
     ]);
     setSaved({ watchlist, favorite });
@@ -70,7 +71,7 @@ export default function Library() {
   });
 
   const grid = saved[tab] || [];
-  const continueRows = tab === "continue" ? progress.video : tab === "recent" ? progress.anime : [];
+  const continueRows = tab === "continue" ? [...progress.video, ...progress.anime].sort((a, b) => String(b.updated_date || "").localeCompare(String(a.updated_date || ""))) : tab === "recent" ? progress.anime : [];
 
   return (
     <div className="pb-16">
@@ -173,7 +174,7 @@ export default function Library() {
               {continueRows.map((row) => (
                 <div key={row.id} className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/40 p-3">
                   <Link
-                    to={tab === "continue" ? `/watch/${row.ref_id}` : `/anime/${row.ref_id}`}
+                    to={tab === "continue" ? (row.kind === "anime" ? `/watch?anime=${encodeURIComponent(row.ref_id)}&season=${row.season || 1}&episode=${row.actual_episode || row.episode || 1}` : `/watch/${row.ref_id}`) : `/anime/${row.ref_id}`}
                     className="flex min-w-0 flex-1 items-center gap-3"
                   >
                     <span className="h-14 w-24 shrink-0 overflow-hidden rounded-md bg-muted">
@@ -182,8 +183,8 @@ export default function Library() {
                     <span className="min-w-0 flex-1">
                       <span className="line-clamp-1 block text-sm text-foreground">{row.title}</span>
                       <span className="mt-0.5 block text-[10px] uppercase tracking-[0.12em] text-muted-foreground">
-                        {row.episode ? `Episode ${row.episode} · ` : ""}
-                        {row.duration ? `${Math.round(percent(row.position, row.duration))}% watched` : "Viewed"}
+                        {row.episode ? `Season ${row.season || 1} · Episode ${row.actual_episode || row.episode} · ` : ""}
+                        {row.duration ? `${Math.round(percent(row.position, row.duration))}% · ${Math.floor(row.position / 60)}:${String(Math.floor(row.position % 60)).padStart(2, "0")} / ${Math.floor(row.duration / 60)}:${String(Math.floor(row.duration % 60)).padStart(2, "0")}` : "Viewed"}
                       </span>
                       <span className="mt-1 block h-0.5 w-32 overflow-hidden rounded-full bg-white/15">
                         <span className="block h-full bg-primary" style={{ width: `${percent(row.position, row.duration)}%` }} />
