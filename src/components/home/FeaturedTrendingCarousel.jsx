@@ -29,7 +29,7 @@ export default function FeaturedTrendingCarousel() {
         <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(ellipse_at_78%_45%,rgba(255,255,255,.13),transparent_45%)]" />
         <div className="relative z-10 grid min-h-[430px] items-center gap-6 p-6 sm:min-h-[510px] sm:grid-cols-[1fr_300px] sm:px-12 sm:py-10 lg:grid-cols-[1fr_360px] lg:px-16">
           <div className="max-w-2xl">
-            <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.34em] text-white/65"><TrendingUp className="h-3.5 w-3.5"/> PRI-ANIME / LIVE CHART</p>
+            <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.34em] text-white/65"><TrendingUp className="h-3.5 w-3.5"/> PRI-ANIME / TRENDING NOW</p>
             <h1 className="mt-4 font-display text-4xl font-semibold tracking-tight sm:text-6xl">Trending <span className="text-white/55">Anime.</span></h1>
             <p className="mt-4 max-w-lg text-sm leading-7 text-white/65">Seven trending anime, rotating automatically every 8 seconds.</p>
             {error ? <p className="mt-5 text-sm text-white/60">{error}</p> : loading || !featured ? <p className="mt-7 text-sm text-white/55">Loading live anime posters…</p> : (
@@ -39,7 +39,10 @@ export default function FeaturedTrendingCarousel() {
                   {featured.score ? <span className="inline-flex items-center gap-1.5"><Star className="h-3.5 w-3.5 fill-white text-white"/>{(featured.score/10).toFixed(1)} AniList</span> : null}
                 </div>
                 <h2 key={featured.id} className="mt-4 max-w-xl animate-in fade-in slide-in-from-bottom-2 duration-500 font-display text-3xl leading-tight sm:text-4xl">{featured.display}</h2>
-                <Link to={`/anime/${featured.id}`} className="mt-6 inline-flex items-center gap-3 rounded-full border border-white/25 bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-white/85"><Play className="h-4 w-4 fill-current"/> Explore anime <ArrowUpRight className="h-4 w-4"/></Link>
+                <div className="mt-6 flex flex-wrap items-center gap-3">
+                  <Link to={`/anime/${featured.id}`} className="inline-flex items-center gap-3 rounded-full border border-white/25 bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-white/85"><Play className="h-4 w-4 fill-current"/> Explore anime <ArrowUpRight className="h-4 w-4"/></Link>
+                  <a href="#airing-radar" className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/30 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/10">Airing schedule <ArrowUpRight className="h-4 w-4"/></a>
+                </div>
               </>
             )}
           </div>
