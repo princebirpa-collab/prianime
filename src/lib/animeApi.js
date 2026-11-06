@@ -4,6 +4,7 @@ import { searchVariants, scoreTitleMatch, withRetries } from "@/lib/searchUtils"
 const DIRECT_URL = "/api/anilist";
 const TTL = 5 * 60 * 1000;
 const SERVER_KEY = "pri:anilist:server-mode";
+const CATALOG_MODE_KEY = "pri-anime:catalog-source-mode";
 const cache = new Map();
 
 const CORE = `id title { romaji english native } synonyms coverImage { extraLarge large color } bannerImage description(asHtml: false) genres averageScore meanScore popularity episodes duration status format season seasonYear startDate { year month day } endDate { year month day } studios(isMain: true) { nodes { name } } trailer { id site } nextAiringEpisode { episode timeUntilAiring }`;
@@ -282,7 +283,8 @@ export async function callAniList(body) {
     // MAL/Jikan is a title-discovery fallback only. Resolve any discovered
     // MAL titles back through AniList so the UI keeps AniList IDs/routes and
     // playback identity; never pass a MAL ID into an AniList watch route.
-    if (result.items.length === 0) {
+    const catalogMode = typeof localStorage !== "undefined" ? localStorage.getItem(CATALOG_MODE_KEY) || "automatic" : "automatic";
+    if (result.items.length === 0 && catalogMode === "automatic") {
       try {
         const malHits = await searchMalTitles(variables.search);
         const aliases = [...new Set(malHits.flatMap((hit) =>
