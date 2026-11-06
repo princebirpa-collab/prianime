@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, CalendarClock, Clock3, RadioTower } from "lucide-react";
 import { useAnimeList } from "@/hooks/useAnime";
@@ -33,6 +33,9 @@ function countdown(seconds) {
 }
 
 export default function AiringRadar() {
+  const [jikanItems, setJikanItems] = useState([]);
+  const [jikanLoading, setJikanLoading] = useState(false);
+  const [jikanSource, setJikanSource] = useState("");
   const season = currentSeason();
   const { items, loading, error } = useAnimeList({
     action: "seasonal",
@@ -40,6 +43,61 @@ export default function AiringRadar() {
     year: season.year,
     perPage: 25,
   });
+
+
+  useEffect(() => {
+    const controller = new AbortController();
+    let active = true;
+    async function loadJikanFallback() {
+      setJikanLoading(true);
+      try {
+        let payload = await fetch("/api/jikan-anime?action=seasonal&page=1", {
+          headers: { Accept: "application/json" },
+          signal: controller.signal,
+        }).then((response) => {
+          if (!response.ok) throw new Error("Jikan seasonal feed unavailable");
+          return response.json();
+        });
+        let entries = Array.isArray(payload?.data) ? payload.data : [];
+        let source = "Jikan current season";
+        if (!entries.length) {
+          payload = await fetch("/api/jikan-anime?action=upcoming&page=1", {
+            headers: { Accept: "application/json" },
+            signal: controller.signal,
+          }).then((response) => {
+            if (!response.ok) throw new Error("Jikan upcoming feed unavailable");
+            return response.json();
+          });
+          entries = Array.isArray(payload?.data) ? payload.data : [];
+          source = "Jikan upcoming season";
+        }
+        if (active) {
+          setJikanItems(entries.filter((entry) => Number.isSafeInteger(Number(entry?.mal_id)) && entry?.mal_id > 0).slice(0, 6));
+          setJikanSource(source);
+        }
+      } catch {
+        if (active && !controller.signal.aborted) {
+          setJikanItems([]);
+          setJikanSource("");
+        }
+      } finally {
+        if (active) setJikanLoading(false);
+      }
+    }
+    loadJikanFallback();
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, []);
+
+  const jikanCards = useMemo(() => jikanItems.map((anime) => ({
+    id: `mal-${anime.mal_id}`,
+    title: anime.title_english || anime.title || "Untitled anime",
+    image: anime.images?.webp?.large_image_url || anime.images?.jpg?.large_image_url || "",
+    detail: anime.broadcast?.string || (anime.status === "Currently Airing" ? "Currently airing" : anime.status || "Seasonal listing"),
+    episodes: anime.episodes,
+  })), [jikanItems]);
 
   const upcoming = useMemo(
     () => items
@@ -71,8 +129,6 @@ export default function AiringRadar() {
           <div className="grid grid-cols-2 gap-3 p-5 sm:grid-cols-3 sm:p-8">
             {Array.from({ length: 6 }).map((_, index) => <div key={index} className="h-32 animate-pulse rounded-xl bg-white/[0.04]" />)}
           </div>
-        ) : error ? (
-          <div className="px-6 py-8 text-sm text-muted-foreground">The airing feed is temporarily unavailable. Browse the seasonal catalogue instead.</div>
         ) : upcoming.length ? (
           <div className="grid gap-3 p-4 sm:grid-cols-2 sm:p-6 lg:grid-cols-3">
             {upcoming.map((anime) => (
@@ -91,8 +147,21 @@ export default function AiringRadar() {
               </Link>
             ))}
           </div>
+        ) : jikanCards.length ? (
+          <div className="grid gap-3 p-4 sm:grid-cols-2 sm:p-6 lg:grid-cols-3">
+            {jikanCards.map((anime) => (
+              <Link key={anime.id} to={`/anime/${anime.id}`} className="group flex min-w-0 gap-3 rounded-xl border border-white/[0.07] bg-black/20 p-3 transition hover:border-primary/35 hover:bg-primary/[0.05]">
+                {anime.image ? <img src={anime.image} alt="" loading="lazy" className="h-24 w-16 shrink-0 rounded-lg object-cover" /> : <span className="h-24 w-16 shrink-0 rounded-lg bg-white/[0.05]" />}
+                <span className="min-w-0 flex-1 py-1">
+                  <span className="block line-clamp-2 text-sm font-semibold leading-snug text-foreground group-hover:text-primary">{anime.title}</span>
+                  <span className="mt-2 block text-[11px] font-semibold text-primary">{anime.detail}</span>
+                  <span className="mt-1 block text-[11px] text-muted-foreground">{anime.episodes ? `${anime.episodes} episodes listed` : "Episode count not announced"}</span>
+                </span>
+              </Link>
+            ))}
+          </div>
         ) : (
-          <div className="px-6 py-8 text-sm text-muted-foreground">No upcoming episode times are available in the current-season feed right now.</div>
+          <div className="px-6 py-8 text-sm text-muted-foreground">{jikanLoading ? "Checking the Jikan backup schedule…" : "The airing feed is temporarily unavailable. Browse the seasonal catalogue instead."}</div>
         )}
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-white/[0.07] px-5 py-4 sm:px-8">
@@ -102,7 +171,7 @@ export default function AiringRadar() {
               {source.label}
             </a>
           ))}
-          <span className="ml-auto text-[10px] text-muted-foreground/60">Times shown in your device timezone · AniList feed</span>
+          <span className="ml-auto text-[10px] text-muted-foreground/60">Times shown in your device timezone · {upcoming.length ? "AniList feed" : jikanSource || "Schedule feeds"}</span>
         </div>
       </div>
     </section>
