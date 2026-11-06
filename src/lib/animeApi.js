@@ -168,6 +168,46 @@ function buildListVariables(body) {
   return variables;
 }
 
+
+function dateParts(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return { year: date.getUTCFullYear(), month: date.getUTCMonth() + 1, day: date.getUTCDate() };
+}
+function normalizeExternalMedia(raw, source) {
+  if (!raw) return null;
+  if (source === "mal") {
+    const id = Number(raw.mal_id);
+    if (!id) return null;
+    const airingSchedule = (raw.episodes_list || []).filter((ep) => ep.aired).map((ep) => ({ episode: ep.mal_id, airingAt: Math.floor(new Date(ep.aired).getTime() / 1000), timeUntilAiring: 0 })).filter((ep) => Number.isFinite(ep.airingAt));
+    return { id: "mal-" + id, source: "mal", display: raw.title_english || raw.title || "Untitled anime", titleRomaji: raw.title || "", titleNative: raw.title_japanese || "", titleAliases: raw.title_synonyms || [], cover: raw.images?.webp?.large_image_url || raw.images?.jpg?.large_image_url || "", banner: raw.images?.webp?.large_image_url || "", description: raw.synopsis || "", genres: (raw.genres || []).map((g) => g.name), score: raw.score ? Math.round(raw.score * 10) : null, popularity: raw.members || 0, episodes: raw.episodes || null, duration: null, status: raw.status || "", format: raw.type || "TV", season: "", seasonYear: raw.year || dateParts(raw.aired?.from)?.year || null, startDate: dateParts(raw.aired?.from), endDate: dateParts(raw.aired?.to), airingSchedule, studios: (raw.studios || []).map((s) => s.name), trailer: null, nextEpisode: null, characters: [], relations: [], recommendations: [] };
+  }
+  const attrs = raw.attributes || raw, id = String(raw.id || attrs.id || "");
+  if (!id) return null;
+  const titles = attrs.titles || { en: raw.title_english || raw.title, ja_jp: raw.title_japanese };
+  const poster = attrs.posterImage || { large: raw.images?.webp?.large_image_url || raw.images?.jpg?.large_image_url };
+  return { id: "kitsu-" + id, source: "kitsu", display: titles.en || attrs.canonicalTitle || titles.en_jp || "Untitled anime", titleRomaji: titles.en_jp || attrs.canonicalTitle || raw.title || "", titleNative: titles.ja_jp || raw.title_japanese || "", titleAliases: [...new Set([...Object.values(titles), ...(raw.title_synonyms || [])].filter(Boolean))], cover: poster.large || poster.original || poster.medium || "", banner: poster.large || poster.original || "", description: attrs.synopsis || attrs.description || raw.synopsis || "", genres: [], score: attrs.averageRating ? Math.round(Number(attrs.averageRating)) : null, popularity: Number(attrs.userCount) || 0, episodes: attrs.episodeCount || null, duration: attrs.episodeLength || null, status: attrs.status || "", format: attrs.showType || "TV", season: "", seasonYear: dateParts(attrs.startDate)?.year || null, startDate: dateParts(attrs.startDate), endDate: dateParts(attrs.endDate), airingSchedule: [], studios: [], trailer: null, nextEpisode: null, characters: [], relations: [], recommendations: [] };
+}
+async function searchExternalCatalog(query) {
+  try {
+    const hits = await searchMalTitles(query);
+    const source = hits.some((hit) => hit.kitsu_id) ? "kitsu" : "mal";
+    return hits.map((hit) => normalizeExternalMedia(source === "kitsu" ? { ...hit, id: hit.kitsu_id } : hit, source)).filter(Boolean).map((item) => ({ item, score: titleSearchScore(item, query) })).filter(({ score }) => score >= 50).sort((x, y) => y.score - x.score).map(({ item }) => item);
+  } catch { return []; }
+}
+async function fetchExternalDetail(id) {
+  const source = String(id).startsWith("mal-") ? "mal" : String(id).startsWith("kitsu-") ? "kitsu" : "";
+  if (!source) throw new Error("Unsupported catalogue ID.");
+  const numericId = String(id).slice(source.length + 1);
+  const response = await fetch("/api/catalog-detail?source=" + source + "&id=" + encodeURIComponent(numericId), { headers: { Accept: "application/json" }, signal: AbortSignal.timeout(9000) });
+  if (!response.ok) throw new Error("The backup catalogue detail is temporarily unavailable.");
+  const payload = await response.json();
+  const item = normalizeExternalMedia(payload.data, source);
+  if (!item) throw new Error("The backup catalogue returned an invalid anime entry.");
+  return item;
+}
+
 function titleSearchScore(anime, query) {
   return scoreTitleMatch(
     [anime?.display, anime?.titleRomaji, anime?.titleNative, ...(anime?.titleAliases || [])],
@@ -226,7 +266,9 @@ export async function callAniList(body) {
   let result;
   // Use the same-origin Vercel AniList proxy consistently for every catalog
   // request. The legacy Base44 "anilist" function is not a catalog source.
-  if (body.action === "by_id") {
+  if (body.action === "by_id" && /^(mal|kitsu)-/.test(String(body.id))) {
+    result = { item: await fetchExternalDetail(body.id), items: [], pageInfo: null };
+  } else if (body.action === "by_id") {
     const id = Number(body.id);
     if (!id) throw new Error("A numeric anime id is required.");
     const data = await graphql(DETAIL_QUERY, { id });
@@ -316,6 +358,10 @@ export async function callAniList(body) {
         // MAL is an optional secondary metadata source; retain AniList's
         // valid empty result rather than turning an upstream outage into error.
       }
+    }
+    if (result.items.length === 0 && catalogMode === "automatic") {
+      const externalItems = await searchExternalCatalog(variables.search);
+      if (externalItems.length) result = { items: externalItems, pageInfo: { total: externalItems.length, currentPage: 1, lastPage: 1, hasNextPage: false }, item: null };
     }
   } else {
     const variables = buildListVariables(body);
