@@ -20,12 +20,18 @@ export default function AnimeDetail() {
   const favorites = useWatchlist("favorite");
   const [mal, setMal] = useState(null);
   const [malChecked, setMalChecked] = useState(false);
+  const [reference, setReference] = useState(null);
 
   useEffect(() => {
     if (!item) return;
     recordAnimeView(item);
     let alive = true;
     setMalChecked(false);
+    setReference(null);
+    fetch(`/api/reference-metadata?q=${encodeURIComponent(item.titleRomaji || item.display)}`)
+      .then((response) => response.ok ? response.json() : null)
+      .then((data) => { if (alive) setReference(data); })
+      .catch(() => {});
     fetchMalRating(item.titleRomaji || item.display)
       .then((rating) => {
         if (alive) {
@@ -125,7 +131,7 @@ export default function AnimeDetail() {
               </div>
 
               <div className="mt-6 flex flex-wrap items-center gap-2">
-                <AnimeStreamLink anime={item} />
+                {item.source === "anilist" && <AnimeStreamLink anime={item} />}
                 <button
                   type="button"
                   onClick={() => watchlist.toggle(item)}
@@ -148,6 +154,13 @@ export default function AnimeDetail() {
                 </button>
               </div>
 
+              {reference && (reference.wikipedia || reference.imdbUrl) && (
+                <div className="mt-5 rounded-xl border border-border/60 bg-card/50 p-4">
+                  <p className="text-[10px] uppercase tracking-[.22em] text-primary">External references</p>
+                  {reference.wikipedia && <div className="mt-2"><p className="text-sm font-medium">Wikipedia</p><p className="mt-1 text-xs leading-relaxed text-muted-foreground">{reference.wikipedia.extract}</p><a className="mt-2 inline-flex text-xs text-primary hover:underline" href={reference.wikipedia.url} target="_blank" rel="noopener noreferrer">Read reference <ExternalLink className="ml-1 h-3 w-3" /></a></div>}
+                  {reference.imdbUrl && <a className="mt-3 inline-flex text-xs text-primary hover:underline" href={reference.imdbUrl} target="_blank" rel="noopener noreferrer">Find this title on IMDb <ExternalLink className="ml-1 h-3 w-3" /></a>}
+                </div>
+              )}
               <div className="mt-7 grid gap-6 sm:grid-cols-2">
                 <div>
                   <h2 className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Synopsis</h2>
@@ -260,7 +273,7 @@ export default function AnimeDetail() {
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/60 bg-card/40 px-5 py-4">
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
             <Sparkles className="h-4 w-4 text-primary" aria-hidden="true" />
-            Metadata from AniList. Episode streaming is not provided by AniList or MyAnimeList.
+            {item.source === "anilist" ? "Metadata from AniList with MAL ratings and external references." : `Backup catalogue metadata from ${item.source === "mal" ? "MyAnimeList / Jikan" : "Kitsu"}. Player routing needs a verified AniList match.`}
           </p>
           <Link to="/policy" className="text-xs uppercase tracking-[0.16em] text-muted-foreground transition hover:text-primary">
             Licensing policy
