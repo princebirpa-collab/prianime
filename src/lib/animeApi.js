@@ -366,15 +366,23 @@ export async function callAniList(body) {
       const externalItems = await searchExternalCatalog(variables.search);
       if (externalItems.length) {
         const merged = [...result.items];
-        const titleKey = (item) => String(item?.display || item?.titleRomaji || "")
-          .toLocaleLowerCase().normalize("NFKD").replace(/[\\u0300-\\u036f]/g, "")
-          .replace(/[^\\p{L}\\p{N}]+/gu, " ").trim();
+        const titleKey = (value) => String(value || "")
+          .toLocaleLowerCase()
+          .normalize("NFKD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^\p{L}\p{N}]+/gu, " ")
+          .trim();
+        const titleKeys = (item) => [
+          item?.display,
+          item?.titleRomaji,
+          item?.titleNative,
+          ...(item?.titleAliases || []),
+        ].map(titleKey).filter(Boolean);
         for (const external of externalItems) {
-          const key = titleKey(external);
+          const externalKeys = new Set(titleKeys(external));
           const existingIndex = merged.findIndex((item) =>
             String(item.id) === String(external.id) ||
-            (key && [item.display, item.titleRomaji, ...(item.titleAliases || [])]
-              .some((title) => titleKey({ display: title }) === key))
+            titleKeys(item).some((key) => externalKeys.has(key))
           );
           if (existingIndex >= 0) {
             const existing = merged[existingIndex];
