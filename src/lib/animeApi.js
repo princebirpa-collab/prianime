@@ -6,7 +6,7 @@ const TTL = 5 * 60 * 1000;
 const SERVER_KEY = "pri:anilist:server-mode";
 const cache = new Map();
 
-const CORE = `id title { romaji english native } synonyms coverImage { extraLarge large color } bannerImage description(asHtml: false) genres averageScore meanScore popularity episodes duration status format season seasonYear startDate { year month day } studios(isMain: true) { nodes { name } } trailer { id site } nextAiringEpisode { episode timeUntilAiring }`;
+const CORE = `id title { romaji english native } synonyms coverImage { extraLarge large color } bannerImage description(asHtml: false) genres averageScore meanScore popularity episodes duration status format season seasonYear startDate { year month day } endDate { year month day } airingSchedule(notYetAired: true, perPage: 100) { nodes { episode airingAt timeUntilAiring } } studios(isMain: true) { nodes { name } } trailer { id site } nextAiringEpisode { episode timeUntilAiring }`;
 
 const LIST_QUERY = `query ($page: Int, $perPage: Int, $search: String, $genre: String, $season: MediaSeason, $seasonYear: Int, $sort: [MediaSort]) {
   Page(page: $page, perPage: $perPage) {
@@ -54,6 +54,9 @@ export function normalize(media) {
     format: media.format || "",
     season: media.season || "",
     seasonYear: media.seasonYear ?? null,
+    startDate: media.startDate || null,
+    endDate: media.endDate || null,
+    airingSchedule: (media.airingSchedule?.nodes || []).map((entry) => ({ episode: entry.episode, airingAt: entry.airingAt, timeUntilAiring: entry.timeUntilAiring })),
     studios: (media.studios?.nodes || []).map((node) => node.name),
     trailer: media.trailer || null,
     nextEpisode: media.nextAiringEpisode || null,
