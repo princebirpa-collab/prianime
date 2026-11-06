@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-const MAX_PARTICLES = 130;
+const MAX_PARTICLES = 28;
 const SPRITE_SIZE = 160;
 
 function makeSprite(channel) {
@@ -172,6 +172,11 @@ export default function InteractiveSmoke({ className = "fixed inset-0 z-40" } = 
         ctx.restore();
       }
       ctx.globalAlpha = 1;
+      // Stop the animation loop when the pointer is idle and all smoke has faded.
+      if (dist < 1 && !pool.some((particle) => particle.active)) {
+        running = false;
+        return;
+      }
     };
 
     const start = () => {
