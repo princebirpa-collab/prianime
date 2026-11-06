@@ -87,23 +87,29 @@ export default function NavBar() {
         </div>
       </form>
       {suggestionsVisible && query.trim().length >= 2 && (
-        <div id={mobile ? "nav-search-suggestions-mobile" : "nav-search-suggestions"} role="listbox" className="absolute right-0 top-full z-[70] mt-2 max-h-[min(70vh,420px)] w-[min(92vw,360px)] overflow-y-auto rounded-2xl border border-border/70 bg-background/95 p-2 shadow-2xl backdrop-blur-xl">
-          {suggestions.map((anime) => (
-            <button type="button" role="option" aria-selected="false" key={anime.id}
-              onMouseDown={(event) => event.preventDefault()}
-              onClick={() => openAnime(anime)}
-              className="flex w-full items-center gap-3 rounded-xl p-2 text-left transition hover:bg-primary/10 focus:bg-primary/10 focus:outline-none">
-              <img src={anime.cover} alt="" loading="lazy" className="h-14 w-10 shrink-0 rounded-md object-cover" />
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-medium text-foreground">{anime.display}</span>
-                {anime.titleRomaji && anime.titleRomaji !== anime.display && <span className="mt-0.5 block truncate text-xs text-muted-foreground">{anime.titleRomaji}</span>}
-                <span className="mt-1 block text-[11px] text-muted-foreground">
-                  {(anime.format ? anime.format.replaceAll("_", " ") : "Anime") + (anime.episodes ? " · " + anime.episodes + " eps" : "")}
-                </span>
-              </span>
-              {anime.score != null && <span className="shrink-0 text-xs text-primary">{anime.score}%</span>}
-            </button>
-          ))}
+        <div id={mobile ? "nav-search-suggestions-mobile" : "nav-search-suggestions"} role="listbox" className="absolute right-0 top-full z-[70] mt-2 max-h-[min(72vh,520px)] w-[min(94vw,720px)] overflow-y-auto rounded-2xl border border-border/70 bg-background/95 p-3 shadow-2xl backdrop-blur-xl">
+          {suggestions.length > 0 && (
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+              {suggestions.map((anime) => (
+                <button type="button" role="option" aria-selected="false" key={anime.id}
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => openAnime(anime)}
+                  className="group min-w-0 overflow-hidden rounded-xl border border-border/60 bg-card/60 text-left transition hover:border-primary/60 hover:bg-primary/10 focus:border-primary/60 focus:outline-none">
+                  <div className="relative aspect-[2/3] overflow-hidden bg-muted">
+                    {anime.cover && <img src={anime.cover} alt="" loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />}
+                    {anime.score != null && <span className="absolute right-1.5 top-1.5 rounded-md bg-black/75 px-1.5 py-1 text-[10px] font-semibold text-primary">{anime.score}%</span>}
+                  </div>
+                  <span className="block min-w-0 p-2">
+                    <span className="block line-clamp-2 min-h-9 text-xs font-semibold leading-snug text-foreground">{anime.display}</span>
+                    {anime.titleRomaji && anime.titleRomaji !== anime.display && <span className="mt-1 block truncate text-[10px] text-muted-foreground">{anime.titleRomaji}</span>}
+                    <span className="mt-1 block truncate text-[10px] uppercase tracking-wide text-muted-foreground">
+                      {(anime.format ? anime.format.replaceAll("_", " ") : "Anime") + (anime.episodes ? " · " + anime.episodes + " eps" : "")}
+                    </span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
           {suggestionsLoading && <div className="px-3 py-2 text-xs text-muted-foreground">Searching AniList and title aliases…</div>}
           {!suggestionsLoading && suggestions.length === 0 && <div className="px-3 py-2 text-xs text-muted-foreground">{suggestionsError ? "Suggestions are temporarily unavailable. Press Enter to retry on the full results page." : "No quick matches yet. Press Enter to search the full catalogue."}</div>}
           <button type="button" onClick={submit} className="mt-1 w-full rounded-xl px-3 py-2 text-left text-xs font-medium text-primary transition hover:bg-primary/10">
