@@ -4,13 +4,16 @@ const verified = {
   141953: { mediaType: "tv", tmdbId: 280564, season: 1, episodeOffset: 0, source: "TMDB verified match", seasonVerified: true },
 };
 
-let registryCache;
+// Keep a warm in-instance index and serve stale data if a refresh fails.
+let registryIndex = null;
 let registryExpiresAt = 0;
+let registryRefresh = null;
 
 function json(res, status, body) {
   res.statusCode = status;
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.setHeader("Cache-Control", "no-store");
+  res.setHeader("X-Content-Type-Options", "nosniff");
   res.end(JSON.stringify(body));
 }
 
@@ -39,15 +42,49 @@ function normalizeRecord(row) {
   };
 }
 
-async function getRegistry() {
-  if (registryCache && Date.now() < registryExpiresAt) return registryCache;
-  const response = await fetch(MAPPING_URL, { signal: AbortSignal.timeout(15000) });
-  if (!response.ok) throw new Error("Anime ID registry is temporarily unavailable.");
-  const rows = await response.json();
-  if (!Array.isArray(rows)) throw new Error("Anime ID registry returned an invalid response.");
-  registryCache = rows;
-  registryExpiresAt = Date.now() + 60 * 60 * 1000;
-  return rows;
+async function refreshRegistry() {
+  if (registryRefresh) return registryRefresh;
+  registryRefresh = (async () => {
+    const response = await fetch(MAPPING_URL, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!response.ok) throw new Error("Anime ID registry is temporarily unavailable.");
+    const rows = await response.json();
+    if (!Array.isArray(rows)) throw new Error("Anime ID registry returned an invalid response.");
+
+    const nextIndex = new Map();
+    for (const row of rows) {
+      const id = Number(row?.anilist_id);
+      if (!Number.isSafeInteger(id) || id <= 0 || nextIndex.has(id)) continue;
+      const match = normalizeRecord(row);
+      if (match) nextIndex.set(id, match);
+    }
+    registryIndex = nextIndex;
+    registryExpiresAt = Date.now() + 6 * 60 * 60 * 1000;
+    return registryIndex;
+  })();
+
+  try {
+    return await registryRefresh;
+  } finally {
+    registryRefresh = null;
+  }
+}
+
+async function getRegistryMatch(animeId) {
+  if (registryIndex && Date.now() < registryExpiresAt) {
+    return registryIndex.get(animeId) || null;
+  }
+
+  try {
+    const index = await refreshRegistry();
+    return index.get(animeId) || null;
+  } catch (error) {
+    // A previously loaded registry remains useful during upstream outages.
+    if (registryIndex) return registryIndex.get(animeId) || null;
+    throw error;
+  }
 }
 
 export default async function handler(req, res) {
@@ -69,21 +106,12 @@ export default async function handler(req, res) {
       return json(res, 400, { ok: false, error: "A valid AniList anime ID is required." });
     }
 
-    let match = verified[animeId] || null;
-    if (!match) {
-      const rows = await getRegistry();
-      const row = rows.find((item) => Number(item.anilist_id) === animeId);
-      match = normalizeRecord(row);
-    }
+    const match = verified[animeId] || await getRegistryMatch(animeId);
+    const result = match
+      ? { ...match, tmdbUrl: `https://www.themoviedb.org/${match.mediaType}/${match.tmdbId}` }
+      : null;
 
-    if (match) {
-      match = {
-        ...match,
-        tmdbUrl: `https://www.themoviedb.org/${match.mediaType}/${match.tmdbId}`,
-      };
-    }
-
-    return json(res, 200, { ok: true, match });
+    return json(res, 200, { ok: true, match: result });
   } catch (error) {
     return json(res, 502, {
       ok: false,
