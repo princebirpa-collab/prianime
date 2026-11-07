@@ -33,8 +33,8 @@ export default function JikanAnimePanel({ title }) {
         const match = (results || []).find((item) =>
           [item.title, item.title_english, item.title_japanese, ...(item.title_synonyms || [])]
             .some((candidate) => normalize(candidate) === wanted)
-        ) || (results || [])[0];
-        if (!match?.mal_id) throw new Error("No matching MyAnimeList entry was found.");
+        );
+        if (!match?.mal_id) throw new Error("No exact title or alternate-title match was found in Jikan. This prevents an unrelated anime from being selected.");
         const [episodeData, videoData, serviceData] = await Promise.all([
           request("episodes", { id: String(match.mal_id) }).catch(() => []),
           request("videos", { id: String(match.mal_id) }).catch(() => ({})),
