@@ -31,7 +31,38 @@ export default function Library() {
       listSaved("watchlist").catch(() => []),
       listSaved("favorite").catch(() => []),
       listProgress("video").catch(() => []),
-      communityRequest(`/watch-history?profileId=${encodeURIComponent(getProfile().id)}`).then((data) => (data.history || []).map((row) => ({ id: `cloud_${row.anime_id}`, owner_ref: getProfile().id, kind: "anime", ref_id: row.anime_id, title: row.title, cover: row.cover, episode: row.episode, season: row.season, position: Number(row.position) || 0, duration: Number(row.duration) || 0, link: row.link, updated_date: row.updated_at }))).catch(() => listProgress("anime").catch(() => [])),
+      Promise.all([
+        listProgress("anime").catch(() => []),
+        communityRequest(`/watch-history?profileId=${encodeURIComponent(getProfile().id)}`)
+          .then((data) => (data.history || []).map((row) => ({
+            id: `cloud_${row.anime_id}`,
+            owner_ref: getProfile().id,
+            kind: "anime",
+            ref_id: String(row.anime_id),
+            title: row.title,
+            cover: row.cover,
+            episode: row.episode,
+            actual_episode: row.episode,
+            season: row.season,
+            position: Number(row.position) || 0,
+            duration: Number(row.duration) || 0,
+            link: row.link,
+            updated_date: row.updated_at,
+          })))
+          .catch(() => []),
+      ]).then(([localRows, cloudRows]) => {
+        // Merge both stores: a successful but empty cloud response must not hide
+        // device-local watch progress. Prefer the newest row for each anime.
+        const byAnime = new Map();
+        [...localRows, ...cloudRows].forEach((row) => {
+          const key = String(row.ref_id);
+          const current = byAnime.get(key);
+          if (!current || String(row.updated_date || "") >= String(current.updated_date || "")) {
+            byAnime.set(key, row);
+          }
+        });
+        return [...byAnime.values()];
+      }),
       Promise.all([
         communityRequest(`/stories?profileId=${encodeURIComponent(getProfile().id)}`)
           .then((data) => (data.stories || []).map((story) => ({ ...story, storage: "cloudflare" })))
