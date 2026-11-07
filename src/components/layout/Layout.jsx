@@ -2,8 +2,6 @@ import { Outlet, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import NavBar from "@/components/layout/NavBar";
 import Footer from "@/components/layout/Footer";
-import InteractiveSmoke from "@/components/effects/InteractiveSmoke";
-import CursorGlow from "@/components/effects/CursorGlow";
 import AnimeGuide from "@/components/AnimeGuide";
 
 export default function Layout() {
@@ -15,10 +13,10 @@ export default function Layout() {
 
   return (
     <div className="relative flex min-h-screen flex-col overflow-x-hidden">
-      <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute -left-40 top-[-10%] h-[520px] w-[520px] rounded-full bg-primary/[0.07] blur-[130px] animate-pulse-glow" />
-        <div className="absolute right-[-10%] top-1/3 h-[460px] w-[460px] rounded-full bg-amethyst/40 blur-[150px] animate-pulse-glow" />
-        <div className="absolute bottom-0 left-1/3 h-[380px] w-[380px] rounded-full bg-primary/[0.05] blur-[120px]" />
+      <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -left-40 top-[-10%] h-[420px] w-[420px] rounded-full bg-primary/[0.055] blur-[90px]" />
+        <div className="absolute right-[-10%] top-1/3 h-[360px] w-[360px] rounded-full bg-amethyst/25 blur-[100px]" />
+        <div className="absolute bottom-0 left-1/3 h-[300px] w-[300px] rounded-full bg-primary/[0.04] blur-[80px]" />
       </div>
 
       <a
@@ -33,8 +31,6 @@ export default function Layout() {
         <Outlet />
       </main>
       <Footer />
-      <CursorGlow />
-      <InteractiveSmoke />
       <AnimeGuide />
     </div>
   );
