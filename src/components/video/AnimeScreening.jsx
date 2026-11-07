@@ -5,6 +5,7 @@ import useAnimeSource from "@/components/video/useAnimeSource";
 import AnimePlayback from "@/components/video/AnimePlayback";
 import VidstuckSource from "@/components/video/VidstuckSource";
 import JikanAnimePanel from "@/components/video/JikanAnimePanel";
+import AnimeWatchHistory from "@/components/video/AnimeWatchHistory";
 import EmptyState from "@/components/common/EmptyState";
 
 export default function AnimeScreening({ animeId }) {
@@ -25,6 +26,7 @@ export default function AnimeScreening({ animeId }) {
           <a href={`https://www.themoviedb.org/search?query=${encodeURIComponent(anime.item?.display || "")}`} target="_blank" rel="noopener noreferrer" className="inline-block text-sm text-primary hover:underline">Search for this anime on TMDB</a>
           <VidstuckSource />
         </>}
+        <AnimeWatchHistory />
         {anime.item?.display && <JikanAnimePanel title={anime.item.display} />}
       </>}
     </div>
