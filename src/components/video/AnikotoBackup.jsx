@@ -31,16 +31,30 @@ function normalizeTitle(value) {
     .replace(/\s+/g, " ");
 }
 
-function findTitleMatch(items, wantedTitle) {
-  const wanted = normalizeTitle(wantedTitle);
-  if (!wanted) return null;
-  const exact = items.find((item) => normalizeTitle(titleOf(item)) === wanted);
+function findTitleMatch(items, wantedTitles) {
+  const wanted = [...new Set(wantedTitles.map(normalizeTitle).filter(Boolean))];
+  if (!wanted.length) return null;
+  const exact = items.find((item) => wanted.includes(normalizeTitle(titleOf(item))));
   if (exact) return exact;
   const partial = items.filter((item) => {
     const candidate = normalizeTitle(titleOf(item));
-    return candidate && candidate.length > 3 && (candidate.includes(wanted) || wanted.includes(candidate));
+    return candidate && candidate.length > 3 && wanted.some((name) => candidate.includes(name) || name.includes(candidate));
   });
   return partial.length === 1 ? partial[0] : null;
+}
+
+async function getJikanTitles(title) {
+  const query = new URLSearchParams({ action: "search", q: title, page: "1" });
+  const response = await fetch(`/api/jikan-anime?${query}`, { signal: AbortSignal.timeout(7000) });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok || !payload?.ok) return [title];
+  const wanted = normalizeTitle(title);
+  const exact = (payload.data || []).find((item) =>
+    [item.title, item.title_english, item.title_japanese, ...(item.title_synonyms || [])]
+      .some((candidate) => normalizeTitle(candidate) === wanted)
+  );
+  if (!exact) return [title];
+  return [title, exact.title, exact.title_english, exact.title_japanese, ...(exact.title_synonyms || [])].filter(Boolean);
 }
 
 function rowsFrom(payload) {
@@ -70,7 +84,7 @@ export default function AnikotoBackup({ title, season, episode, tmdbId }) {
         if (!response.ok || !payload?.ok) throw new Error(payload?.error || "AniKoto catalogue is unavailable.");
         return rowsFrom(payload);
       })
-      .then((rows) => {
+      .then(async (rows) => {
         if (cancelled) return;
         const unique = new Map();
         rows.forEach((item, index) => {
@@ -80,7 +94,9 @@ export default function AnikotoBackup({ title, season, episode, tmdbId }) {
         });
         const list = [...unique.values()];
         setItems(list);
-        const match = findTitleMatch(list, title);
+        const aliases = await getJikanTitles(title);
+        if (cancelled) return;
+        const match = findTitleMatch(list, aliases);
         if (match && idOf(match)) setSelectedId(idOf(match));
       })
       .catch((err) => { if (!cancelled) setError(err.message || "AniKoto is temporarily unavailable."); })
