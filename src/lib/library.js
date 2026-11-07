@@ -114,6 +114,7 @@ export async function saveProgress(entry) {
   if (foundIndex >= 0) rows[foundIndex] = payload;
   else rows.push(payload);
   writeRows(PROGRESS_KEY, rows);
+  if (typeof window !== "undefined") window.dispatchEvent(new Event("pri-anime:progress-updated"));
   return payload;
 }
 
