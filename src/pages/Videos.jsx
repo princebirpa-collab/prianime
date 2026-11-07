@@ -5,22 +5,12 @@ import { base44 } from "@/api/base44Client";
 import PageHeader from "@/components/common/PageHeader";
 import VideoCard from "@/components/video/VideoCard";
 import VidstuckSource from "@/components/video/VidstuckSource";
+import ThirdPartySourcePlayer from "@/components/video/ThirdPartySourcePlayer";
 import AnimeScreening from "@/components/video/AnimeScreening";
 import EmptyState from "@/components/common/EmptyState";
 import { listProgress } from "@/lib/library";
 import { percent } from "@/lib/format";
 
-function ThugTVStatus() {
-  return (
-    <section className="mb-6 rounded-2xl border border-border/60 bg-card/60 p-5" aria-labelledby="thugtv-theatre-title">
-      <p className="text-[11px] uppercase tracking-[0.2em] text-primary">Additional source</p>
-      <h2 id="thugtv-theatre-title" className="mt-2 text-lg font-semibold">ThugTV · In-page integration</h2>
-      <p className="mt-2 text-sm leading-6 text-muted-foreground">
-        ThugTV is not connected as a playback source yet. An authorized API or embed endpoint is required before it can play here. This page will not redirect to another tab or load unverified streams.
-      </p>
-    </section>
-  );
-}
 
 export default function Videos() {
   const [params] = useSearchParams();
@@ -107,7 +97,7 @@ export default function Videos() {
       </PageHeader>
 
       <div className="mx-auto w-full max-w-[1600px] px-4 pt-8 sm:px-6 lg:px-10">
-        <ThugTVStatus />
+        <ThirdPartySourcePlayer animeTitle="Choose an anime from the screening catalogue" />
         {showVidstuck && <VidstuckSource />}
         {error ? (
           <EmptyState title="The theatre could not be loaded" body={error} />
