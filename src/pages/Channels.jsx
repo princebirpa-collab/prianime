@@ -7,6 +7,7 @@ const MUSE_CHANNEL = "https://www.youtube.com/channel/" + MUSE_CHANNEL_ID;
 const MUSE_UPLOADS_PLAYLIST = "UUYYhAzgWuxPauRXdPpLAX3Q";
 const PLUTO_URL = "https://pluto.tv/intl/";
 const PARTNER_LINKS = [
+  { name: "ThugTV", url: "https://thugtv.online/", label: "External destination", description: "Open the provider website directly. In-app playback is not enabled because an authorized embed/API interface has not been verified." },
   { name: "TheOGPirateBot", url: "https://theogpiratebot.online/", label: "External provider", description: "External destination only. An authorized public API or embed agreement is required before connecting an in-app episode player." },
   { name: "AnimeSalt", url: "https://animesalt.cx/", label: "External provider", description: "External destination only. An authorized public API or embed agreement is required before connecting an in-app episode player." },
 ];
