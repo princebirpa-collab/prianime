@@ -4,6 +4,7 @@ import PageHeader from "@/components/common/PageHeader";
 import { useProfile } from "@/lib/profile";
 import { useTheme } from "@/lib/theme";
 import { usePref, LANGUAGES } from "@/lib/prefs";
+import LibraryPage from "@/pages/Library";
 
 
 const AVATAR_STYLES = [
@@ -46,6 +47,7 @@ function PrefToggle({ toggle }) {
 
 export default function Settings() {
   const [profile, updateProfile] = useProfile();
+  const [showLibrary, setShowLibrary] = useState(false);
   const { theme, setTheme, themes } = useTheme();
   const [name, setName] = useState(profile.name);
   const [bio, setBio] = useState(profile.bio || "");
@@ -78,7 +80,11 @@ export default function Settings() {
         description="Theme, language and playback preferences are stored on this device and survive every reload."
       />
 
-      <div className="mx-auto grid w-full max-w-[1100px] gap-6 px-4 pt-8 sm:px-6 lg:grid-cols-2 lg:px-10">
+      <div className="mx-auto w-full max-w-[1100px] px-4 pt-6 sm:px-6 lg:px-10">
+        <button type="button" onClick={() => setShowLibrary((value) => !value)} aria-expanded={showLibrary} className="rounded-full border border-primary/50 px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary/10">{showLibrary ? "Hide my library" : "Open my library · Watchlist · History · Favorites"}</button>
+      </div>
+      {showLibrary && <div className="mt-4"><LibraryPage /></div>}
+      <div className="mx-auto grid w-full max-w-[1100px] gap-6 px-4 pt-4 sm:px-6 lg:grid-cols-2 lg:px-10">
         <form onSubmit={save} className="rounded-2xl border border-border/60 bg-card/40 p-5">
           <h2 className="font-display text-xl">Viewer profile</h2>
           <div className="mt-4 flex items-center gap-4">
