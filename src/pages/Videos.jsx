@@ -10,6 +10,18 @@ import EmptyState from "@/components/common/EmptyState";
 import { listProgress } from "@/lib/library";
 import { percent } from "@/lib/format";
 
+function ThugTVStatus() {
+  return (
+    <section className="mb-6 rounded-2xl border border-border/60 bg-card/60 p-5" aria-labelledby="thugtv-theatre-title">
+      <p className="text-[11px] uppercase tracking-[0.2em] text-primary">Additional source</p>
+      <h2 id="thugtv-theatre-title" className="mt-2 text-lg font-semibold">ThugTV · In-page integration</h2>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">
+        ThugTV is not connected as a playback source yet. An authorized API or embed endpoint is required before it can play here. This page will not redirect to another tab or load unverified streams.
+      </p>
+    </section>
+  );
+}
+
 export default function Videos() {
   const [params] = useSearchParams();
   const requestedAnime = Number(params.get("anime"));
@@ -63,7 +75,7 @@ export default function Videos() {
       <PageHeader
         eyebrow="Theatre"
         title="Long-form screenings"
-        description="Full episodes, original shorts and manhwa-style films published by creators â€” played from licensed sources only."
+        description="Full episodes, original shorts and manhwa-style films published by creators — played from licensed sources only."
       >
         <button
           type="button"
@@ -73,7 +85,6 @@ export default function Videos() {
         >
           Vidstuck source
         </button>
-        <a href="https://thugtv.online/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-border/70 px-5 py-2.5 text-sm font-semibold text-muted-foreground transition hover:border-primary/60 hover:text-primary">ThugTV</a>
         <a href="https://animesalt.cx/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-border/70 px-5 py-2.5 text-sm font-semibold text-muted-foreground transition hover:border-primary/60 hover:text-primary">AnimeSalt</a>
         <a href="https://anikotoapi.site/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-border/70 px-5 py-2.5 text-sm font-semibold text-muted-foreground transition hover:border-primary/60 hover:text-primary">AniKoto · Extra Backup</a>
         <Link
@@ -84,20 +95,19 @@ export default function Videos() {
         </Link>
         <div className="flex h-11 items-center gap-2 rounded-full border border-border/70 bg-background/60 px-4">
           <Search className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-          <label htmlFor="video-search" className="sr-only">
-            Search videos
-          </label>
+          <label htmlFor="video-search" className="sr-only">Search videos</label>
           <input
             id="video-search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search the theatreâ€¦"
+            placeholder="Search the theatre…"
             className="w-44 bg-transparent text-sm outline-none"
           />
         </div>
       </PageHeader>
 
       <div className="mx-auto w-full max-w-[1600px] px-4 pt-8 sm:px-6 lg:px-10">
+        <ThugTVStatus />
         {showVidstuck && <VidstuckSource />}
         {error ? (
           <EmptyState title="The theatre could not be loaded" body={error} />
