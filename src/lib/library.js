@@ -26,6 +26,19 @@ function localRowsFor(kind) {
   const profileId = owner();
   return readRows(PROGRESS_KEY)
     .filter((row) => row.owner_ref === profileId && (!kind || row.kind === kind))
+    .map((row) => {
+      // Backfill episode metadata for older local history entries from their
+      // saved watch URL, without discarding any existing progress.
+      let params;
+      try { params = new URLSearchParams(String(row.link || "").split("?")[1] || ""); } catch { params = new URLSearchParams(); }
+      const season = Number(row.season ?? params.get("season") ?? 1);
+      const actualEpisode = Number(row.actual_episode ?? params.get("episode") ?? row.episode ?? 0);
+      return {
+        ...row,
+        season: Number.isFinite(season) && season > 0 ? season : 1,
+        actual_episode: Number.isFinite(actualEpisode) && actualEpisode > 0 ? actualEpisode : 0,
+      };
+    })
     .sort((a, b) => String(b.updated_date || "").localeCompare(String(a.updated_date || "")));
 }
 
@@ -89,6 +102,8 @@ export async function saveProgress(entry) {
     title: entry.title || previous?.title || "",
     cover: entry.cover || previous?.cover || "",
     episode: entry.episode ?? previous?.episode ?? 0,
+    season: entry.season ?? previous?.season ?? 1,
+    actual_episode: entry.actualEpisode ?? entry.actual_episode ?? previous?.actual_episode ?? entry.episode ?? 0,
     position: Math.max(0, Math.round(entry.position ?? 0)),
     duration: Math.max(0, Math.round(entry.duration ?? 0)),
     link: entry.link || previous?.link || "",
