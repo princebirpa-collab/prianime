@@ -24,7 +24,7 @@ export default function AnimeScreening({ animeId }) {
           <EmptyState title="No verified TMDB match found" body="This anime is not yet linked to a TMDB title. No unrelated stream has been substituted." />
           <a href={`https://www.themoviedb.org/search?query=${encodeURIComponent(anime.item?.display || "")}`} target="_blank" rel="noopener noreferrer" className="inline-block text-sm text-primary hover:underline">Search for this anime on TMDB</a>
           <VidstuckSource />
-          <div className="rounded-xl border border-border/60 bg-card/40 p-4"><h2 className="font-display text-lg">Official viewing options</h2><p className="mt-1 text-xs text-muted-foreground">Check licensed availability on official services. A listing does not guarantee regional availability.</p><div className="mt-3 flex flex-wrap gap-3 text-sm"><a className="text-primary hover:underline" href="https://www.crunchyroll.com/" target="_blank" rel="noopener noreferrer">Crunchyroll</a><a className="text-primary hover:underline" href="https://www.netflix.com/" target="_blank" rel="noopener noreferrer">Netflix</a><a className="text-primary hover:underline" href="https://www.primevideo.com/" target="_blank" rel="noopener noreferrer">Prime Video</a></div></div>
+          <a href="https://thugtv.online/" target="_blank" rel="noopener noreferrer" className="inline-flex rounded-full border border-border px-4 py-2 text-sm font-semibold text-primary hover:border-primary/60">Open ThugTV</a>
         </>}
         {anime.item?.display && <JikanAnimePanel title={anime.item.display} />}
       </>}
