@@ -7,18 +7,6 @@ import VidstuckSource from "@/components/video/VidstuckSource";
 import JikanAnimePanel from "@/components/video/JikanAnimePanel";
 import EmptyState from "@/components/common/EmptyState";
 
-function ThugTVStatus() {
-  return (
-    <section className="rounded-2xl border border-border/60 bg-card/60 p-5" aria-labelledby="thugtv-status-title">
-      <p className="text-[11px] uppercase tracking-[0.2em] text-primary">Additional source</p>
-      <h2 id="thugtv-status-title" className="mt-2 text-lg font-semibold">ThugTV · In-page integration</h2>
-      <p className="mt-2 text-sm leading-6 text-muted-foreground">
-        ThugTV playback is not connected yet. This panel will only play a source after an authorized API or embed endpoint is provided and verified. No external tab will be opened and no unverified stream will be loaded.
-      </p>
-    </section>
-  );
-}
-
 export default function AnimeScreening({ animeId }) {
   const anime = useAnimeDetail(animeId);
   const source = useAnimeSource(animeId);
@@ -37,7 +25,6 @@ export default function AnimeScreening({ animeId }) {
           <a href={`https://www.themoviedb.org/search?query=${encodeURIComponent(anime.item?.display || "")}`} target="_blank" rel="noopener noreferrer" className="inline-block text-sm text-primary hover:underline">Search for this anime on TMDB</a>
           <VidstuckSource />
         </>}
-        <ThugTVStatus />
         {anime.item?.display && <JikanAnimePanel title={anime.item.display} />}
       </>}
     </div>
