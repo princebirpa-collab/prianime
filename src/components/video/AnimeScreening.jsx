@@ -7,10 +7,22 @@ import VidstuckSource from "@/components/video/VidstuckSource";
 import JikanAnimePanel from "@/components/video/JikanAnimePanel";
 import EmptyState from "@/components/common/EmptyState";
 
+function ThugTVStatus() {
+  return (
+    <section className="rounded-2xl border border-border/60 bg-card/60 p-5" aria-labelledby="thugtv-status-title">
+      <p className="text-[11px] uppercase tracking-[0.2em] text-primary">Additional source</p>
+      <h2 id="thugtv-status-title" className="mt-2 text-lg font-semibold">ThugTV · In-page integration</h2>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">
+        ThugTV playback is not connected yet. This panel will only play a source after an authorized API or embed endpoint is provided and verified. No external tab will be opened and no unverified stream will be loaded.
+      </p>
+    </section>
+  );
+}
+
 export default function AnimeScreening({ animeId }) {
   const anime = useAnimeDetail(animeId);
   const source = useAnimeSource(animeId);
-  if (anime.loading || source.isPending) return <div role="status" className="grid min-h-[60vh] place-items-center"><span className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin text-primary" /> Matching anime playerâ€¦</span></div>;
+  if (anime.loading || source.isPending) return <div role="status" className="grid min-h-[60vh] place-items-center"><span className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin text-primary" /> Matching anime player…</span></div>;
   const error = anime.error || source.error?.message;
   return (
     <div className="mx-auto w-full max-w-[1600px] space-y-6 px-4 py-8 sm:px-6 lg:px-10">
@@ -24,8 +36,8 @@ export default function AnimeScreening({ animeId }) {
           <EmptyState title="No verified TMDB match found" body="This anime is not yet linked to a TMDB title. No unrelated stream has been substituted." />
           <a href={`https://www.themoviedb.org/search?query=${encodeURIComponent(anime.item?.display || "")}`} target="_blank" rel="noopener noreferrer" className="inline-block text-sm text-primary hover:underline">Search for this anime on TMDB</a>
           <VidstuckSource />
-          <a href="https://thugtv.online/" target="_blank" rel="noopener noreferrer" className="inline-flex rounded-full border border-border px-4 py-2 text-sm font-semibold text-primary hover:border-primary/60">Open ThugTV</a>
         </>}
+        <ThugTVStatus />
         {anime.item?.display && <JikanAnimePanel title={anime.item.display} />}
       </>}
     </div>
