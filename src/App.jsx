@@ -29,6 +29,8 @@ const Missions = lazy(() => import('@/pages/Missions'));
 const Arena = lazy(() => import('@/pages/Arena'));
 const WorldMap = lazy(() => import('@/pages/WorldMap'));
 const WatchParty = lazy(() => import('@/pages/WatchParty'));
+const Channels = lazy(() => import('@/pages/Channels'));
+const Manhwa = lazy(() => import('@/pages/Manhwa'));
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
