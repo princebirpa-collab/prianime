@@ -14,7 +14,9 @@ export default function VideoPlayer({ src, poster, subtitles, title, startAt = 0
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const [rate, setRate] = useState(1);
-  const [captions, setCaptions] = useState(Boolean(subtitles));
+  const subtitleTracks = Array.isArray(subtitles) ? subtitles.filter((track) => track?.src) : subtitles ? [{ src: subtitles, lang: "en", label: "English" }] : [];
+  const [selectedSubtitle, setSelectedSubtitle] = useState(subtitleTracks.length ? "0" : "-1");
+  const [captions, setCaptions] = useState(subtitleTracks.length > 0);
   const [failed, setFailed] = useState(false);
   const [buffering, setBuffering] = useState(false);
 
@@ -128,15 +130,16 @@ export default function VideoPlayer({ src, poster, subtitles, title, startAt = 0
         }}
         onError={() => setFailed(true)}
       >
-        {subtitles ? (
+        {subtitleTracks.map((track, index) => (
           <track
-            kind="captions"
-            src={subtitles}
-            srcLang="en"
-            label="English"
-            default={captions}
+            key={track.src + index}
+            kind="subtitles"
+            src={track.src}
+            srcLang={track.lang || "en"}
+            label={track.label || track.lang || `Subtitle ${index + 1}`}
+            default={String(index) === selectedSubtitle}
           />
-        ) : null}
+        ))}
       </video>
 
       {!playing && !failed && (
@@ -206,21 +209,30 @@ export default function VideoPlayer({ src, poster, subtitles, title, startAt = 0
           </span>
 
           <div className="ml-auto flex items-center gap-1">
-            {subtitles && (
-              <button
-                type="button"
-                onClick={() => {
-                  const next = !captions;
-                  setCaptions(next);
-                  const tracks = videoRef.current?.textTracks;
-                  if (tracks) for (const track of tracks) track.mode = next ? "showing" : "hidden";
-                }}
-                aria-pressed={captions}
-                aria-label="Toggle subtitles"
-                className={`p-2 ${captions ? "text-primary" : ""}`}
-              >
-                <Captions className="h-4 w-4" />
-              </button>
+            {subtitleTracks.length > 0 && (
+              <label className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-black/30 px-2 py-1.5 text-[10px] text-white/80" aria-label="Subtitle language">
+                <Captions className="h-4 w-4 text-primary" />
+                <select
+                  value={selectedSubtitle}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    setSelectedSubtitle(value);
+                    setCaptions(value !== "-1");
+                    const tracks = videoRef.current?.textTracks;
+                    if (tracks) Array.from(tracks).forEach((track, index) => {
+                      track.mode = value === String(index) ? "showing" : "disabled";
+                    });
+                  }}
+                  className="max-w-[110px] bg-transparent text-[10px] text-white outline-none"
+                >
+                  <option value="-1" className="bg-[#111]">Off</option>
+                  {subtitleTracks.map((track, index) => (
+                    <option key={track.src + index} value={String(index)} className="bg-[#111]">
+                      {track.label || track.lang || `Track ${index + 1}`}
+                    </option>
+                  ))}
+                </select>
+              </label>
             )}
             <button type="button" onClick={changeRate} aria-label="Playback speed" className="flex items-center gap-1 px-2 py-2 text-[11px]">
               <Gauge className="h-4 w-4" />
