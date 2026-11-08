@@ -21,7 +21,6 @@ function hasSeenIntro() {
 
 export default function IntroOverlay() {
   const [visible, setVisible] = useState(() => !hasSeenIntro());
-  const [backgroundFailed, setBackgroundFailed] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(false);
   const backgroundVideoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -132,18 +131,23 @@ export default function IntroOverlay() {
   return createPortal(
     <div className="fixed inset-0 z-[2147483647] h-[100dvh] w-full overflow-y-auto overscroll-contain bg-[#050308] text-white">
       <section className="relative isolate flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#050308] text-white">
-        {!backgroundFailed && (
-          <video
-            ref={backgroundVideoRef}
-            className="absolute inset-0 h-full w-full object-cover"
-            src={introAsset("bg.mp4.mp4")}
-            autoPlay
-            loop
-            playsInline
-            onError={() => setBackgroundFailed(true)}
-            aria-hidden="true"
-          />
-        )}
+        <img
+          className="absolute inset-0 h-full w-full object-cover object-center"
+          src="/zenitsu-intro.webp"
+          alt=""
+          aria-hidden="true"
+          fetchPriority="high"
+        />
+        <video
+          ref={backgroundVideoRef}
+          className="pointer-events-none absolute h-px w-px opacity-0"
+          src={introAsset("bg.mp4.mp4")}
+          autoPlay
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden="true"
+        />
         <div className="absolute inset-0 bg-black/50" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#050308]/90 via-transparent to-black/45" />
         <InteractiveSmoke className="absolute inset-0 z-[2]" />
