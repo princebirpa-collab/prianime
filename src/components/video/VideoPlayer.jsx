@@ -16,7 +16,7 @@ export default function VideoPlayer({ src, poster, subtitles, title, startAt = 0
   const [rate, setRate] = useState(1);
   const subtitleTracks = useMemo(() => Array.isArray(subtitles) ? subtitles.filter((track) => track?.src) : subtitles ? [{ src: subtitles, lang: "en", label: "English" }] : [], [subtitles]);
   const [selectedSubtitle, setSelectedSubtitle] = useState(subtitleTracks.length ? "0" : "-1");
-  const [captions, setCaptions] = useState(subtitleTracks.length > 0);
+
   const [failed, setFailed] = useState(false);
   const [buffering, setBuffering] = useState(false);
 
@@ -217,7 +217,6 @@ export default function VideoPlayer({ src, poster, subtitles, title, startAt = 0
                   onChange={(event) => {
                     const value = event.target.value;
                     setSelectedSubtitle(value);
-                    setCaptions(value !== "-1");
                     const tracks = videoRef.current?.textTracks;
                     if (tracks) Array.from(tracks).forEach((track, index) => {
                       track.mode = value === String(index) ? "showing" : "disabled";
