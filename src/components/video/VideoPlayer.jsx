@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Play, Pause, Volume2, VolumeX, Maximize, Gauge, Captions, RotateCcw, AlertTriangle, ExternalLink } from "lucide-react";
 import { formatClock } from "@/lib/format";
 import ServerVideoPlayer from "@/components/video/ServerVideoPlayer";
@@ -14,7 +14,7 @@ export default function VideoPlayer({ src, poster, subtitles, title, startAt = 0
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const [rate, setRate] = useState(1);
-  const subtitleTracks = Array.isArray(subtitles) ? subtitles.filter((track) => track?.src) : subtitles ? [{ src: subtitles, lang: "en", label: "English" }] : [];
+  const subtitleTracks = useMemo(() => Array.isArray(subtitles) ? subtitles.filter((track) => track?.src) : subtitles ? [{ src: subtitles, lang: "en", label: "English" }] : [], [subtitles]);
   const [selectedSubtitle, setSelectedSubtitle] = useState(subtitleTracks.length ? "0" : "-1");
   const [captions, setCaptions] = useState(subtitleTracks.length > 0);
   const [failed, setFailed] = useState(false);
