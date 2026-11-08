@@ -18,6 +18,13 @@ const PRESET_AVATARS = AVATAR_STYLES.map(([name, hair, bg, style], index) => {
   return { name, src: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg) };
 });
 
+const PROFILE_DECORATIONS = [
+  { id: "crimson", label: "Crimson Aura", color: "#ef476f" },
+  { id: "gold", label: "Gilded Halo", color: "#eab65e" },
+  { id: "violet", label: "Violet Flame", color: "#a78bfa" },
+  { id: "ice", label: "Frost Edge", color: "#9ed9ee" },
+];
+
 const TOGGLES = [
   { key: "autoplayReels", label: "Autoplay reels", hint: "Play the next adjacent reel when it scrolls into view." },
   { key: "reelMuted", label: "Start reels muted", hint: "Unmute manually â€” browsers require it anyway." },
@@ -53,6 +60,7 @@ export default function Settings() {
   const [bio, setBio] = useState(profile.bio || "");
   const [saved, setSaved] = useState(false);
   const [avatarError, setAvatarError] = useState("");
+  const [bannerError, setBannerError] = useState("");
   const chooseAvatar = (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -62,6 +70,35 @@ export default function Settings() {
     reader.onerror = () => setAvatarError("This image could not be read."); reader.readAsDataURL(file);
   };
   const [language, setLanguage] = usePref("language");
+  const chooseBanner = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || file.size > 5 * 1024 * 1024) {
+      setBannerError("Choose a JPG, PNG or WebP banner under 5 MB.");
+      event.target.value = "";
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const image = new Image();
+      image.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = 1200;
+        canvas.height = 400;
+        const context = canvas.getContext("2d");
+        const scale = Math.max(1200 / image.width, 400 / image.height);
+        const width = image.width * scale;
+        const height = image.height * scale;
+        context?.drawImage(image, (1200 - width) / 2, (400 - height) / 2, width, height);
+        updateProfile({ banner: canvas.toDataURL("image/webp", 0.78) });
+        setBannerError("");
+      };
+      image.onerror = () => setBannerError("This banner image could not be opened.");
+      image.src = reader.result;
+    };
+    reader.onerror = () => setBannerError("This banner image could not be read.");
+    reader.readAsDataURL(file);
+  };
   const [catalogMode, setCatalogMode] = useState(() => localStorage.getItem("pri-anime:catalog-source-mode") || "automatic");
   const updateCatalogMode = (value) => { setCatalogMode(value); localStorage.setItem("pri-anime:catalog-source-mode", value); };
 
@@ -87,6 +124,28 @@ export default function Settings() {
       <div className="mx-auto grid w-full max-w-[1100px] gap-6 px-4 pt-4 sm:px-6 lg:grid-cols-2 lg:px-10">
         <form onSubmit={save} className="rounded-2xl border border-border/60 bg-card/40 p-5">
           <h2 className="font-display text-xl">Viewer profile</h2>
+          <div className="mt-4 overflow-hidden rounded-xl border border-border/60 bg-background/50">
+            <div className="relative h-28 bg-gradient-to-r from-primary/30 via-[#221326] to-[#d5a34a]/20">
+              {profile.banner && <img src={profile.banner} alt="Profile banner" className="h-full w-full object-cover" />}
+              <label htmlFor="profile-banner-upload" className="absolute bottom-2 right-2 cursor-pointer rounded-full border border-white/20 bg-black/65 px-3 py-1.5 text-[11px] font-semibold text-white backdrop-blur">Change banner</label>
+              <input id="profile-banner-upload" type="file" accept="image/png,image/jpeg,image/webp" onChange={chooseBanner} className="sr-only" />
+            </div>
+            <div className="flex items-center gap-3 p-3">
+              <div className="h-12 w-12 shrink-0 rounded-full p-0.5" style={{ background: PROFILE_DECORATIONS.find((item) => item.id === profile.avatarDecoration)?.color || "hsl(var(--primary))" }}>
+                <img src={profile.avatar || "/avatar-default.svg"} alt="" className="h-full w-full rounded-full border-2 border-background object-cover" />
+              </div>
+              <div className="min-w-0"><p className="truncate text-sm font-semibold">{profile.name}</p><p className="text-[11px] text-muted-foreground">Profile preview · {PROFILE_DECORATIONS.find((item) => item.id === profile.avatarDecoration)?.label || "Classic frame"}</p></div>
+            </div>
+          </div>
+          {bannerError && <p role="alert" className="mt-2 text-xs text-destructive">{bannerError}</p>}
+          <div className="mt-4">
+            <p className="mb-2 text-xs uppercase tracking-[0.16em] text-muted-foreground">Avatar decorations</p>
+            <div className="grid grid-cols-2 gap-2">
+              {PROFILE_DECORATIONS.map((decoration) => <button key={decoration.id} type="button" onClick={() => updateProfile({ avatarDecoration: decoration.id })} aria-pressed={profile.avatarDecoration === decoration.id} className={"rounded-xl border px-3 py-2 text-left text-xs transition " + (profile.avatarDecoration === decoration.id ? "border-primary bg-primary/10" : "border-border/60 hover:border-primary/50")}>
+                <span className="mr-2 inline-block h-3 w-3 rounded-full align-middle" style={{ backgroundColor: decoration.color }} />{decoration.label}
+              </button>)}
+            </div>
+          </div>
           <div className="mt-4 flex items-center gap-4">
             <div className="relative"><img src={profile.avatar || "/avatar-default.svg"} alt="Profile avatar" className="h-20 w-20 rounded-full border-2 border-primary/70 object-cover" /><label htmlFor="profile-avatar-upload" className="absolute -bottom-1 -right-1 cursor-pointer rounded-full bg-primary px-2 py-1 text-white">＋</label><input id="profile-avatar-upload" type="file" accept="image/png,image/jpeg,image/webp" onChange={chooseAvatar} className="sr-only" /></div>
             <p className="text-xs text-muted-foreground">
