@@ -131,18 +131,13 @@ export default function IntroOverlay() {
   return createPortal(
     <div className="fixed inset-0 z-[2147483647] h-[100dvh] w-full overflow-y-auto overscroll-contain bg-[#050308] text-white">
       <section className="relative isolate flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#050308] text-white">
-        <img
-          className="absolute inset-0 h-full w-full object-cover object-center"
-          src="/zenitsu-intro.webp"
-          alt=""
-          aria-hidden="true"
-          fetchPriority="high"
-        />
         <video
           ref={backgroundVideoRef}
-          className="pointer-events-none absolute h-px w-px opacity-0"
+          className="absolute inset-0 h-full w-full object-cover object-center"
           src={introAsset("bg.mp4.mp4")}
+          poster="/zenitsu-intro.webp"
           autoPlay
+          muted
           loop
           playsInline
           preload="auto"
