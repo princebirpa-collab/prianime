@@ -6,7 +6,7 @@ import { parseVidstuckUrl } from "@/components/video/vidstuckUrls";
 
 function buildVideasyUrl(source) {
   const id = String(source?.tmdbId || "").trim();
-  if (!/^(\\d+|tt\\d+)$/.test(id)) return "";
+  if (!/^(\d+|tt\d+)$/.test(id)) return "";
   if (source.mediaType === "tv") {
     const season = Number(source.season);
     const episode = Number(source.episode);
