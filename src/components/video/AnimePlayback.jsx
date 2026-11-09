@@ -13,7 +13,7 @@ export default function AnimePlayback({ anime, match }) {
     <div className="space-y-4">
       <VideoPlayer src={playback.src} poster={anime.cover} title={anime.display} startAt={playback.startAt} onProgress={playback.onProgress} />
       <LicensedServerSlot anime={anime} match={match} season={playback.season} episode={playback.episode} onSelect={playback.selectEpisode} onProgress={playback.onProgress} />
-      <ThirdPartySourcePlayer animeTitle={anime.display} />
+      <ThirdPartySourcePlayer animeTitle={anime.display} match={match} season={playback.season} episode={playback.episode} />
       {match.mediaType === "tv" && <AnimeEpisodeControls season={playback.season} episode={playback.episode} maxEpisode={maxEpisode} onSelect={playback.selectEpisode} />}
       <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
         <span>{match.mediaType === "tv" ? `Season ${playback.season} Â· Episode ${playback.episode}` : "Movie"}</span>
