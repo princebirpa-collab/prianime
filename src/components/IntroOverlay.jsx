@@ -174,39 +174,27 @@ export default function IntroOverlay() {
             Enter the world beyond imagination
           </p>
 
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            {!audioEnabled && (
-              <button
-                type="button"
-                onClick={enableBackgroundAudio}
-                className="rounded-full border border-white/35 bg-black/35 px-6 py-3 text-xs uppercase tracking-[0.18em] text-white/90 backdrop-blur transition hover:border-[#d8b56d] hover:text-[#d8b56d]"
-              >
-                Enable Intro Sound
-              </button>
-            )}
+          <div className="mt-8 flex flex-col items-center gap-3">
             <button
               type="button"
               onClick={dismiss}
-              className="rounded-full border border-[#d8b56d] bg-[#d8b56d] px-8 py-3 text-xs font-bold uppercase tracking-[0.22em] text-black transition hover:bg-white hover:border-white"
+              className="inline-flex min-w-[218px] items-center justify-center gap-3 rounded-2xl border border-white/70 bg-white px-8 py-4 text-sm font-bold tracking-wide text-[#17151a] shadow-[0_12px_35px_rgba(0,0,0,.25)] transition hover:-translate-y-0.5 hover:bg-white/90"
             >
+              <span aria-hidden="true">☾</span>
               Enter PRI-ANIME
             </button>
-            <button
-              type="button"
-              onClick={dismiss}
-              className="rounded-full border border-white/35 bg-black/30 px-6 py-3 text-xs uppercase tracking-[0.2em] text-white/85 backdrop-blur transition hover:border-[#d8b56d] hover:text-[#d8b56d]"
+            <a
+              href="https://discord.gg/2meCrBHQw"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-w-[218px] items-center justify-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-7 py-3 text-sm font-semibold text-white/90 shadow-lg backdrop-blur-xl transition hover:border-white/35 hover:bg-white/20"
             >
-              Skip intro
-            </button>
-          </div>
-          <div className="mt-7 flex max-w-2xl flex-col items-center gap-3 rounded-2xl border border-white/15 bg-black/35 px-5 py-4 text-center shadow-2xl backdrop-blur-xl sm:px-8">
-            <p className="text-sm font-semibold tracking-wide text-white sm:text-base">Watch anime online · Ad-free experience</p>
-            <p className="max-w-xl text-xs leading-6 text-white/65">Discover anime, explore player options, and join the PRI-ANIME community.</p>
-            <p className="text-[11px] text-[#d8b56d]">Created by one person · Prince Birla. An independent anime passion project.</p>
-            <div className="flex flex-wrap justify-center gap-2"><a href="https://discord.gg/2meCrBHQw" target="_blank" rel="noopener noreferrer" className="rounded-full border border-indigo-200/35 bg-indigo-500/20 px-4 py-2 text-xs font-semibold text-white transition hover:bg-indigo-500/35">Join Discord</a><a href="https://www.instagram.com/pri-ani-anime/" target="_blank" rel="noopener noreferrer" className="rounded-full border border-pink-200/35 bg-pink-500/15 px-4 py-2 text-xs font-semibold text-white transition hover:bg-pink-500/30">Instagram · @pri-ani-anime</a></div>
+              <span aria-hidden="true">◉</span>
+              Discord Community
+            </a>
           </div>
           <p className="mt-5 text-[10px] uppercase tracking-[0.16em] text-white/45">
-            Scroll down to explore features · Only Enter or Skip opens the website
+            Scroll down to explore PRI-ANIME features
           </p>
         </div>
       </section>
