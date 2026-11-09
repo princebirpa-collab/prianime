@@ -5,7 +5,6 @@ import EmbedIframe from "@/components/video/EmbedIframe";
 const SOURCES = [
   { id: "thugtv", label: "ThugTV", eyebrow: "PRIMARY SOURCE", url: import.meta.env.VITE_THUGTV_EMBED_URL, description: "Main third-party player area" },
   { id: "anikoto", label: "AniKoto", eyebrow: "CATALOGUE", url: import.meta.env.VITE_ANIKOTO_EMBED_URL, description: "Additional provider slot" },
-  { id: "videasy", label: "Videasy", eyebrow: "PLAYER SLOT", url: "", description: "Authorized embed endpoint required" },
 ];
 
 function safeEmbedUrl(value) {
@@ -18,13 +17,26 @@ function safeEmbedUrl(value) {
   }
 }
 
-export default function ThirdPartySourcePlayer({ animeTitle = "Selected anime" }) {
+export default function ThirdPartySourcePlayer({ animeTitle = "Selected anime", match, season = 1, episode = 1 }) {
   const sources = useMemo(
     () => SOURCES.map((source) => ({ ...source, embedUrl: safeEmbedUrl(source.url) })),
     []
   );
+  const mediaId = String(match?.tmdbId || "").trim();
+  const videasyUrl = useMemo(() => {
+    if (!mediaId || !/^(\\d+|tt\\d+)$/.test(mediaId)) return "";
+    if (match?.mediaType === "tv") {
+      const s = Number(season);
+      const e = Number(episode);
+      if (!Number.isInteger(s) || s < 1 || !Number.isInteger(e) || e < 1) return "";
+      return `https://player.videasy.ws/embed/tv/${encodeURIComponent(mediaId)}/${s}/${e}`;
+    }
+    if (match?.mediaType === "movie") return `https://player.videasy.ws/embed/movie/${encodeURIComponent(mediaId)}`;
+    return "";
+  }, [mediaId, match?.mediaType, season, episode]);
+  const allSources = [...sources, { id: "videasy", label: "Videasy", eyebrow: "ANIME PLAYER", embedUrl: safeEmbedUrl(videasyUrl), description: "Dynamic TMDB anime embed" }];
   const [activeId, setActiveId] = useState("videasy");
-  const active = sources.find((source) => source.id === activeId) || sources[0];
+  const active = allSources.find((source) => source.id === activeId) || allSources[0];
 
   return (
     <section className="relative isolate overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#09090d] p-3 shadow-[0_24px_90px_rgba(0,0,0,0.42)] sm:p-5" aria-label="Additional video servers">
@@ -41,7 +53,7 @@ export default function ThirdPartySourcePlayer({ animeTitle = "Selected anime" }
           <p className="mt-1 truncate text-xs text-white/50">{animeTitle}</p>
         </div>
         <div className="flex flex-wrap gap-2" role="group" aria-label="Select video source">
-          {sources.map((source) => {
+          {allSources.map((source) => {
             const selected = activeId === source.id;
             return (
               <button
@@ -83,10 +95,10 @@ export default function ThirdPartySourcePlayer({ animeTitle = "Selected anime" }
               </div>
               <p className="mt-4 text-base font-extrabold text-white">{active.label} player slot</p>
               <p className="mt-2 text-sm leading-6 text-white/60">
-                The in-page player layout is ready. Videasy player tab is added. Playback stays off until its provider documents an authorized HTTPS embed URL and required episode parameters. A generic player.html page does not establish a working episode embed.
+                {active.id === "videasy" ? "A valid TMDB movie or TV ID is required to load this anime. Select an anime with TMDB mapping, then choose its season and episode." : "This source has no configured embed URL yet."}
               </p>
               <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-200/70">
-                Awaiting verified embed configuration
+                {active.id === "videasy" ? "TMDB ID · Season · Episode" : "Awaiting embed configuration"}
               </p>
             </div>
           </div>
