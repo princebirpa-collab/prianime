@@ -4,7 +4,8 @@ import EmbedIframe from "@/components/video/EmbedIframe";
 
 const SOURCES = [
   { id: "thugtv", label: "ThugTV", eyebrow: "PRIMARY SOURCE", url: import.meta.env.VITE_THUGTV_EMBED_URL, description: "Main third-party player area" },
-  { id: "anikoto", label: "AniKoto", eyebrow: "ALTERNATE SOURCE", url: import.meta.env.VITE_ANIKOTO_EMBED_URL, description: "Additional provider slot" },
+  { id: "anikoto", label: "AniKoto", eyebrow: "CATALOGUE", url: import.meta.env.VITE_ANIKOTO_EMBED_URL, description: "Additional provider slot" },
+  { id: "videasy", label: "Videasy", eyebrow: "PLAYER SLOT", url: "", description: "Authorized embed endpoint required" },
 ];
 
 function safeEmbedUrl(value) {
@@ -22,11 +23,11 @@ export default function ThirdPartySourcePlayer({ animeTitle = "Selected anime" }
     () => SOURCES.map((source) => ({ ...source, embedUrl: safeEmbedUrl(source.url) })),
     []
   );
-  const [activeId, setActiveId] = useState("thugtv");
+  const [activeId, setActiveId] = useState("videasy");
   const active = sources.find((source) => source.id === activeId) || sources[0];
 
   return (
-    <section className="relative isolate overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#09090d] p-3 shadow-[0_24px_90px_rgba(0,0,0,0.42)] sm:p-5" aria-label="Additional third-party players">
+    <section className="relative isolate overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#09090d] p-3 shadow-[0_24px_90px_rgba(0,0,0,0.42)] sm:p-5" aria-label="Additional video servers">
       <div className="pointer-events-none absolute -right-24 -top-28 -z-10 h-72 w-72 rounded-full bg-rose-700/20 blur-[90px]" />
       <div className="pointer-events-none absolute -bottom-32 left-1/4 -z-10 h-64 w-64 rounded-full bg-amber-500/10 blur-[90px]" />
 
@@ -36,7 +37,7 @@ export default function ThirdPartySourcePlayer({ animeTitle = "Selected anime" }
             <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
             PRI-ANIME · THEATRE
           </div>
-          <h2 className="mt-2 text-xl font-black tracking-tight text-white sm:text-2xl">External player lounge</h2>
+          <h2 className="mt-2 text-xl font-black tracking-tight text-white sm:text-2xl">Server selection</h2>
           <p className="mt-1 truncate text-xs text-white/50">{animeTitle}</p>
         </div>
         <div className="flex flex-wrap gap-2" role="group" aria-label="Select video source">
@@ -82,10 +83,10 @@ export default function ThirdPartySourcePlayer({ animeTitle = "Selected anime" }
               </div>
               <p className="mt-4 text-base font-extrabold text-white">{active.label} player slot</p>
               <p className="mt-2 text-sm leading-6 text-white/60">
-                The in-page player layout is ready. Actual playback needs a provider-authorized HTTPS embed/player URL; a homepage address or catalogue API is not a video embed.
+                The in-page player layout is ready. Videasy player tab is added. Playback stays off until its provider documents an authorized HTTPS embed URL and required episode parameters. A generic player.html page does not establish a working episode embed.
               </p>
               <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-200/70">
-                Awaiting authorized player endpoint
+                Awaiting verified embed configuration
               </p>
             </div>
           </div>
