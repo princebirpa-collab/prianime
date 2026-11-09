@@ -59,7 +59,7 @@ async function refreshRegistry() {
       for (const entry of values) {
         const raw = typeof entry === "object" && entry ? (entry.id ?? entry.mal_id ?? entry.kitsu_id) : entry;
         const externalId = String(raw ?? "").trim();
-        if (/^[1-9]\\d{0,11}$/.test(externalId)) {
+        if (/^[1-9]\d{0,11}$/.test(externalId)) {
           const key = source + "-" + externalId;
           if (!nextIndex.has(key)) nextIndex.set(key, match);
         }
@@ -117,7 +117,7 @@ export default async function handler(req, res) {
     }
 
     const animeId = String(body.animeId || "").trim();
-    const validId = /^(?:[1-9]\\d{0,8}|mal-[1-9]\\d{0,11}|kitsu-[1-9]\\d{0,11})$/.test(animeId);
+    const validId = /^(?:[1-9]\d{0,8}|mal-[1-9]\d{0,11}|kitsu-[1-9]\d{0,11})$/.test(animeId);
     if (!validId) {
       return json(res, 400, { ok: false, error: "A valid AniList, MyAnimeList, or Kitsu anime ID is required." });
     }
