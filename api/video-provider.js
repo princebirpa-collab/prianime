@@ -54,11 +54,25 @@ async function refreshRegistry() {
     if (!Array.isArray(rows)) throw new Error("Anime ID registry returned an invalid response.");
 
     const nextIndex = new Map();
+    const addExternalIds = (source, value, match) => {
+      const values = Array.isArray(value) ? value : [value];
+      for (const entry of values) {
+        const raw = typeof entry === "object" && entry ? (entry.id ?? entry.mal_id ?? entry.kitsu_id) : entry;
+        const externalId = String(raw ?? "").trim();
+        if (/^[1-9]\\d{0,11}$/.test(externalId)) {
+          const key = source + "-" + externalId;
+          if (!nextIndex.has(key)) nextIndex.set(key, match);
+        }
+      }
+    };
     for (const row of rows) {
       const id = Number(row?.anilist_id);
-      if (!Number.isSafeInteger(id) || id <= 0 || nextIndex.has(id)) continue;
+      if (!Number.isSafeInteger(id) || id <= 0) continue;
       const match = normalizeRecord(row);
-      if (match) nextIndex.set(id, match);
+      if (!match) continue;
+      if (!nextIndex.has(String(id))) nextIndex.set(String(id), match);
+      addExternalIds("mal", row?.mal_id, match);
+      addExternalIds("kitsu", row?.kitsu_id, match);
     }
     registryIndex = nextIndex;
     registryExpiresAt = Date.now() + 6 * 60 * 60 * 1000;
@@ -73,16 +87,17 @@ async function refreshRegistry() {
 }
 
 async function getRegistryMatch(animeId) {
+  const key = String(animeId);
   if (registryIndex && Date.now() < registryExpiresAt) {
-    return registryIndex.get(animeId) || null;
+    return registryIndex.get(key) || null;
   }
 
   try {
     const index = await refreshRegistry();
-    return index.get(animeId) || null;
+    return index.get(key) || null;
   } catch (error) {
     // A previously loaded registry remains useful during upstream outages.
-    if (registryIndex) return registryIndex.get(animeId) || null;
+    if (registryIndex) return registryIndex.get(key) || null;
     throw error;
   }
 }
@@ -101,12 +116,13 @@ export default async function handler(req, res) {
       return json(res, 400, { ok: false, error: `Unknown action "${action}".` });
     }
 
-    const animeId = Number(body.animeId);
-    if (!Number.isSafeInteger(animeId) || animeId <= 0 || animeId > 100000000) {
-      return json(res, 400, { ok: false, error: "A valid AniList anime ID is required." });
+    const animeId = String(body.animeId || "").trim();
+    const validId = /^(?:[1-9]\\d{0,8}|mal-[1-9]\\d{0,11}|kitsu-[1-9]\\d{0,11})$/.test(animeId);
+    if (!validId) {
+      return json(res, 400, { ok: false, error: "A valid AniList, MyAnimeList, or Kitsu anime ID is required." });
     }
 
-    const match = verified[animeId] || await getRegistryMatch(animeId);
+    const match = verified[Number(animeId)] || await getRegistryMatch(animeId);
     const result = match
       ? { ...match, tmdbUrl: `https://www.themoviedb.org/${match.mediaType}/${match.tmdbId}` }
       : null;
