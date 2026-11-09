@@ -1,11 +1,6 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Play, Radio, ShieldCheck, Sparkles } from "lucide-react";
 import EmbedIframe from "@/components/video/EmbedIframe";
-
-const SOURCES = [
-  { id: "thugtv", label: "ThugTV", eyebrow: "PRIMARY SOURCE", url: import.meta.env.VITE_THUGTV_EMBED_URL, description: "Main third-party player area" },
-  { id: "anikoto", label: "AniKoto", eyebrow: "CATALOGUE", url: import.meta.env.VITE_ANIKOTO_EMBED_URL, description: "Additional provider slot" },
-];
 
 function safeEmbedUrl(value) {
   if (!value) return "";
@@ -18,74 +13,57 @@ function safeEmbedUrl(value) {
 }
 
 export default function ThirdPartySourcePlayer({ animeTitle = "Selected anime", match, season = 1, episode = 1 }) {
-  const sources = useMemo(
-    () => SOURCES.map((source) => ({ ...source, embedUrl: safeEmbedUrl(source.url) })),
-    []
-  );
   const mediaId = String(match?.tmdbId || "").trim();
   const videasyUrl = useMemo(() => {
-    if (!mediaId || !/^(\\d+|tt\\d+)$/.test(mediaId)) return "";
+    if (!/^(\d+|tt\d+)$/.test(mediaId)) return "";
     if (match?.mediaType === "tv") {
       const s = Number(season);
       const e = Number(episode);
-      if (!Number.isInteger(s) || s < 1 || !Number.isInteger(e) || e < 1) return "";
+      if (!Number.isInteger(s) || s < 0 || !Number.isInteger(e) || e < 1) return "";
       return `https://player.videasy.ws/embed/tv/${encodeURIComponent(mediaId)}/${s}/${e}`;
     }
-    if (match?.mediaType === "movie") return `https://player.videasy.ws/embed/movie/${encodeURIComponent(mediaId)}`;
+    if (match?.mediaType === "movie") {
+      return `https://player.videasy.ws/embed/movie/${encodeURIComponent(mediaId)}`;
+    }
     return "";
   }, [mediaId, match?.mediaType, season, episode]);
-  const allSources = [...sources, { id: "videasy", label: "Videasy", eyebrow: "ANIME PLAYER", embedUrl: safeEmbedUrl(videasyUrl), description: "Dynamic TMDB anime embed" }];
-  const [activeId, setActiveId] = useState("videasy");
-  const active = allSources.find((source) => source.id === activeId) || allSources[0];
+
+  const embedUrl = safeEmbedUrl(videasyUrl);
 
   return (
-    <section className="relative isolate overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#09090d] p-3 shadow-[0_24px_90px_rgba(0,0,0,0.42)] sm:p-5" aria-label="Additional video servers">
+    <section className="relative isolate overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#09090d] p-3 shadow-[0_24px_90px_rgba(0,0,0,0.42)] sm:p-5" aria-label="Videasy anime player">
       <div className="pointer-events-none absolute -right-24 -top-28 -z-10 h-72 w-72 rounded-full bg-rose-700/20 blur-[90px]" />
       <div className="pointer-events-none absolute -bottom-32 left-1/4 -z-10 h-64 w-64 rounded-full bg-amber-500/10 blur-[90px]" />
 
-      <div className="flex flex-col gap-4 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.28em] text-rose-300">
             <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-            PRI-ANIME · THEATRE
+            PRI-ANIME · ALTERNATE THEATRE
           </div>
-          <h2 className="mt-2 text-xl font-black tracking-tight text-white sm:text-2xl">Server selection</h2>
+          <h2 className="mt-2 text-xl font-black tracking-tight text-white sm:text-2xl">Videasy Player</h2>
           <p className="mt-1 truncate text-xs text-white/50">{animeTitle}</p>
         </div>
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Select video source">
-          {allSources.map((source) => {
-            const selected = activeId === source.id;
-            return (
-              <button
-                key={source.id}
-                type="button"
-                aria-pressed={selected}
-                onClick={() => setActiveId(source.id)}
-                className={`group inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-xs font-bold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 ${selected ? "border-rose-400/70 bg-gradient-to-r from-rose-600/30 to-amber-500/10 text-white shadow-[0_0_24px_rgba(225,29,72,0.14)]" : "border-white/10 bg-white/[0.03] text-white/55 hover:border-white/25 hover:text-white"}`}
-              >
-                <span className={`h-1.5 w-1.5 rounded-full ${selected ? "bg-rose-300 shadow-[0_0_10px_rgba(251,113,133,0.9)]" : "bg-white/25"}`} />
-                {source.label}
-              </button>
-            );
-          })}
-        </div>
+        <span className="inline-flex w-fit items-center gap-2 rounded-full border border-rose-300/25 bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-100">
+          <Radio className="h-3.5 w-3.5" aria-hidden="true" />
+          Separate player
+        </span>
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Radio className="h-4 w-4 text-rose-300" aria-hidden="true" />
-          <span className="text-sm font-semibold text-white">{active.label}</span>
-          <span className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-1 text-[9px] font-bold tracking-[0.16em] text-white/45">{active.eyebrow}</span>
+          <Play className="h-4 w-4 text-rose-300" aria-hidden="true" />
+          <span className="text-sm font-semibold text-white">Now playing · {match?.mediaType === "tv" ? `S${season} E${episode}` : "Movie"}</span>
         </div>
         <div className="inline-flex items-center gap-1.5 text-[10px] text-white/45">
           <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" aria-hidden="true" />
-          Provider security restrictions respected
+          VidStuck remains independent and unchanged
         </div>
       </div>
 
       <div className="mt-3">
-        {active.embedUrl ? (
-          <EmbedIframe key={active.id} src={active.embedUrl} title={`${active.label} player for ${animeTitle}`} />
+        {embedUrl ? (
+          <EmbedIframe key={embedUrl} src={embedUrl} title={`Videasy player for ${animeTitle}`} />
         ) : (
           <div className="relative grid aspect-video w-full place-items-center overflow-hidden rounded-2xl border border-white/10 bg-[radial-gradient(ellipse_at_50%_45%,rgba(159,18,57,0.22),transparent_55%),linear-gradient(135deg,#171016,#08080b_62%)] p-5 text-center">
             <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,.25) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.25) 1px, transparent 1px)", backgroundSize: "34px 34px" }} />
@@ -93,21 +71,21 @@ export default function ThirdPartySourcePlayer({ animeTitle = "Selected anime", 
               <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl border border-rose-300/20 bg-rose-500/10 text-rose-200 shadow-[0_0_40px_rgba(225,29,72,0.16)]">
                 <Play className="ml-0.5 h-6 w-6" fill="currentColor" aria-hidden="true" />
               </div>
-              <p className="mt-4 text-base font-extrabold text-white">{active.label} player slot</p>
+              <p className="mt-4 text-base font-extrabold text-white">Videasy player is ready</p>
               <p className="mt-2 text-sm leading-6 text-white/60">
-                {active.id === "videasy" ? "A valid TMDB movie or TV ID is required to load this anime. Select an anime with TMDB mapping, then choose its season and episode." : "This source has no configured embed URL yet."}
+                {match?.mediaType === "tv" || match?.mediaType === "movie"
+                  ? "This title needs a valid TMDB or IMDb ID to create its player link."
+                  : "Choose a matched anime with TMDB movie or TV metadata to load the correct Videasy player."}
               </p>
-              <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-200/70">
-                {active.id === "videasy" ? "TMDB ID · Season · Episode" : "Awaiting embed configuration"}
-              </p>
+              <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-200/70">Anime · Season · Episode aware</p>
             </div>
           </div>
         )}
       </div>
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[10px] text-white/40">
-        <span>Responsive 16:9 · In-page playback area</span>
-        <span>VidStuck is independent and unchanged</span>
+        <span>Responsive 16:9 · Episode-aware embed</span>
+        <span>Playback availability depends on Videasy</span>
       </div>
     </section>
   );
