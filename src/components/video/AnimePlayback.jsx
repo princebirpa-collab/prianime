@@ -1,7 +1,5 @@
 import { Loader2, ExternalLink } from "lucide-react";
 import VideoPlayer from "@/components/video/VideoPlayer";
-import LicensedServerSlot from "@/components/video/LicensedServerSlot";
-import ThirdPartySourcePlayer from "@/components/video/ThirdPartySourcePlayer";
 import AnimeEpisodeControls from "@/components/video/AnimeEpisodeControls";
 import useAnimePlayback from "@/components/video/useAnimePlayback";
 
@@ -12,11 +10,9 @@ export default function AnimePlayback({ anime, match }) {
   return (
     <div className="space-y-4">
       <VideoPlayer src={playback.src} poster={anime.cover} title={anime.display} startAt={playback.startAt} onProgress={playback.onProgress} />
-      <LicensedServerSlot anime={anime} match={match} season={playback.season} episode={playback.episode} onSelect={playback.selectEpisode} onProgress={playback.onProgress} />
-      <ThirdPartySourcePlayer animeTitle={anime.display} match={match} season={playback.season} episode={playback.episode} />
       {match.mediaType === "tv" && <AnimeEpisodeControls season={playback.season} episode={playback.episode} maxEpisode={maxEpisode} onSelect={playback.selectEpisode} />}
       <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
-        <span>{match.mediaType === "tv" ? `Season ${playback.season} Â· Episode ${playback.episode}` : "Movie"}</span>
+        <span>{match.mediaType === "tv" ? `Season ${playback.season} · Episode ${playback.episode}` : "Movie"}</span>
         <a href={match.tmdbUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-primary hover:underline">TMDB {match.tmdbId} <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" /></a>
       </div>
       {playback.historyError && <p role="status" className="text-xs text-muted-foreground">Watch progress could not be restored or saved. Playback is still available.</p>}
