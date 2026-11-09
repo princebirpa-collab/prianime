@@ -5,7 +5,7 @@ import useAnimeSource from "@/components/video/useAnimeSource";
 export default function AnimeStreamLink({ anime }) {
   const navigate = useNavigate();
   const animeId = String(anime?.id || "");
-  const validCatalogueId = /^(?:[1-9]\\d{0,8}|mal-[1-9]\\d{0,11}|kitsu-[1-9]\\d{0,11})$/.test(animeId);
+  const validCatalogueId = /^(?:[1-9]\d{0,8}|mal-[1-9]\d{0,11}|kitsu-[1-9]\d{0,11})$/.test(animeId);
   const source = useAnimeSource(validCatalogueId ? animeId : null);
 
   const openAnime = () => {
