@@ -144,7 +144,7 @@ export default function AnimeDetail() {
                 </div>
               )}
               <div className="mt-6 flex flex-wrap items-center gap-2">
-                {item.source === "anilist" && <AnimeStreamLink anime={item} />}
+                <AnimeStreamLink anime={item} />
                 <button
                   type="button"
                   onClick={() => watchlist.toggle(item)}
