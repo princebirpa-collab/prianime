@@ -137,7 +137,7 @@ export default function IntroOverlay() {
           src={introAsset("bg.mp4.mp4")}
           poster="/zenitsu-intro.webp"
           autoPlay
-          muted
+          muted={!audioEnabled}
           loop
           playsInline
           preload="auto"
@@ -175,6 +175,15 @@ export default function IntroOverlay() {
           </p>
 
           <div className="mt-8 flex flex-col items-center gap-3">
+            <button
+              type="button"
+              onClick={enableBackgroundAudio}
+              aria-pressed={audioEnabled}
+              className="inline-flex min-w-[218px] items-center justify-center gap-2 rounded-full border border-[#d8b56d]/35 bg-black/35 px-5 py-2.5 text-xs font-semibold text-[#f3dfb1] shadow-lg backdrop-blur-xl transition hover:bg-black/55"
+            >
+              <span aria-hidden="true">{audioEnabled ? "♫" : "♪"}</span>
+              {audioEnabled ? "Intro Sound On" : "Enable Intro Sound"}
+            </button>
             <button
               type="button"
               onClick={dismiss}
