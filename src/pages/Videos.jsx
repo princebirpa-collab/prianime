@@ -14,8 +14,8 @@ import { percent } from "@/lib/format";
 
 export default function Videos() {
   const [params] = useSearchParams();
-  const requestedAnime = Number(params.get("anime"));
-  const animeId = Number.isSafeInteger(requestedAnime) && requestedAnime > 0 && requestedAnime <= 100000000 ? requestedAnime : null;
+  const requestedAnime = String(params.get("anime") || "").trim();
+  const animeId = /^(?:[1-9]\d{0,8}|mal-[1-9]\d{0,11}|kitsu-[1-9]\d{0,11})$/.test(requestedAnime) ? requestedAnime : null;
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
