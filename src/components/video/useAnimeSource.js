@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 
 export default function useAnimeSource(animeId) {
+  const id = String(animeId || "").trim();
   return useQuery({
-    queryKey: ["anime-stream-source", Number(animeId)],
+    queryKey: ["anime-stream-source", id],
     queryFn: async () => {
       const response = await fetch("/api/video-provider", {
         method: "POST",
@@ -12,7 +13,7 @@ export default function useAnimeSource(animeId) {
         },
         body: JSON.stringify({
           action: "resolveAnime",
-          animeId: Number(animeId),
+          animeId: id,
         }),
       });
 
@@ -22,7 +23,7 @@ export default function useAnimeSource(animeId) {
       }
       return data.match || null;
     },
-    enabled: Number.isSafeInteger(Number(animeId)) && Number(animeId) > 0,
+    enabled: /^(?:[1-9]\d{0,8}|mal-[1-9]\d{0,11}|kitsu-[1-9]\d{0,11})$/.test(id),
     staleTime: 12 * 60 * 60 * 1000,
     retry: 1,
   });
