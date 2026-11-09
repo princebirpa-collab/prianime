@@ -17,12 +17,12 @@ export default function Footer() {
       </div>
       <div><p className="text-[11px] uppercase tracking-[0.22em] text-white/45">Explore</p><ul className="mt-3 grid gap-2 text-sm">{NAV_LINKS.map((link) => <li key={link.to}><Link className="text-white/60 transition hover:text-primary" to={link.to}>{link.label}</Link></li>)}</ul></div>
       <div><p className="text-[11px] uppercase tracking-[0.22em] text-white/45">About & support</p><div className="mt-3 space-y-3 text-sm text-white/60">
-        <p><span className="font-semibold text-white">About the owner</span><br />PRI-ANIME is an independent anime discovery and community project created by Prince Birpa.</p>
+        <p><span className="font-semibold text-white">About the owner</span><br />PRI-ANIME is an independent anime discovery and community project created by Prince Birla.</p>
         <Link className="block transition hover:text-primary" to="/policy">Policies & licensing</Link><Link className="block transition hover:text-primary" to="/community">Community</Link>
       </div></div>
     </div>
     <div className="relative border-t border-white/10 px-4 py-7 text-center sm:px-6 lg:px-10">
-      <p className="font-display text-2xl font-black tracking-[0.12em] text-white sm:text-4xl">PIRACY IS BAD.</p>
+      <p className="font-display text-2xl font-black tracking-[0.12em] text-white sm:text-4xl">PIRACY IS BAD. MAYBE?</p>
       <p className="mt-2 text-xs text-white/45">Support the creators, studios, and official distributors behind the stories you love.</p>
       <p className="mt-5 inline-flex items-center gap-2 text-[11px] text-white/35"><Sparkles className="h-3.5 w-3.5 text-primary" /> Made with <Heart className="h-3 w-3 text-rose-400" /> for anime fans · PRI-ANIME</p>
     </div>
