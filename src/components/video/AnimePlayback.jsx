@@ -9,7 +9,7 @@ export default function AnimePlayback({ anime, match }) {
   const maxEpisode = playback.season === match.season && anime.episodes ? Math.max(1, anime.episodes + match.episodeOffset) : 9999;
   return (
     <div className="space-y-4">
-      <ServerVideoPlayer src={playback.src} title={anime.display} startAt={playback.startAt} onProgress={playback.onProgress} />
+      <ServerVideoPlayer src={playback.src} title={anime.display} startAt={playback.startAt} onProgress={playback.onProgress} match={match} season={playback.season} episode={playback.episode} />
       {match.mediaType === "tv" && <AnimeEpisodeControls season={playback.season} episode={playback.episode} maxEpisode={maxEpisode} onSelect={playback.selectEpisode} />}
       <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
         <span>{match.mediaType === "tv" ? `Season ${playback.season} · Episode ${playback.episode}` : "Movie"}</span>
