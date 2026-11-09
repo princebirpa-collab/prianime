@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import IntroDetailsShowcase from "@/components/IntroDetailsShowcase";
 import InteractiveSmoke from "@/components/effects/InteractiveSmoke";
 
-const INTRO_SEEN_KEY = "prianime-intro-completed:session:v1";
+const INTRO_SEEN_KEY = "prianime-intro-completed:session:v2";
 
 // Set VITE_R2_PUBLIC_BASE_URL in Vercel to the public Cloudflare R2
 // bucket domain (without a trailing slash). Local public assets remain fallback.
@@ -173,6 +173,9 @@ export default function IntroOverlay() {
           <p className="mt-5 text-xs uppercase tracking-[0.28em] text-white/75 sm:text-sm">
             Enter the world beyond imagination
           </p>
+          <p className="mt-3 text-[9px] font-semibold uppercase tracking-[0.24em] text-rose-200/65 sm:text-[10px]">
+            PIRACY IS BAD. MAYBE?
+          </p>
 
           <div className="mt-8 flex flex-col items-center gap-3">
             <button
@@ -191,6 +194,13 @@ export default function IntroOverlay() {
             >
               <span aria-hidden="true">☾</span>
               Enter PRI-ANIME
+            </button>
+            <button
+              type="button"
+              onClick={dismiss}
+              className="rounded-full px-5 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/55 transition hover:text-white/90"
+            >
+              Skip intro
             </button>
             <a
               href="https://discord.gg/2meCrBHQw"
