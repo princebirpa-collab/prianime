@@ -4,10 +4,11 @@ import AnikotoBackup from "@/components/video/AnikotoBackup";
 import EmbedIframe from "@/components/video/EmbedIframe";
 import { parseVidstuckUrl } from "@/components/video/vidstuckUrls";
 
-function buildVideasyUrl(source) {
+function buildVideasyUrl(source, episodePicker = false) {
   const id = String(source?.tmdbId || "").trim();
   if (!/^(\d+|tt\d+)$/.test(id)) return "";
   if (source.mediaType === "tv") {
+    if (episodePicker) return `https://player.videasy.ws/embed/tv/${encodeURIComponent(id)}`;
     const season = Number(source.season);
     const episode = Number(source.episode);
     if (!Number.isInteger(season) || season < 0 || !Number.isInteger(episode) || episode < 1) return "";
@@ -18,7 +19,11 @@ function buildVideasyUrl(source) {
 }
 
 function VideasyPanel({ source, title }) {
-  const url = buildVideasyUrl(source);
+  // Anime catalogues and TMDB sometimes number seasons differently. Start
+  // with Videasy's documented built-in episode selector, then let the viewer
+  // switch to the app-selected season/episode route when it matches.
+  const [episodePicker, setEpisodePicker] = useState(source?.mediaType === "tv");
+  const url = buildVideasyUrl(source, episodePicker);
   return (
     <section className="space-y-3 rounded-2xl border border-border/60 bg-card/40 p-3 sm:p-4" aria-label="Videasy alternate player">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -28,6 +33,12 @@ function VideasyPanel({ source, title }) {
         </div>
         <span className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-[10px] font-semibold text-primary">Separate player</span>
       </div>
+      {source?.mediaType === "tv" && (
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Videasy episode mode">
+          <button type="button" aria-pressed={episodePicker} onClick={() => setEpisodePicker(true)} className={`rounded-full border px-3 py-2 text-xs font-semibold transition ${episodePicker ? "border-primary bg-primary/10 text-primary" : "border-border bg-background text-muted-foreground hover:border-primary/60"}`}>Browse episodes</button>
+          <button type="button" aria-pressed={!episodePicker} onClick={() => setEpisodePicker(false)} className={`rounded-full border px-3 py-2 text-xs font-semibold transition ${!episodePicker ? "border-primary bg-primary/10 text-primary" : "border-border bg-background text-muted-foreground hover:border-primary/60"}`}>Use selected episode</button>
+        </div>
+      )}
       {url ? (
         <EmbedIframe key={url} src={url} title={`Videasy player for ${title || "selected anime"}`} />
       ) : (
@@ -38,7 +49,7 @@ function VideasyPanel({ source, title }) {
           </div>
         </div>
       )}
-      <p className="text-[10px] text-muted-foreground">Responsive 16:9 · Season and episode follow the selected VidStuck title</p>
+      <p className="text-[10px] text-muted-foreground">Responsive 16:9 · {episodePicker && source?.mediaType === "tv" ? "Select the episode in Videasy if catalogue season numbering differs" : "Follows the selected season and episode"}</p>
     </section>
   );
 }
