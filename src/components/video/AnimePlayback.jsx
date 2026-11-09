@@ -1,5 +1,6 @@
 import { Loader2, ExternalLink } from "lucide-react";
 import VideoPlayer from "@/components/video/VideoPlayer";
+import LicensedServerSlot from "@/components/video/LicensedServerSlot";
 import AnimeEpisodeControls from "@/components/video/AnimeEpisodeControls";
 import useAnimePlayback from "@/components/video/useAnimePlayback";
 
@@ -10,6 +11,7 @@ export default function AnimePlayback({ anime, match }) {
   return (
     <div className="space-y-4">
       <VideoPlayer src={playback.src} poster={anime.cover} title={anime.display} startAt={playback.startAt} onProgress={playback.onProgress} />
+      <LicensedServerSlot anime={anime} match={match} season={playback.season} episode={playback.episode} onSelect={playback.selectEpisode} onProgress={playback.onProgress} />
       {match.mediaType === "tv" && <AnimeEpisodeControls season={playback.season} episode={playback.episode} maxEpisode={maxEpisode} onSelect={playback.selectEpisode} />}
       <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
         <span>{match.mediaType === "tv" ? `Season ${playback.season} Â· Episode ${playback.episode}` : "Movie"}</span>
