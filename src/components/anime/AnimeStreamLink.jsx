@@ -10,23 +10,37 @@ function normalizeTitle(value) {
     .normalize("NFKD")
     .replace(/[\\u0300-\\u036f]/g, "")
     .replace(/[^\\p{L}\\p{N}]+/gu, " ")
-    .trim();
+    .trim()
+    .replace(/\\s+/g, " ");
 }
 
-function hasExactTitleMatch(item, anime) {
-  const wanted = new Set([
-    anime?.display,
-    anime?.titleRomaji,
-    anime?.titleNative,
-    ...(anime?.titleAliases || []),
-  ].map(normalizeTitle).filter(Boolean));
-  const candidates = [
+function titleCandidates(item) {
+  return [
     item?.display,
     item?.titleRomaji,
     item?.titleNative,
     ...(item?.titleAliases || []),
   ].map(normalizeTitle).filter(Boolean);
-  return candidates.some((title) => wanted.has(title));
+}
+
+function resolveAniListMatch(items, anime) {
+  const wanted = titleCandidates(anime);
+  if (!wanted.length) return null;
+
+  const valid = (items || []).filter((item) => /^\\d+$/.test(String(item?.id || "")));
+  const exact = valid.find((item) => titleCandidates(item).some((title) => wanted.includes(title)));
+  if (exact) return exact;
+
+  // Permit a single unambiguous normalized title containment match for
+  // translated/shortened catalogue titles; never guess between multiple shows.
+  const partial = valid.filter((item) => {
+    const candidates = titleCandidates(item);
+    return candidates.some((candidate) =>
+      wanted.some((name) => candidate.length > 4 && name.length > 4 &&
+        (candidate.includes(name) || name.includes(candidate)))
+    );
+  });
+  return partial.length === 1 ? partial[0] : null;
 }
 
 export default function AnimeStreamLink({ anime }) {
@@ -43,23 +57,23 @@ export default function AnimeStreamLink({ anime }) {
       return;
     }
 
-    // MAL/Kitsu catalogue IDs are not valid playback IDs. Resolve the exact
-    // title back to AniList before opening the anime theatre; never send a
-    // "mal-..." or "kitsu-..." ID to the numeric watch route.
     setResolving(true);
     try {
-      const query = anime.titleRomaji || anime.display;
-      const result = await callAniList({ action: "search", q: query, perPage: 50 });
-      const match = (result.items || []).find((item) =>
-        /^\\d+$/.test(String(item?.id || "")) && hasExactTitleMatch(item, anime)
-      );
+      const queries = [...new Set([anime?.titleRomaji, anime?.display, anime?.titleNative].filter(Boolean))];
+      let match = null;
+      for (const query of queries) {
+        const result = await callAniList({ action: "search", q: query, perPage: 50 });
+        match = resolveAniListMatch(result?.items, anime);
+        if (match) break;
+      }
+
       if (!match) {
-        setMessage("Is title ka exact AniList playback match nahi mila. Search results mein title detail dekh sakte ho, lekin galat anime open nahi karenge.");
+        setMessage("We couldn't confidently match this catalogue title to an AniList entry. Try another title or use the available catalogue reference.");
         return;
       }
       navigate(`/watch?anime=${encodeURIComponent(match.id)}`);
     } catch (error) {
-      setMessage(error?.message || "Anime playback match abhi resolve nahi ho paaya. Thodi der baad retry karo.");
+      setMessage(error?.message || "The playback match could not be loaded. Please try again.");
     } finally {
       setResolving(false);
     }
@@ -74,18 +88,18 @@ export default function AnimeStreamLink({ anime }) {
         className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
       >
         {resolving ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Play className="h-4 w-4 fill-current" aria-hidden="true" />}
-        {resolving ? "Finding playable match…" : "Watch anime"}
+        {resolving ? "Finding a playable match…" : "Watch anime"}
       </button>
       {source.data ? (
         <a href={source.data.tmdbUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-primary">
-          TMDB {source.data.tmdbId} · Vidstuck <ExternalLink className="h-3 w-3" aria-hidden="true" />
+          TMDB {source.data.tmdbId} · VidStuck <ExternalLink className="h-3 w-3" aria-hidden="true" />
         </a>
       ) : isAniListId ? (
         <span className="text-[11px] text-muted-foreground">
-          {source.isPending ? "Finding TMDB match…" : source.isError ? "Source lookup unavailable — open player to retry" : "No verified TMDB match yet"}
+          {source.isPending ? "Finding a TMDB match…" : source.isError ? "Source lookup is unavailable. Open the player to retry." : "No verified TMDB match yet."}
         </span>
       ) : (
-        <span className="text-[11px] text-muted-foreground">Backup catalogue title · playback ID is resolved before opening</span>
+        <span className="text-[11px] text-muted-foreground">Backup catalogue title · resolving its playback ID</span>
       )}
       {message && <p role="status" className="max-w-sm text-xs leading-relaxed text-amber-300">{message}</p>}
     </div>
