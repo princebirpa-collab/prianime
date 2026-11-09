@@ -43,8 +43,17 @@ function VideasyPanel({ source, title }) {
   );
 }
 
-export default function ServerVideoPlayer({ src, title, startAt = 0, onProgress }) {
-  const source = parseVidstuckUrl(src);
+export default function ServerVideoPlayer({ src, title, startAt = 0, onProgress, match, season = 1, episode = 1 }) {
+  const parsedSource = parseVidstuckUrl(src);
+  // Use the same TMDB match already used to construct the working VidStuck URL.
+  // This avoids requiring a second title lookup for Videasy.
+  const source = parsedSource || (match?.tmdbId ? {
+    tmdbId: match.tmdbId,
+    mediaType: match.mediaType,
+    season,
+    episode,
+  } : null);
+  const videasySource = source ? { ...source, season, episode } : null;
   const [server, setServer] = useState("vidstuck");
   const progress = useRef(null);
   const [resume, setResume] = useState(null);
@@ -87,7 +96,7 @@ export default function ServerVideoPlayer({ src, title, startAt = 0, onProgress 
         ? <VidstuckPlayer src={src} startAt={resume?.src === src ? resume.position : startAt} onProgress={rememberProgress} />
         : server === "anikoto"
           ? <AnikotoBackup key={src} title={title} season={source.season} episode={source.episode} tmdbId={source.tmdbId} />
-          : <VideasyPanel source={source} title={title} />}
+          : <VideasyPanel source={videasySource} title={title} />}
     </div>
   );
 }
