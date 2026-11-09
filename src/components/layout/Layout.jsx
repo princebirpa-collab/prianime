@@ -5,6 +5,7 @@ import Footer from "@/components/layout/Footer";
 import InteractiveSmoke from "@/components/effects/InteractiveSmoke";
 import CursorGlow from "@/components/effects/CursorGlow";
 import AnimeGuide from "@/components/AnimeGuide";
+import { MessageCircle } from "lucide-react";
 
 export default function Layout() {
   const { pathname } = useLocation();
@@ -36,6 +37,7 @@ export default function Layout() {
       <CursorGlow />
       <InteractiveSmoke />
       <AnimeGuide />
+      <a href="https://discord.gg/2meCrBHQw" target="_blank" rel="noopener noreferrer" aria-label="Join the PRI-ANIME Discord community" className="fixed bottom-5 right-5 z-[90] inline-flex items-center gap-2 rounded-full border border-indigo-200/30 bg-[#5865F2]/90 px-4 py-3 text-xs font-bold text-white shadow-[0_12px_40px_rgba(88,101,242,.35)] backdrop-blur-xl transition hover:-translate-y-1 hover:bg-[#5865F2] focus-visible:outline-white"><MessageCircle className="h-4 w-4" /><span className="hidden sm:inline">Join Discord</span><span className="sm:hidden">Discord</span></a>
     </div>
   );
 }
