@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import NavBar from "@/components/layout/NavBar";
 import Footer from "@/components/layout/Footer";
 import InteractiveSmoke from "@/components/effects/InteractiveSmoke";
@@ -8,10 +8,36 @@ import { MessageCircle } from "lucide-react";
 
 export default function Layout() {
   const { pathname } = useLocation();
+  const adSlotRef = useRef(null);
+  const [adDismissed, setAdDismissed] = useState(false);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, [pathname]);
+
+  useEffect(() => {
+    const slot = adSlotRef.current;
+    if (!slot || adDismissed) return;
+
+    // Adsterra 468x60 display banner. Adult ads are disabled in the publisher dashboard.
+    window.atOptions = {
+      key: "4b24d350aaefbfd0dc60c882142daffc",
+      format: "iframe",
+      height: 60,
+      width: 468,
+      params: {},
+    };
+
+    const loader = document.createElement("script");
+    loader.src = "https://bauval.org/22/4b24d350aaefbfd0dc60c882142daffc";
+    loader.async = true;
+    loader.setAttribute("data-cfasync", "false");
+    slot.appendChild(loader);
+
+    return () => {
+      slot.replaceChildren();
+    };
+  }, [adDismissed]);
 
   return (
     <div className="relative flex min-h-screen flex-col overflow-x-hidden">
