@@ -1,6 +1,9 @@
 const MAPPING_URL = "https://raw.githubusercontent.com/Fribb/anime-lists/master/anime-list-full.json";
 
 const verified = {
+  // Kuroko no Basket (AniList/MAL 11771) -> TMDB TV 45783.
+  // Explicit mapping avoids a stale or ambiguous catalogue crosswalk.
+  11771: { mediaType: "tv", tmdbId: 45783, season: 1, episodeOffset: 0, source: "Manually verified TMDB match", seasonVerified: true },
   141953: { mediaType: "tv", tmdbId: 280564, season: 1, episodeOffset: 0, source: "TMDB verified match", seasonVerified: true },
 };
 
