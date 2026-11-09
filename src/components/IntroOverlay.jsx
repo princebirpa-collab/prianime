@@ -199,6 +199,12 @@ export default function IntroOverlay() {
               Skip intro
             </button>
           </div>
+          <div className="mt-7 flex max-w-2xl flex-col items-center gap-3 rounded-2xl border border-white/15 bg-black/35 px-5 py-4 text-center shadow-2xl backdrop-blur-xl sm:px-8">
+            <p className="text-sm font-semibold tracking-wide text-white sm:text-base">Watch anime online · Ad-free experience</p>
+            <p className="max-w-xl text-xs leading-6 text-white/65">Discover anime, explore player options, and join the PRI-ANIME community.</p>
+            <p className="text-[11px] text-[#d8b56d]">About the owner · An independent project created by Prince Birpa.</p>
+            <div className="flex flex-wrap justify-center gap-2"><a href="https://discord.gg/2meCrBHQw" target="_blank" rel="noopener noreferrer" className="rounded-full border border-indigo-200/35 bg-indigo-500/20 px-4 py-2 text-xs font-semibold text-white transition hover:bg-indigo-500/35">Join Discord</a><a href="https://www.instagram.com/pri-ani-anime/" target="_blank" rel="noopener noreferrer" className="rounded-full border border-pink-200/35 bg-pink-500/15 px-4 py-2 text-xs font-semibold text-white transition hover:bg-pink-500/30">Instagram · @pri-ani-anime</a></div>
+          </div>
           <p className="mt-5 text-[10px] uppercase tracking-[0.16em] text-white/45">
             Scroll down to explore features · Only Enter or Skip opens the website
           </p>
