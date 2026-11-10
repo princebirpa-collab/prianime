@@ -24,14 +24,7 @@ export default function IntroDetailsShowcase() {
       </div>
 
       <div className="mx-auto max-w-6xl">
-        <div className="mb-10 grid gap-5 lg:grid-cols-[1.15fr_.85fr]">
-          <article className="relative overflow-hidden rounded-[1.8rem] border border-[#d8b56d]/20 bg-white/[0.035] p-7 shadow-[0_20px_70px_rgba(0,0,0,.3)] backdrop-blur-2xl sm:p-9">
-            <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full bg-amber-300/10 blur-[80px]" />
-            <p className="text-[10px] font-bold uppercase tracking-[.3em] text-[#d8b56d]">Behind the project</p>
-            <h2 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">Made by one person.<br /><span className="bg-gradient-to-r from-rose-300 via-[#d8b56d] to-fuchsia-300 bg-clip-text text-transparent">Built for anime fans.</span></h2>
-            <p className="mt-4 max-w-xl text-sm leading-7 text-white/65">PRI-ANIME is an independent project created and developed by Prince Birla. It is a one-person passion project shaped by creativity and feedback from the anime community.</p>
-            <p className="mt-3 text-xs leading-6 text-white/40">This is an independent fan project and is not affiliated with anime studios, publishers, or streaming platforms.</p>
-          </article>
+        <div className="mb-10 grid gap-5">
           <article className="flex flex-col justify-between rounded-[1.8rem] border border-indigo-200/15 bg-gradient-to-br from-indigo-500/[0.13] via-white/[0.035] to-fuchsia-500/[0.08] p-7 shadow-[0_20px_70px_rgba(0,0,0,.25)] backdrop-blur-2xl sm:p-9">
             <div><p className="text-[10px] font-bold uppercase tracking-[.3em] text-indigo-200/80">The community</p><h3 className="mt-3 text-2xl font-black text-white">Join the PRI-ANIME Discord</h3><p className="mt-3 text-sm leading-6 text-white/60">Get project news, share feedback, meet other anime fans, and follow future updates.</p></div>
             <a href="https://discord.gg/2meCrBHQw" target="_blank" rel="noopener noreferrer" className="mt-7 inline-flex w-fit items-center gap-2 rounded-full border border-indigo-200/30 bg-indigo-500/20 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-indigo-500/35">Join our Discord <span aria-hidden="true">↗</span></a>
