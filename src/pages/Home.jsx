@@ -4,7 +4,6 @@ import AiringRadar from "@/components/home/AiringRadar";
 import ContinueWatching from "@/components/home/ContinueWatching";
 import LiveCatalogue from "@/components/home/LiveCatalogue";
 import RealmGrid from "@/components/home/RealmGrid";
-import ExperiencePanel from "@/components/home/ExperiencePanel";
 
 export default function Home() {
   return (
@@ -15,7 +14,6 @@ export default function Home() {
       <ContinueWatching />
       <LiveCatalogue />
       <RealmGrid />
-      <ExperiencePanel />
     </div>
   );
 }
