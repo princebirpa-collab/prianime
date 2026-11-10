@@ -12,10 +12,6 @@ export default function LiveCatalogue() {
           <p className="text-[11px] uppercase tracking-[0.28em] text-primary">Live from AniList</p>
           <h2 className="mt-2 font-display text-3xl font-medium sm:text-4xl">The living catalogue</h2>
         </div>
-        <p className="max-w-md text-[13px] leading-relaxed text-muted-foreground">
-          Every row below is a live metadata query â€” scores, episode counts and artwork come straight from the
-          AniList GraphQL API, cached for five minutes.
-        </p>
       </div>
 
       <AnimeRowRemote title="All-time popular" subtitle="The canon, ranked by followers" body={{ action: "popular", perPage: 20 }} viewAll="/browse?sort=popular" rank />
