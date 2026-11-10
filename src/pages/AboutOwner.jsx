@@ -1,9 +1,25 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Instagram, ArrowUpRight, Play, Volume2, VolumeX, UserRound } from "lucide-react";
 
 export default function AboutOwner() {
   const videoRef = useRef(null);
   const [soundOn, setSoundOn] = useState(false);
+  const [needsTap, setNeedsTap] = useState(false);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = false;
+    video.volume = 1;
+    video.play().then(() => {
+      setSoundOn(true);
+      setNeedsTap(false);
+    }).catch(() => {
+      // Browsers may block autoplay with sound in a newly opened tab.
+      setSoundOn(false);
+      setNeedsTap(true);
+    });
+  }, []);
 
   const playWithSound = async () => {
     const video = videoRef.current;
@@ -13,8 +29,10 @@ export default function AboutOwner() {
     try {
       await video.play();
       setSoundOn(true);
+      setNeedsTap(false);
     } catch {
       setSoundOn(false);
+      setNeedsTap(true);
     }
   };
 
@@ -29,8 +47,8 @@ export default function AboutOwner() {
             <div className="relative z-10 w-full max-w-2xl">
               <p className="mb-4 text-[10px] font-semibold uppercase tracking-[.3em] text-[#d8b56d]">Creator introduction</p>
               <h1 className="mb-5 font-display text-4xl font-semibold sm:text-6xl">Prince Birla</h1>
-              <video ref={videoRef} src="/about-owner.mp4" controls playsInline preload="metadata" className="mx-auto max-h-[68vh] w-full rounded-2xl border border-white/15 bg-black object-contain shadow-2xl" aria-label="Prince Birla's About Owner introduction video" onVolumeChange={(event) => setSoundOn(!event.currentTarget.muted && event.currentTarget.volume > 0)} />
-              <button type="button" onClick={playWithSound} className="mt-4 inline-flex items-center gap-2 rounded-full border border-rose-200/30 bg-rose-300/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-rose-300/20"><Play className="h-4 w-4" /> Play video with sound</button>
+              <video ref={videoRef} src="/about-owner.mp4" autoPlay controls playsInline preload="auto" className="mx-auto max-h-[68vh] w-full rounded-2xl border border-white/15 bg-black object-contain shadow-2xl" aria-label="Prince Birla's About Owner introduction video" onVolumeChange={(event) => setSoundOn(!event.currentTarget.muted && event.currentTarget.volume > 0)} />
+              {needsTap && <button type="button" onClick={playWithSound} className="mt-4 inline-flex items-center gap-2 rounded-full border border-rose-200/30 bg-rose-300/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-rose-300/20"><Play className="h-4 w-4" /> Tap to play with sound</button>}{!needsTap && <button type="button" onClick={playWithSound} className="mt-4 inline-flex items-center gap-2 rounded-full border border-rose-200/30 bg-rose-300/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-rose-300/20"><Play className="h-4 w-4" /> Play with sound</button>}
               <span className="ml-3 inline-flex items-center gap-1 text-xs text-white/55">{soundOn ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}{soundOn ? "Sound on" : "Sound muted"}</span>
             </div>
           </div>
