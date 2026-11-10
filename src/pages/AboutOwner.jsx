@@ -14,11 +14,11 @@ export default function AboutOwner() {
               <PlayCircle className="mx-auto h-14 w-14 text-rose-200/75" />
               <p className="mt-5 text-[10px] font-semibold uppercase tracking-[.3em] text-[#d8b56d]">Creator introduction</p>
               <h1 className="mt-3 font-display text-4xl font-semibold sm:text-6xl">Prince Birla</h1>
-              <p className="mx-auto mt-4 max-w-lg text-sm leading-7 text-white/65">The personal introduction video will appear here. This space is ready for your own video.</p>
+              <p className="mx-auto mt-4 max-w-lg text-sm leading-7 text-white/65">I watch many anime and I am still new to the anime world. I am exploring new stories, characters and adventures. My favourite anime is Black Clover.</p>
             </div>
           </div>
           <div className="flex flex-col gap-5 border-t border-white/10 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
-            <div><p className="text-[10px] font-bold uppercase tracking-[.28em] text-rose-200/75">Founder & creator</p><h2 className="mt-2 text-2xl font-semibold">About the owner</h2><p className="mt-2 max-w-xl text-sm leading-6 text-white/60">PRI-ANIME is an independent project created and developed by Prince Birla.</p></div>
+            <div><p className="text-[10px] font-bold uppercase tracking-[.28em] text-rose-200/75">Founder & creator</p><h2 className="mt-2 text-2xl font-semibold">About the owner</h2><p className="mt-2 max-w-xl text-sm leading-6 text-white/60">I watch many anime, I am new to the anime world, and Black Clover is my favourite. PRI-ANIME is my independent project, created for fellow anime fans.</p></div>
             <a href="https://www.instagram.com/prin.birlaa/" target="_blank" rel="noopener noreferrer" className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full border border-white/25 bg-white/[0.08] px-5 py-3 text-sm font-semibold text-white shadow-xl backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-rose-200/50 hover:bg-rose-300/10"><Instagram className="h-4 w-4" /> @prin.birlaa <ArrowUpRight className="h-4 w-4" /></a>
           </div>
         </section>
