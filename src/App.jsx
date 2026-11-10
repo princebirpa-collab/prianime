@@ -20,6 +20,7 @@ const Videos = lazy(() => import('@/pages/Videos'));
 const Watch = lazy(() => import('@/pages/Watch'));
 const Studio = lazy(() => import('@/pages/Studio'));
 const Creator = lazy(() => import('@/pages/Creator'));
+const AboutOwner = lazy(() => import('@/pages/AboutOwner'));
 const Library = lazy(() => import('@/pages/Library'));
 const Settings = lazy(() => import('@/pages/Settings'));
 const Admin = lazy(() => import('@/pages/Admin'));
@@ -69,6 +70,7 @@ const AuthenticatedApp = () => {
         <Route path="/watch/:id" element={<Watch />} />
         <Route path="/studio" element={<Studio />} />
         <Route path="/creator" element={<Creator />} />
+        <Route path="/about-owner" element={<AboutOwner />} />
         <Route path="/library" element={<Library />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/admin" element={<Admin />} />
