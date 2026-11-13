@@ -31,8 +31,9 @@ function buildVidriftUrl(source, title, animeId) {
   } else if (source.mediaType === "tv") {
     // Vidrift's AniList route avoids relying on TMDB's anime season mapping.
     // MAL/Kitsu catalogue entries continue through the verified TMDB mapping.
-    if (/^[1-9]\d{0,8}$/.test(anilistId) && Number.isInteger(episode) && episode >= 1) {
-      path = `/embed/anilist/${encodeURIComponent(anilistId)}/${episode}`;
+    const anilistEpisode = episode - Number(source.episodeOffset || 0);
+    if (/^[1-9]\d{0,8}$/.test(anilistId) && Number.isInteger(anilistEpisode) && anilistEpisode >= 1) {
+      path = `/embed/anilist/${encodeURIComponent(anilistId)}/${anilistEpisode}`;
     } else if (Number.isInteger(season) && season >= 0 && Number.isInteger(episode) && episode >= 1) {
       path = `/embed/tv/${encodeURIComponent(tmdbId)}/${season}/${episode}`;
     }
@@ -66,6 +67,19 @@ function VidriftPanel({ source, title, animeId, startAt = 0, onProgress, onEpiso
     const onMessage = (event) => {
       if (event.origin !== "https://embed.vidrift.net" || !event.data || typeof event.data !== "object") return;
       const data = event.data;
+      if (data.type === "vidrift:state") {
+        const position = Number(data.currentTime);
+        const duration = Number(data.duration);
+        if (Number.isFinite(position) && Number.isFinite(duration) && duration > 0 && position > 0) {
+          setPlaybackConfirmed(true);
+          setLoadTimedOut(false);
+        }
+        const nextSeason = Number(data.season);
+        const nextEpisode = Number(data.episode);
+        if (Number.isInteger(nextSeason) && nextSeason >= 0 && Number.isInteger(nextEpisode) && nextEpisode >= 1) {
+          onEpisodeChange?.(nextSeason, nextEpisode);
+        }
+      }
       if (data.type === "vidrift:progress" || data.type === "vidrift:paused") {
         const position = Number(data.currentTime);
         const duration = Number(data.duration);
@@ -80,12 +94,8 @@ function VidriftPanel({ source, title, animeId, startAt = 0, onProgress, onEpiso
           });
         }
       }
-      if (data.type === "vidrift:episode") {
-        const nextSeason = Number(data.season);
-        const nextEpisode = Number(data.episode);
-        if (Number.isInteger(nextSeason) && nextSeason >= 0 && Number.isInteger(nextEpisode) && nextEpisode >= 1) {
-          onEpisodeChange?.(nextSeason, nextEpisode);
-        }
+      if (data.type === "vidrift:unpaused") {
+        setLoadTimedOut(false);
       }
     };
     window.addEventListener("message", onMessage);
@@ -93,6 +103,7 @@ function VidriftPanel({ source, title, animeId, startAt = 0, onProgress, onEpiso
   }, [onProgress, onEpisodeChange, source.season, source.episode]);
 
   const handleLoad = () => {
+    frameRef.current?.contentWindow?.postMessage({ type: "vidrift:get-state" }, "https://embed.vidrift.net");
     if (startAt > 0) {
       frameRef.current?.contentWindow?.postMessage(
         { type: "vidrift:resume", currentTime: startAt },
@@ -184,7 +195,7 @@ export default function ServerVideoPlayer({ src, title, animeId, startAt = 0, on
     season,
     episode,
   } : null);
-  const videasySource = source ? { ...source, season, episode } : null;
+  const videasySource = source ? { ...source, season, episode, episodeOffset: match?.episodeOffset ?? source.episodeOffset ?? 0 } : null;
   const [server, setServer] = useState("vidstuck");
   const progress = useRef(null);
   const [resume, setResume] = useState(null);
