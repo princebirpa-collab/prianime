@@ -97,7 +97,7 @@ export default function ServerVideoPlayer({ src, title, startAt = 0, onProgress,
         <span className="mr-1 text-xs text-muted-foreground">Server</span>
         {[
           { id: "vidstuck", label: "VidStuck · Main" },
-          { id: "anikoto", label: "AniKoto · Catalogue" },
+          { id: "anikoto", label: "AniKoto · Player" },
           { id: "videasy", label: "Videasy · Alternate" },
         ].map((item) => (
           <button key={item.id} type="button" aria-pressed={server === item.id} onClick={() => switchServer(item.id)} className={`rounded-full border px-4 py-2 text-xs font-semibold transition ${server === item.id ? "border-primary bg-primary/10 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60 hover:text-primary"}`}>{item.label}</button>
