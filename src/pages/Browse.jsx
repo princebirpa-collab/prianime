@@ -188,7 +188,7 @@ export default function Browse() {
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">{Array.from({ length: 12 }).map((_, index) => <SkeletonCard key={index} />)}</div>
           ) : visibleItems.length === 0 && !(letter && hasNext) ? (
             <EmptyState title={letter ? `No loaded titles begin with “${letter}”` : "No anime found for this search"}
-              body={letter ? "Load another catalogue page to look for more titles with this letter." : `AniList returned no matching titles for “${committedQuery}”. Try another spelling or clear the filters.`}
+              body={letter ? "Load another catalogue page to look for more titles with this letter." : `No matching anime was found for “${committedQuery}” across the available catalogues. Try another spelling or clear the filters.`}
               actionLabel={letter ? "Load more titles" : "Clear filters"} onAction={letter ? loadMore : clearAllFilters} />
           ) : (
             <>
