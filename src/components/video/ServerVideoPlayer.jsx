@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import VidstuckPlayer from "@/components/video/VidstuckPlayer";
 import AnikotoBackup from "@/components/video/AnikotoBackup";
 import EmbedIframe from "@/components/video/EmbedIframe";
@@ -16,6 +16,82 @@ function buildVideasyUrl(source, episodePicker = false) {
   }
   if (source.mediaType === "movie") return `https://player.videasy.ws/embed/movie/${encodeURIComponent(id)}`;
   return "";
+}
+
+function buildVidriftUrl(source, title) {
+  const id = String(source?.tmdbId || "").trim();
+  if (!/^\\d+$/.test(id)) return "";
+  const type = source.mediaType === "movie" ? "movie" : source.mediaType === "tv" ? "tv" : "";
+  if (!type) return "";
+  const path = type === "movie"
+    ? `/embed/movie/${encodeURIComponent(id)}`
+    : `/embed/tv/${encodeURIComponent(id)}/${Number(source.season)}/${Number(source.episode)}`;
+  const url = new URL(path, "https://embed.vidrift.net");
+  if (title) url.searchParams.set("title", title);
+  url.searchParams.set("brand", "PRI-ANIME");
+  url.searchParams.set("brandColor", "dc2626");
+  url.searchParams.set("exit", "1");
+  return url.href;
+}
+
+function VidriftPanel({ source, title, startAt = 0, onProgress }) {
+  const frameRef = useRef(null);
+  const url = useMemo(() => buildVidriftUrl(source, title), [source, title]);
+  useEffect(() => {
+    const onMessage = (event) => {
+      if (event.origin !== "https://embed.vidrift.net" || !event.data || typeof event.data !== "object") return;
+      const data = event.data;
+      if (data.type === "vidrift:progress" || data.type === "vidrift:paused") {
+        const position = Number(data.currentTime);
+        const duration = Number(data.duration);
+        if (Number.isFinite(position) && Number.isFinite(duration) && duration > 0) {
+          onProgress?.(position, duration, {
+            season: Number(data.season) || source.season,
+            episode: Number(data.episode) || source.episode,
+          });
+        }
+      }
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [onProgress, source.season, source.episode]);
+
+  const handleLoad = () => {
+    if (startAt > 0) {
+      frameRef.current?.contentWindow?.postMessage(
+        { type: "vidrift:resume", currentTime: startAt },
+        "https://embed.vidrift.net"
+      );
+    }
+  };
+
+  if (!url) return <div className="grid aspect-video place-items-center rounded-xl border border-border bg-background p-5 text-center text-sm text-muted-foreground">Vidrift needs a valid TMDB movie or TV ID for this title.</div>;
+  return (
+    <section className="space-y-3 rounded-2xl border border-border/60 bg-card/40 p-3 sm:p-4" aria-label="Vidrift alternate player">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <p className="text-sm font-bold text-foreground">Vidrift · Alternate player</p>
+          <p className="mt-1 text-xs text-muted-foreground">{title || "Selected title"} · {source.mediaType === "tv" ? `Season ${source.season} · Episode ${source.episode}` : "Movie"}</p>
+        </div>
+        <span className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-[10px] font-semibold text-primary">Responsive 16:9</span>
+      </div>
+      <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-border/60 bg-black">
+        <iframe
+          ref={frameRef}
+          src={url}
+          title={`Vidrift player for ${title || "selected title"}`}
+          className="absolute inset-0 h-full w-full border-0"
+          allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+          allowFullScreen
+          referrerPolicy="strict-origin-when-cross-origin"
+          onLoad={handleLoad}
+        />
+      </div>
+      <div className="flex justify-end">
+        <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-primary">Open Vidrift directly ↗</a>
+      </div>
+    </section>
+  );
 }
 
 function VideasyPanel({ source, title }) {
@@ -99,6 +175,7 @@ export default function ServerVideoPlayer({ src, title, startAt = 0, onProgress,
           { id: "vidstuck", label: "VidStuck · Main" },
           { id: "anikoto", label: "AniKoto · Player" },
           { id: "videasy", label: "Videasy · Alternate" },
+          { id: "vidrift", label: "Vidrift · 2nd Alternate" },
         ].map((item) => (
           <button key={item.id} type="button" aria-pressed={server === item.id} onClick={() => switchServer(item.id)} className={`rounded-full border px-4 py-2 text-xs font-semibold transition ${server === item.id ? "border-primary bg-primary/10 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60 hover:text-primary"}`}>{item.label}</button>
         ))}
@@ -107,7 +184,9 @@ export default function ServerVideoPlayer({ src, title, startAt = 0, onProgress,
         ? <VidstuckPlayer src={src} startAt={resume?.src === src ? resume.position : startAt} onProgress={rememberProgress} />
         : server === "anikoto"
           ? <AnikotoBackup key={src} title={title} season={source.season} episode={source.episode} tmdbId={source.tmdbId} />
-          : <VideasyPanel source={videasySource} title={title} />}
+          : server === "videasy"
+            ? <VideasyPanel source={videasySource} title={title} />
+            : <VidriftPanel source={videasySource} title={title} startAt={resume?.src === src ? resume.position : startAt} onProgress={rememberProgress} />}
     </div>
   );
 }
