@@ -20,21 +20,20 @@ function buildVideasyUrl(source, episodePicker = false) {
 
 function buildVidriftUrl(source, title, animeId) {
   const tmdbId = String(source?.tmdbId || "").trim();
-  if (!/^\d+$/.test(tmdbId)) return "";
-  const episode = Number(source.episode);
-  const season = Number(source.season);
+  const episode = Number(source?.episode);
+  const season = Number(source?.season);
   const anilistId = String(animeId || "").trim();
 
   let path = "";
-  if (source.mediaType === "movie") {
+  if (source?.mediaType === "movie") {
+    if (!/^\d+$/.test(tmdbId)) return "";
     path = `/embed/movie/${encodeURIComponent(tmdbId)}`;
-  } else if (source.mediaType === "tv") {
-    // Vidrift's AniList route avoids relying on TMDB's anime season mapping.
-    // MAL/Kitsu catalogue entries continue through the verified TMDB mapping.
+  } else if (source?.mediaType === "tv") {
+    // Vidrift's AniList route does not require a TMDB ID.
     const anilistEpisode = episode - Number(source.episodeOffset || 0);
     if (/^[1-9]\d{0,8}$/.test(anilistId) && Number.isInteger(anilistEpisode) && anilistEpisode >= 1) {
       path = `/embed/anilist/${encodeURIComponent(anilistId)}/${anilistEpisode}`;
-    } else if (Number.isInteger(season) && season >= 0 && Number.isInteger(episode) && episode >= 1) {
+    } else if (/^\d+$/.test(tmdbId) && Number.isInteger(season) && season >= 0 && Number.isInteger(episode) && episode >= 1) {
       path = `/embed/tv/${encodeURIComponent(tmdbId)}/${season}/${episode}`;
     }
   }
@@ -67,6 +66,13 @@ function VidriftPanel({ source, title, animeId, startAt = 0, onProgress, onEpiso
     const onMessage = (event) => {
       if (event.origin !== "https://embed.vidrift.net" || !event.data || typeof event.data !== "object") return;
       const data = event.data;
+      if (data.type === "vidrift:episode") {
+        const nextSeason = Number(data.season);
+        const nextEpisode = Number(data.episode);
+        if (Number.isInteger(nextSeason) && nextSeason >= 0 && Number.isInteger(nextEpisode) && nextEpisode >= 1) {
+          onEpisodeChange?.(nextSeason, nextEpisode);
+        }
+      }
       if (data.type === "vidrift:state") {
         const position = Number(data.currentTime);
         const duration = Number(data.duration);
