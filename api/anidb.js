@@ -16,8 +16,8 @@ function send(res, status, payload) {
 
 function normalizeTitle(value) {
   return String(value || "").toLocaleLowerCase().normalize("NFKD")
-    .replace(/[\\u0300-\\u036f]/g, "")
-    .replace(/[^\\p{L}\\p{N}]+/gu, " ").trim();
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 }
 
 async function loadTitleRows() {
@@ -31,10 +31,10 @@ async function loadTitleRows() {
     const compressed = Buffer.from(await response.arrayBuffer());
     const text = gunzipSync(compressed).toString("utf8");
     const rows = [];
-    for (const line of text.split(/\\r?\\n/)) {
+    for (const line of text.split(/\r?\n/)) {
       if (!line || line.startsWith("#")) continue;
       const parts = line.split("|");
-      if (parts.length < 4 || !/^\\d+$/.test(parts[0])) continue;
+      if (parts.length < 4 || !/^\d+$/.test(parts[0])) continue;
       const title = parts.slice(3).join("|").trim();
       if (title) rows.push({ aid: parts[0], type: parts[1], lang: parts[2], title, normalized: normalizeTitle(title) });
     }
