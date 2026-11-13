@@ -28,7 +28,11 @@ async function searchKitsu(query) {
   );
   if (!response.ok) return [];
   const payload = await response.json();
-  return (Array.isArray(payload?.data) ? payload.data : []).filter((entry) => {\n    const rating = String(entry?.attributes?.ageRating || "").toUpperCase();\n    const guide = String(entry?.attributes?.ageRatingGuide || "").toUpperCase();\n    return !["R", "R18", "R18+", "NC-17"].includes(rating) && !/18\\s*\\+|R18|NC-17|ADULT/.test(guide);\n  }).map((entry) => {
+  return (Array.isArray(payload?.data) ? payload.data : []).filter((entry) => {
+    const rating = String(entry?.attributes?.ageRating || "").toUpperCase();
+    const guide = String(entry?.attributes?.ageRatingGuide || "").toUpperCase();
+    return !["R", "R18", "R18+", "NC-17"].includes(rating) && !/18\s*\\+|R18|NC-17|ADULT/.test(guide);
+  }).map((entry) => {
     const attrs = entry?.attributes || {};
     const titles = attrs.titles || {};
     const synonyms = [
