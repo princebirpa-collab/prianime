@@ -36,21 +36,17 @@ const Manhwa = lazy(() => import('@/pages/Manhwa'));
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
 
-  // Keep the public About Owner page independent from Base44 auth/settings.
-  // This route must render in a fresh tab even when the legacy auth service is unavailable.
+  // Public standalone profile route: no legacy auth gate, navbar, footer, or site overlays.
   if (window.location.pathname === '/about-owner') {
     return (
-      <Suspense fallback={<div role="status" className="grid min-h-[50vh] place-items-center text-sm text-muted-foreground">Loading About Owner…</div>}>
+      <Suspense fallback={<div role="status" className="grid min-h-[100dvh] place-items-center bg-[#05040b] text-sm text-white/70">Loading About Owner…</div>}>
         <Routes>
-          <Route element={<Layout />}>
-            <Route path="/about-owner" element={<AboutOwner />} />
-          </Route>
+          <Route path="/about-owner" element={<AboutOwner />} />
         </Routes>
       </Suspense>
     );
   }
 
-  // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
       <div className="fixed inset-0 flex items-center justify-center">
@@ -59,46 +55,43 @@ const AuthenticatedApp = () => {
     );
   }
 
-  // Handle authentication errors
   if (authError) {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     } else if (authError.type === 'auth_required') {
-      // Redirect to login automatically
       navigateToLogin();
       return null;
     }
   }
 
-  // Render the main app
   return (
     <Suspense fallback={<div role="status" className="grid min-h-[50vh] place-items-center text-sm text-muted-foreground">Loading PRI-ANIME…</div>}>
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/browse" element={<Browse />} />
-        <Route path="/category/:slug" element={<Category />} />
-        <Route path="/anime/:id" element={<AnimeDetail />} />
-        <Route path="/reels" element={<Reels />} />
-        <Route path="/watch" element={<Videos />} />
-        <Route path="/watch/:id" element={<Watch />} />
-        <Route path="/studio" element={<Studio />} />
-        <Route path="/creator" element={<Creator />} />
-        <Route path="/about-owner" element={<AboutOwner />} />
-        <Route path="/library" element={<Library />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/policy" element={<Policy />} />
-        <Route path="/community" element={<Community />} />
-        <Route path="/missions" element={<Missions />} />
-        <Route path="/arena" element={<Arena />} />
-        <Route path="/world-map" element={<WorldMap />} />
-        <Route path="/watch-party" element={<WatchParty />} />
-        <Route path="/channels" element={<Channels />} />
-        <Route path="/manhwa" element={<Manhwa />} />
-      </Route>
-      <Route path="*" element={<PageNotFound />} />
-    </Routes>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/browse" element={<Browse />} />
+          <Route path="/category/:slug" element={<Category />} />
+          <Route path="/anime/:id" element={<AnimeDetail />} />
+          <Route path="/reels" element={<Reels />} />
+          <Route path="/watch" element={<Videos />} />
+          <Route path="/watch/:id" element={<Watch />} />
+          <Route path="/studio" element={<Studio />} />
+          <Route path="/creator" element={<Creator />} />
+          <Route path="/about-owner" element={<AboutOwner />} />
+          <Route path="/library" element={<Library />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/policy" element={<Policy />} />
+          <Route path="/community" element={<Community />} />
+          <Route path="/missions" element={<Missions />} />
+          <Route path="/arena" element={<Arena />} />
+          <Route path="/world-map" element={<WorldMap />} />
+          <Route path="/watch-party" element={<WatchParty />} />
+          <Route path="/channels" element={<Channels />} />
+          <Route path="/manhwa" element={<Manhwa />} />
+        </Route>
+        <Route path="*" element={<PageNotFound />} />
+      </Routes>
     </Suspense>
   );
 };
@@ -117,7 +110,7 @@ function App() {
         </QueryClientProvider>
       </AuthProvider>
     </ThemeProvider>
-  )
+  );
 }
 
 export default App
