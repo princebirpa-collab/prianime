@@ -18,14 +18,27 @@ function buildVideasyUrl(source, episodePicker = false) {
   return "";
 }
 
-function buildVidriftUrl(source, title) {
-  const id = String(source?.tmdbId || "").trim();
-  if (!/^\d+$/.test(id)) return "";
-  const type = source.mediaType === "movie" ? "movie" : source.mediaType === "tv" ? "tv" : "";
-  if (!type) return "";
-  const path = type === "movie"
-    ? `/embed/movie/${encodeURIComponent(id)}`
-    : `/embed/tv/${encodeURIComponent(id)}/${Number(source.season)}/${Number(source.episode)}`;
+function buildVidriftUrl(source, title, animeId) {
+  const tmdbId = String(source?.tmdbId || "").trim();
+  if (!/^\d+$/.test(tmdbId)) return "";
+  const episode = Number(source.episode);
+  const season = Number(source.season);
+  const anilistId = String(animeId || "").trim();
+
+  let path = "";
+  if (source.mediaType === "movie") {
+    path = `/embed/movie/${encodeURIComponent(tmdbId)}`;
+  } else if (source.mediaType === "tv") {
+    // Vidrift's AniList route avoids relying on TMDB's anime season mapping.
+    // MAL/Kitsu catalogue entries continue through the verified TMDB mapping.
+    if (/^[1-9]\d{0,8}$/.test(anilistId) && Number.isInteger(episode) && episode >= 1) {
+      path = `/embed/anilist/${encodeURIComponent(anilistId)}/${episode}`;
+    } else if (Number.isInteger(season) && season >= 0 && Number.isInteger(episode) && episode >= 1) {
+      path = `/embed/tv/${encodeURIComponent(tmdbId)}/${season}/${episode}`;
+    }
+  }
+  if (!path) return "";
+
   const url = new URL(path, "https://embed.vidrift.net");
   if (title) url.searchParams.set("title", title);
   url.searchParams.set("brand", "PRI-ANIME");
@@ -34,9 +47,21 @@ function buildVidriftUrl(source, title) {
   return url.href;
 }
 
-function VidriftPanel({ source, title, startAt = 0, onProgress }) {
+function VidriftPanel({ source, title, animeId, startAt = 0, onProgress, onEpisodeChange }) {
   const frameRef = useRef(null);
-  const url = useMemo(() => buildVidriftUrl(source, title), [source, title]);
+  const [frameLoaded, setFrameLoaded] = useState(false);
+  const [playbackConfirmed, setPlaybackConfirmed] = useState(false);
+  const [loadTimedOut, setLoadTimedOut] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+  const url = useMemo(() => buildVidriftUrl(source, title, animeId), [source, title, animeId]);
+
+  useEffect(() => {
+    setFrameLoaded(false);
+    setPlaybackConfirmed(false);
+    setLoadTimedOut(false);
+    const timer = window.setTimeout(() => setLoadTimedOut(true), 20000);
+    return () => window.clearTimeout(timer);
+  }, [url, attempt]);
   useEffect(() => {
     const onMessage = (event) => {
       if (event.origin !== "https://embed.vidrift.net" || !event.data || typeof event.data !== "object") return;
@@ -44,17 +69,28 @@ function VidriftPanel({ source, title, startAt = 0, onProgress }) {
       if (data.type === "vidrift:progress" || data.type === "vidrift:paused") {
         const position = Number(data.currentTime);
         const duration = Number(data.duration);
+        if (data.type === "vidrift:progress" && Number.isFinite(position) && Number.isFinite(duration) && duration > 0) {
+          setPlaybackConfirmed(true);
+          setLoadTimedOut(false);
+        }
         if (Number.isFinite(position) && Number.isFinite(duration) && duration > 0) {
           onProgress?.(position, duration, {
-            season: Number(data.season) || source.season,
-            episode: Number(data.episode) || source.episode,
+            season: Number.isInteger(Number(data.season)) ? Number(data.season) : source.season,
+            episode: Number.isInteger(Number(data.episode)) && Number(data.episode) > 0 ? Number(data.episode) : source.episode,
           });
+        }
+      }
+      if (data.type === "vidrift:episode") {
+        const nextSeason = Number(data.season);
+        const nextEpisode = Number(data.episode);
+        if (Number.isInteger(nextSeason) && nextSeason >= 0 && Number.isInteger(nextEpisode) && nextEpisode >= 1) {
+          onEpisodeChange?.(nextSeason, nextEpisode);
         }
       }
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [onProgress, source.season, source.episode]);
+  }, [onProgress, onEpisodeChange, source.season, source.episode]);
 
   const handleLoad = () => {
     if (startAt > 0) {
@@ -78,17 +114,25 @@ function VidriftPanel({ source, title, startAt = 0, onProgress }) {
       <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-border/60 bg-black">
         <iframe
           ref={frameRef}
+          key={attempt}
           src={url}
           title={`Vidrift player for ${title || "selected title"}`}
           className="absolute inset-0 h-full w-full border-0"
           allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
           allowFullScreen
           referrerPolicy="strict-origin-when-cross-origin"
-          onLoad={handleLoad}
+          onLoad={() => { setFrameLoaded(true); handleLoad(); }}
+          onError={() => setLoadTimedOut(true)}
         />
       </div>
-      <div className="flex justify-end">
-        <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-primary">Open Vidrift directly ↗</a>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p role="status" aria-live="polite" className={`text-xs ${playbackConfirmed ? "text-emerald-400" : loadTimedOut ? "text-amber-400" : "text-muted-foreground"}`}>
+          {playbackConfirmed ? "Playback confirmed · live progress received" : loadTimedOut ? "Player frame loaded, but video playback is not confirmed. Try reload or another server." : frameLoaded ? "Player loaded · waiting for video stream…" : "Loading Vidrift player…"}
+        </p>
+        <div className="flex items-center gap-4">
+          <button type="button" onClick={() => setAttempt((value) => value + 1)} className="text-xs text-muted-foreground hover:text-primary">Reload</button>
+          <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-primary">Open Vidrift directly ↗</a>
+        </div>
       </div>
     </section>
   );
@@ -130,7 +174,7 @@ function VideasyPanel({ source, title }) {
   );
 }
 
-export default function ServerVideoPlayer({ src, title, startAt = 0, onProgress, match, season = 1, episode = 1 }) {
+export default function ServerVideoPlayer({ src, title, animeId, startAt = 0, onProgress, onEpisodeChange, match, season = 1, episode = 1 }) {
   const parsedSource = parseVidstuckUrl(src);
   // Use the same TMDB match already used to construct the working VidStuck URL.
   // This avoids requiring a second title lookup for Videasy.
@@ -186,7 +230,7 @@ export default function ServerVideoPlayer({ src, title, startAt = 0, onProgress,
           ? <AnikotoBackup key={src} title={title} season={source.season} episode={source.episode} tmdbId={source.tmdbId} />
           : server === "videasy"
             ? <VideasyPanel source={videasySource} title={title} />
-            : <VidriftPanel source={videasySource} title={title} startAt={resume?.src === src ? resume.position : startAt} onProgress={rememberProgress} />}
+            : <VidriftPanel source={videasySource} title={title} animeId={animeId} startAt={resume?.src === src ? resume.position : startAt} onProgress={rememberProgress} onEpisodeChange={onEpisodeChange} />}
     </div>
   );
 }
