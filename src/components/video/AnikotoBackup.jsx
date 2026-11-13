@@ -114,23 +114,7 @@ async function searchAniListTitles(title) {
     titles: [item.title?.english, item.title?.romaji, item.title?.native].filter(Boolean),
   }));
 }
-function buildAniListEpisodeFallback(media) {
-  const count = Math.min(300, Math.max(Number(media?.episodes) || 1, 1));
-  const title = media?.titles?.[0] || "Selected anime";
-  return {
-    anime: { title },
-    episodes: Array.from({ length: count }, (_, index) => {
-      const number = index + 1;
-      return {
-        number,
-        embed_url: {
-          sub: `https://megaplay.buzz/stream/ani/${media.id}/${number}/sub`,
-          dub: `https://megaplay.buzz/stream/ani/${media.id}/${number}/dub`,
-        },
-      };
-    }),
-  };
-}
+
 export default function AnikotoBackup({ title, season = 1, episode = 1 }) {
   const [items, setItems] = useState([]);
   const [selectedId, setSelectedId] = useState("");
@@ -173,8 +157,15 @@ export default function AnikotoBackup({ title, season = 1, episode = 1 }) {
         });
         const list = [...unique.values()];
         setItems(list);
-        const aliases = await getJikanTitles(title);
+        // Resolve aliases from independent catalogues concurrently. This avoids
+        // waiting for a slow Jikan response before starting AniList.
+        const [jikanResult, aniListResult] = await Promise.allSettled([
+          getJikanTitles(title),
+          title ? searchAniListTitles(title) : Promise.resolve([]),
+        ]);
         if (cancelled) return;
+        const aliases = jikanResult.status === "fulfilled" ? jikanResult.value : [title];
+        const catalogueTitles = aniListResult.status === "fulfilled" ? aniListResult.value : [];
         let match = findTitleMatch(list, aliases);
         if (match && idOf(match)) {
           setSelectedId(idOf(match));
@@ -184,28 +175,13 @@ export default function AnikotoBackup({ title, season = 1, episode = 1 }) {
         // spellings against actual AniKoto IDs. Never invent a series ID or
         // an embed URL when the provider has not returned one.
         if (title) {
-          const catalogueTitles = await searchAniListTitles(title);
-          if (cancelled) return;
           const canonicalNames = catalogueTitles.flatMap((item) => item.titles);
           match = findTitleMatch(list, [...aliases, ...canonicalNames]);
           if (match && idOf(match)) {
             setSelectedId(idOf(match));
             setQuery(titleOf(match));
           } else {
-            const wanted = normalizeTitle(title);
-            const resolved = catalogueTitles.find((item) =>
-              item.titles.some((candidate) => normalizeTitle(candidate) === wanted)
-            ) || catalogueTitles[0];
-            if (resolved?.id) {
-              // MegaPlay documents direct AniList-ID episode embeds. This
-              // fallback avoids requiring the anime to appear in AniKoto's
-              // paginated recent feed.
-              setSeriesData(buildAniListEpisodeFallback(resolved));
-              setSelectedId(`anilist:${resolved.id}`);
-              setError("");
-            } else {
-              setError(`"${title}" was not found in AniKoto's recent feed or AniList catalogue.`);
-            }
+            setError(`"${title}" is not in AniKoto's recent catalogue. AniList can identify the title, but it cannot provide AniKoto episode IDs or playable embeds.`);
           }
         }
       } catch (err) {
