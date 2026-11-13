@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import IntroDetailsShowcase from "@/components/IntroDetailsShowcase";
-import InteractiveSmoke from "@/components/effects/InteractiveSmoke";
 import { Volume2, VolumeX, UserRound } from "lucide-react";
 
 const INTRO_SEEN_KEY = "prianime-intro-completed:session:v2";
@@ -141,14 +140,13 @@ export default function IntroOverlay() {
           muted={!audioEnabled}
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
           aria-hidden="true"
         />
         <div className="absolute inset-0 bg-black/50" />
         <a href="/about-owner" target="_blank" rel="noopener noreferrer" onClick={() => { const video = backgroundVideoRef.current; if (video) video.muted = true; setAudioEnabled(false); }} className="absolute right-5 top-5 z-20 inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/35 px-4 py-2.5 text-xs font-semibold text-white/90 shadow-xl backdrop-blur-xl transition hover:border-white/50 hover:bg-black/55"><UserRound className="h-4 w-4" /> About Owner</a>
         <button type="button" onClick={audioEnabled ? () => { const video = backgroundVideoRef.current; if (video) video.muted = true; setAudioEnabled(false); } : enableBackgroundAudio} aria-label={audioEnabled ? "Mute intro sound" : "Unmute intro sound"} aria-pressed={audioEnabled} className="absolute right-5 top-[4.6rem] z-20 grid h-11 w-11 place-items-center rounded-full border border-white/25 bg-black/40 text-white shadow-xl backdrop-blur-xl transition hover:scale-105 hover:bg-black/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"><span className="sr-only">{audioEnabled ? "Mute" : "Unmute"}</span>{audioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}</button>
         <div className="absolute inset-0 bg-gradient-to-t from-[#050308]/90 via-transparent to-black/45" />
-        <InteractiveSmoke className="absolute inset-0 z-[2]" />
 
         <video
           ref={textVideoRef}
