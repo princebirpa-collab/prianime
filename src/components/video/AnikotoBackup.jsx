@@ -73,12 +73,11 @@ function rowsFrom(payload) {
   }
   return [];
 }
-async function searchAniListTitle(title) {
+async function searchAniListTitles(title) {
   const query = `query ($search: String) {
     Page(page: 1, perPage: 10) {
       media(type: ANIME, isAdult: false, search: $search, sort: SEARCH_MATCH) {
         id
-        episodes
         title { romaji english native }
       }
     }
@@ -91,54 +90,11 @@ async function searchAniListTitle(title) {
   });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok || payload?.errors?.length) throw new Error(payload?.errors?.[0]?.message || "Anime title search is temporarily unavailable.");
-  const rows = payload?.data?.Page?.media || [];
-  const wanted = normalizeTitle(title);
-  return rows.find((item) => [item.title?.english, item.title?.romaji, item.title?.native]
-    .some((value) => normalizeTitle(value) === wanted))
-    || rows.find((item) => [item.title?.english, item.title?.romaji, item.title?.native]
-      .some((value) => {
-        const candidate = normalizeTitle(value);
-        return candidate && wanted && (candidate.includes(wanted) || wanted.includes(candidate));
-      }))
-    || rows[0]
-    || null;
+  return (payload?.data?.Page?.media || []).map((item) => ({
+    id: item.id,
+    titles: [item.title?.english, item.title?.romaji, item.title?.native].filter(Boolean),
+  }));
 }
-function makeAniListFallback(media, requestedEpisode) {
-  if (!media?.id) return null;
-  const count = Math.min(300, Math.max(Number(media.episodes) || Number(requestedEpisode) || 1, 1));
-  return {
-    anime: { id: media.id, title: media.title?.english || media.title?.romaji || "Selected anime" },
-    episodes: Array.from({ length: count }, (_, index) => ({
-      number: index + 1,
-      embed_url: {
-        sub: `https://megaplay.buzz/stream/ani/${media.id}/${index + 1}/sub`,
-        dub: `https://megaplay.buzz/stream/ani/${media.id}/${index + 1}/dub`,
-      },
-    })),
-  };
-}
-function safeEmbed(value) {
-  if (typeof value !== "string" || !value.trim()) return "";
-  try {
-    const url = new URL(value.trim());
-    return url.protocol === "https:" ? url.href : "";
-  } catch {
-    return "";
-  }
-}
-function episodeEmbeds(item) {
-  const urls = item?.embed_url || item?.embedUrl || {};
-  const episodeId = item?.episode_embed_id || item?.episodeEmbedId || item?.embed_id;
-  const legacy = episodeId ? {
-    sub: `https://megaplay.buzz/stream/s-2/${encodeURIComponent(String(episodeId))}/sub`,
-    dub: `https://megaplay.buzz/stream/s-2/${encodeURIComponent(String(episodeId))}/dub`,
-  } : {};
-  return {
-    sub: safeEmbed(urls.sub || item?.sub_embed_url || item?.sub || legacy.sub),
-    dub: safeEmbed(urls.dub || item?.dub_embed_url || item?.dub || legacy.dub),
-  };
-}
-
 export default function AnikotoBackup({ title, season = 1, episode = 1 }) {
   const [items, setItems] = useState([]);
   const [selectedId, setSelectedId] = useState("");
@@ -183,25 +139,24 @@ export default function AnikotoBackup({ title, season = 1, episode = 1 }) {
         setItems(list);
         const aliases = await getJikanTitles(title);
         if (cancelled) return;
-        const match = findTitleMatch(list, aliases);
+        let match = findTitleMatch(list, aliases);
         if (match && idOf(match)) {
           setSelectedId(idOf(match));
           return;
         }
-        // AniKoto only documents a recent feed, not title search. When a title
-        // is outside that feed, resolve its safe AniList metadata and use the
-        // provider's documented AniList-ID embed route as a fallback.
+        // Use AniList only to discover canonical spellings, then match those
+        // spellings against actual AniKoto IDs. Never invent a series ID or
+        // an embed URL when the provider has not returned one.
         if (title) {
-          const media = await searchAniListTitle(title);
+          const catalogueTitles = await searchAniListTitles(title);
           if (cancelled) return;
-          if (media) {
-            const fallback = makeAniListFallback(media, episode);
-            setSeriesData(fallback);
-            setSelectedId(`anilist:${media.id}`);
-            setQuery(media.title?.english || media.title?.romaji || title);
-            setError("");
+          const canonicalNames = catalogueTitles.flatMap((item) => item.titles);
+          match = findTitleMatch(list, [...aliases, ...canonicalNames]);
+          if (match && idOf(match)) {
+            setSelectedId(idOf(match));
+            setQuery(titleOf(match));
           } else {
-            setError(`"${title}" was not found in AniKoto recent titles or the safe anime catalogue.`);
+            setError(`"${title}" is not present in AniKoto's recent feed. AniKoto has not exposed a title-search endpoint here, so its series ID is still needed.`);
           }
         }
       } catch (err) {
