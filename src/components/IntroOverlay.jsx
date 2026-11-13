@@ -21,7 +21,7 @@ function hasSeenIntro() {
 }
 
 export default function IntroOverlay() {
-  const [visible, setVisible] = useState(() => !hasSeenIntro());
+  const [visible, setVisible] = useState(() => window.location.pathname !== "/about-owner" && !hasSeenIntro());
   const [audioEnabled, setAudioEnabled] = useState(false);
   const backgroundVideoRef = useRef(null);
   const canvasRef = useRef(null);
