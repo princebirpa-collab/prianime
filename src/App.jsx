@@ -36,6 +36,20 @@ const Manhwa = lazy(() => import('@/pages/Manhwa'));
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
 
+  // Keep the public About Owner page independent from Base44 auth/settings.
+  // This route must render in a fresh tab even when the legacy auth service is unavailable.
+  if (window.location.pathname === '/about-owner') {
+    return (
+      <Suspense fallback={<div role="status" className="grid min-h-[50vh] place-items-center text-sm text-muted-foreground">Loading About Owner…</div>}>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/about-owner" element={<AboutOwner />} />
+          </Route>
+        </Routes>
+      </Suspense>
+    );
+  }
+
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
