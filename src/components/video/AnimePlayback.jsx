@@ -9,14 +9,14 @@ export default function AnimePlayback({ anime, match }) {
   const maxEpisode = playback.season === match.season && anime.episodes ? Math.max(1, anime.episodes + match.episodeOffset) : 9999;
   return (
     <div className="space-y-4">
-      <ServerVideoPlayer src={playback.src} title={anime.display} startAt={playback.startAt} onProgress={playback.onProgress} match={match} season={playback.season} episode={playback.episode} />
+      <ServerVideoPlayer src={playback.src} title={anime.display} animeId={anime.id} startAt={playback.startAt} onProgress={playback.onProgress} onEpisodeChange={playback.selectEpisode} match={match} season={playback.season} episode={playback.episode} />
       {match.mediaType === "tv" && <AnimeEpisodeControls season={playback.season} episode={playback.episode} maxEpisode={maxEpisode} onSelect={playback.selectEpisode} />}
       <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
         <span>{match.mediaType === "tv" ? `Season ${playback.season} · Episode ${playback.episode}` : "Movie"}</span>
         <a href={match.tmdbUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-primary hover:underline">TMDB {match.tmdbId} <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" /></a>
       </div>
       {playback.historyError && <p role="status" className="text-xs text-muted-foreground">Watch progress could not be restored or saved. Playback is still available.</p>}
-      <p className="text-xs leading-relaxed text-muted-foreground">VidStuck is the main player. Videasy is available as a separate alternate player; each provider controls its own playback availability.</p>
+      <p className="text-xs leading-relaxed text-muted-foreground">VidStuck is the main player. Videasy and Vidrift are separate alternate players; each provider controls its own playback availability.</p>
     </div>
   );
 }
