@@ -95,6 +95,7 @@ async function searchAniListTitles(title) {
     Page(page: 1, perPage: 10) {
       media(type: ANIME, isAdult: false, search: $search, sort: SEARCH_MATCH) {
         id
+        episodes
         title { romaji english native }
       }
     }
@@ -109,8 +110,26 @@ async function searchAniListTitles(title) {
   if (!response.ok || payload?.errors?.length) throw new Error(payload?.errors?.[0]?.message || "Anime title search is temporarily unavailable.");
   return (payload?.data?.Page?.media || []).map((item) => ({
     id: item.id,
+    episodes: item.episodes,
     titles: [item.title?.english, item.title?.romaji, item.title?.native].filter(Boolean),
   }));
+}
+function buildAniListEpisodeFallback(media) {
+  const count = Math.min(300, Math.max(Number(media?.episodes) || 1, 1));
+  const title = media?.titles?.[0] || "Selected anime";
+  return {
+    anime: { title },
+    episodes: Array.from({ length: count }, (_, index) => {
+      const number = index + 1;
+      return {
+        number,
+        embed_url: {
+          sub: `https://megaplay.buzz/stream/ani/${media.id}/${number}/sub`,
+          dub: `https://megaplay.buzz/stream/ani/${media.id}/${number}/dub`,
+        },
+      };
+    }),
+  };
 }
 export default function AnikotoBackup({ title, season = 1, episode = 1 }) {
   const [items, setItems] = useState([]);
@@ -173,7 +192,20 @@ export default function AnikotoBackup({ title, season = 1, episode = 1 }) {
             setSelectedId(idOf(match));
             setQuery(titleOf(match));
           } else {
-            setError(`"${title}" is not present in AniKoto's recent feed. AniKoto has not exposed a title-search endpoint here, so its series ID is still needed.`);
+            const wanted = normalizeTitle(title);
+            const resolved = catalogueTitles.find((item) =>
+              item.titles.some((candidate) => normalizeTitle(candidate) === wanted)
+            ) || catalogueTitles[0];
+            if (resolved?.id) {
+              // MegaPlay documents direct AniList-ID episode embeds. This
+              // fallback avoids requiring the anime to appear in AniKoto's
+              // paginated recent feed.
+              setSeriesData(buildAniListEpisodeFallback(resolved));
+              setSelectedId(`anilist:${resolved.id}`);
+              setError("");
+            } else {
+              setError(`"${title}" was not found in AniKoto's recent feed or AniList catalogue.`);
+            }
           }
         }
       } catch (err) {
