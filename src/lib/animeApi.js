@@ -133,8 +133,8 @@ async function graphql(query, variables) {
 function buildListVariables(body) {
   const action = body.action || "trending";
   const variables = {
-    page: Math.min(Math.max(Number(body.page) || 1, 1), 50),
-    perPage: Math.min(Math.max(Number(body.perPage) || 20, 1), 25),
+    page: Math.min(Math.max(Number(body.page) || 1, 1), 100),
+    perPage: Math.min(Math.max(Number(body.perPage) || 20, 1), 50),
     search: null,
     // Preserve the Browse genre filter for popular/trending/top/seasonal
     // catalogue requests as well as the dedicated genre action.

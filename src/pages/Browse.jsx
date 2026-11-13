@@ -77,8 +77,8 @@ export default function Browse() {
   };
 
   const body = committedQuery
-    ? { action: "search", q: committedQuery, genre: genre || undefined, perPage: 24 }
-    : { action: sort, genre: genre || undefined, perPage: 25 };
+    ? { action: "search", q: committedQuery, genre: genre || undefined, perPage: 50 }
+    : { action: sort, genre: genre || undefined, perPage: 50 };
   const { items, loading, error, hasNext, total, loadMore, retry } = usePaginatedAnime(body);
   const visibleItems = useMemo(
     () => letter ? items.filter((anime) => firstLetter(anime) === letter) : items,
@@ -103,7 +103,7 @@ export default function Browse() {
               Find your next <span className="text-rose-300">anime.</span>
             </h1>
             <p className="mt-6 max-w-xl text-sm leading-7 text-white/70 sm:text-base">
-              Explore the anime universe, from current trending titles to timeless favourites. Search, filter, or browse alphabetically.
+              Explore a growing, multi-source anime catalogue. Search titles, filter genres, or browse alphabetically with more pages as you go.
             </p>
             {featured && (
               <div className="mt-8 flex flex-wrap items-center gap-3 text-xs text-white/75">
@@ -130,7 +130,7 @@ export default function Browse() {
         <PageHeader
           eyebrow="Browse A–Z"
           title={committedQuery ? `Results for “${committedQuery}”` : "The anime catalogue"}
-          description="Live anime metadata, posters, scores and genres. Pick a letter to narrow the catalogue."
+          description="Anime metadata from connected catalogues, with paginated results. Pick a letter to narrow the titles loaded so far."
         >
           <div className="flex flex-wrap items-center gap-2">
             <form onSubmit={(event) => { event.preventDefault(); commitQuery(input); }}
