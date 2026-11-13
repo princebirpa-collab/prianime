@@ -20,7 +20,7 @@ function buildVideasyUrl(source, episodePicker = false) {
 
 function buildVidriftUrl(source, title) {
   const id = String(source?.tmdbId || "").trim();
-  if (!/^\\d+$/.test(id)) return "";
+  if (!/^\d+$/.test(id)) return "";
   const type = source.mediaType === "movie" ? "movie" : source.mediaType === "tv" ? "tv" : "";
   if (!type) return "";
   const path = type === "movie"
