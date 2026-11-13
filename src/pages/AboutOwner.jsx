@@ -1,64 +1,112 @@
 import { useEffect, useRef, useState } from "react";
-import { Instagram, ArrowUpRight, Play, Volume2, VolumeX, UserRound } from "lucide-react";
+import { Instagram, ArrowUpRight, Play, Volume2, VolumeX, UserRound, Heart, Compass } from "lucide-react";
 
 export default function AboutOwner() {
   const videoRef = useRef(null);
+  const [playing, setPlaying] = useState(false);
   const [soundOn, setSoundOn] = useState(false);
-  const [needsTap, setNeedsTap] = useState(false);
+  const [videoMissing, setVideoMissing] = useState(false);
 
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.muted = false;
-    video.volume = 1;
-    video.play().then(() => {
-      setSoundOn(true);
-      setNeedsTap(false);
-    }).catch(() => {
-      // Browsers may block autoplay with sound in a newly opened tab.
-      setSoundOn(false);
-      setNeedsTap(true);
-    });
+    const title = document.title;
+    document.title = "About Owner | PRI-ANIME";
+    return () => { document.title = title; };
   }, []);
 
-  const playWithSound = async () => {
+  const startVideo = async () => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || videoMissing) return;
     video.muted = false;
     video.volume = 1;
     try {
       await video.play();
+      setPlaying(true);
       setSoundOn(true);
-      setNeedsTap(false);
     } catch {
-      setSoundOn(false);
-      setNeedsTap(true);
+      video.muted = true;
+      try {
+        await video.play();
+        setPlaying(true);
+        setSoundOn(false);
+      } catch {
+        setPlaying(false);
+      }
     }
   };
 
+  const toggleSound = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = !video.muted;
+    setSoundOn(!video.muted);
+  };
+
   return (
-    <main className="relative min-h-[calc(100vh-68px)] overflow-hidden bg-[#08050b] pb-16 text-white">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_20%_10%,rgba(244,114,182,.16),transparent_45%),radial-gradient(ellipse_at_90%_80%,rgba(216,181,109,.12),transparent_40%)]" />
-      <div className="relative mx-auto max-w-5xl px-4 pt-10 sm:px-6 lg:px-8">
-        <div className="mb-8 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.32em] text-rose-200/75"><UserRound className="h-4 w-4" /> Behind PRI-ANIME</div>
-        <section className="overflow-hidden rounded-[2rem] border border-white/15 bg-white/[0.045] shadow-[0_30px_100px_rgba(0,0,0,.45)] backdrop-blur-xl">
-          <div className="relative grid min-h-[300px] place-items-center bg-[linear-gradient(135deg,rgba(20,12,24,.96),rgba(5,8,15,.95))] p-8 text-center sm:min-h-[420px]">
-            <div aria-hidden="true" className="absolute inset-0 opacity-25" style={{backgroundImage:"radial-gradient(circle at 20% 30%, #f9a8d4 0 1px, transparent 2px), radial-gradient(circle at 75% 65%, #d8b56d 0 1px, transparent 2px)",backgroundSize:"52px 52px"}} />
-            <div className="relative z-10 w-full max-w-2xl">
-              <p className="mb-4 text-[10px] font-semibold uppercase tracking-[.3em] text-[#d8b56d]">Creator introduction</p>
-              <h1 className="mb-5 font-display text-4xl font-semibold sm:text-6xl">Prince Birla</h1>
-              <video ref={videoRef} src="/about-owner.mp4" autoPlay controls playsInline preload="auto" className="mx-auto max-h-[68vh] w-full rounded-2xl border border-white/15 bg-black object-contain shadow-2xl" aria-label="Prince Birla's About Owner introduction video" onVolumeChange={(event) => setSoundOn(!event.currentTarget.muted && event.currentTarget.volume > 0)} />
-              {needsTap && <button type="button" onClick={playWithSound} className="mt-4 inline-flex items-center gap-2 rounded-full border border-rose-200/30 bg-rose-300/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-rose-300/20"><Play className="h-4 w-4" /> Tap to play with sound</button>}{!needsTap && <button type="button" onClick={playWithSound} className="mt-4 inline-flex items-center gap-2 rounded-full border border-rose-200/30 bg-rose-300/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-rose-300/20"><Play className="h-4 w-4" /> Play with sound</button>}
-              <span className="ml-3 inline-flex items-center gap-1 text-xs text-white/55">{soundOn ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}{soundOn ? "Sound on" : "Sound muted"}</span>
-            </div>
+    <main className="relative isolate flex min-h-[calc(100vh-68px)] items-center justify-center overflow-hidden bg-[#08070c] px-4 py-12 text-white sm:px-6">
+      <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(ellipse_at_18%_12%,rgba(190,85,145,.25),transparent_42%),radial-gradient(ellipse_at_85%_85%,rgba(216,181,109,.16),transparent_40%)]" />
+      <div aria-hidden="true" className="absolute inset-0 opacity-[.13]" style={{backgroundImage:"linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px)",backgroundSize:"52px 52px"}} />
+      <section className="relative w-full max-w-3xl overflow-hidden rounded-[2rem] border border-white/15 bg-[#111019]/75 shadow-[0_30px_120px_rgba(0,0,0,.65)] backdrop-blur-2xl">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-rose-200/70 to-transparent" />
+        <div className="px-6 pb-5 pt-8 text-center sm:px-10 sm:pt-10">
+          <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full border border-white/25 bg-gradient-to-br from-rose-200/25 to-amber-200/10 shadow-[0_0_35px_rgba(244,114,182,.18)]">
+            <UserRound className="h-7 w-7 text-rose-100" />
           </div>
-          <div className="flex flex-col gap-5 border-t border-white/10 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
-            <div><p className="text-[10px] font-bold uppercase tracking-[.28em] text-rose-200/75">Founder & creator</p><h2 className="mt-2 text-2xl font-semibold">About the owner</h2><p className="mt-2 max-w-xl text-sm leading-6 text-white/60">I enjoy watching many anime and I am still new to the anime world. I am exploring new stories and characters, and my favourite anime is Black Clover. PRI-ANIME is my independent project, created for fellow anime fans.</p></div>
-            <a href="https://www.instagram.com/prin.birlaa/" target="_blank" rel="noopener noreferrer" className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full border border-white/25 bg-white/[0.08] px-5 py-3 text-sm font-semibold text-white shadow-xl backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-rose-200/50 hover:bg-rose-300/10"><Instagram className="h-4 w-4" /> @prin.birlaa <ArrowUpRight className="h-4 w-4" /></a>
+          <p className="text-[9px] font-bold uppercase tracking-[.38em] text-rose-200/75">The creator behind PRI-ANIME</p>
+          <h1 className="mt-3 font-display text-3xl font-semibold tracking-wide sm:text-5xl">Prince Birla</h1>
+          <p className="mt-3 text-xs text-white/50">A little about me · My anime journey</p>
+        </div>
+
+        <div className="mx-auto w-full max-w-[430px] px-5">
+          <div className="group relative overflow-hidden rounded-2xl border border-white/15 bg-black shadow-2xl">
+            <video
+              ref={videoRef}
+              src="/about-owner.mp4"
+              controls={playing}
+              playsInline
+              preload="metadata"
+              onError={() => setVideoMissing(true)}
+              onEnded={() => setPlaying(false)}
+              onVolumeChange={(e) => setSoundOn(!e.currentTarget.muted && e.currentTarget.volume > 0)}
+              className="aspect-[5/9] max-h-[54vh] w-full bg-black object-contain"
+              aria-label="Prince Birla's introduction video"
+            />
+            {!playing && !videoMissing && (
+              <button type="button" onClick={startVideo} className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/45 text-center transition hover:bg-black/35" aria-label="Start introduction video">
+                <span className="grid h-16 w-16 place-items-center rounded-full border border-white/50 bg-white/15 shadow-xl backdrop-blur-xl transition group-hover:scale-105"><Play className="ml-1 h-7 w-7 fill-white" /></span>
+                <span className="text-[10px] font-bold uppercase tracking-[.25em] text-white/90">Click to start</span>
+              </button>
+            )}
+            {videoMissing && (
+              <div className="absolute inset-0 grid place-items-center bg-[#0b0910] p-6 text-center">
+                <div><Play className="mx-auto mb-3 h-7 w-7 text-rose-200/70" /><p className="text-sm font-semibold">Video asset not connected</p><p className="mt-2 max-w-xs text-xs leading-5 text-white/50">The player is ready for your original MP4. The file still needs to be uploaded to the site's public assets.</p></div>
+              </div>
+            )}
           </div>
-        </section>
-        <a href="/" className="mt-7 inline-flex items-center gap-3 rounded-2xl border border-white/25 bg-white/[0.07] px-6 py-3.5 font-mono text-sm font-bold text-white shadow-lg backdrop-blur-xl transition hover:border-white/45 hover:bg-white/[0.13]">☷ Browse Catalog</a>
-      </div>
+          <div className="flex items-center justify-between py-3">
+            <span className="text-[9px] uppercase tracking-[.2em] text-white/40">Personal introduction</span>
+            <button type="button" onClick={toggleSound} disabled={!playing} className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[.06] px-3 py-1.5 text-[10px] text-white/75 transition hover:bg-white/10 disabled:opacity-35">
+              {soundOn ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}{soundOn ? "Sound on" : "Sound off"}
+            </button>
+          </div>
+        </div>
+
+        <div className="px-6 pb-8 pt-3 sm:px-10 sm:pb-10">
+          <p className="text-center text-sm leading-7 text-white/70">
+            Hey! I watch many anime, and I am still new to the anime world. I am exploring different stories, characters and worlds. My favourite anime is <span className="font-semibold text-[#f0d69b]">Black Clover</span>.
+          </p>
+          <p className="mx-auto mt-3 max-w-xl text-center text-xs leading-6 text-white/45">
+            PRI-ANIME is my independent project, made as I explore my love for anime and build a place for fellow fans.
+          </p>
+          <div className="mx-auto mt-6 grid max-w-md grid-cols-2 gap-3">
+            <div className="rounded-xl border border-white/10 bg-white/[.045] p-3 text-center"><Heart className="mx-auto mb-2 h-4 w-4 text-rose-200" /><p className="text-[9px] uppercase tracking-[.2em] text-white/40">Favourite anime</p><p className="mt-1 text-sm font-semibold">Black Clover</p></div>
+            <div className="rounded-xl border border-white/10 bg-white/[.045] p-3 text-center"><Compass className="mx-auto mb-2 h-4 w-4 text-amber-200" /><p className="text-[9px] uppercase tracking-[.2em] text-white/40">Anime journey</p><p className="mt-1 text-sm font-semibold">Still exploring</p></div>
+          </div>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <a href="https://www.instagram.com/prin.birlaa/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-rose-200/30 bg-rose-200/10 px-5 py-2.5 text-xs font-semibold text-white transition hover:bg-rose-200/20"><Instagram className="h-4 w-4" /> @prin.birlaa <ArrowUpRight className="h-3.5 w-3.5" /></a>
+            <a href="/browse" className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[.07] px-5 py-2.5 text-xs font-semibold text-white/85 transition hover:bg-white/[.13]">Browse Catalog <ArrowUpRight className="h-3.5 w-3.5" /></a>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
