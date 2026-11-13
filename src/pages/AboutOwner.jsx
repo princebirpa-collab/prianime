@@ -13,6 +13,14 @@ export default function AboutOwner() {
     return () => { document.title = title; };
   }, []);
 
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || videoMissing) return;
+    // Start automatically without sound; browsers generally block audible autoplay.
+    video.muted = true;
+    video.play().catch(() => setPlaying(false));
+  }, [videoMissing]);
+
   const startVideo = async () => {
     const video = videoRef.current;
     if (!video || videoMissing) return;
@@ -64,6 +72,7 @@ export default function AboutOwner() {
               controls={playing}
               playsInline
               preload="metadata"
+              onPlay={() => setPlaying(true)}
               onError={() => setVideoMissing(true)}
               onEnded={() => setPlaying(false)}
               onVolumeChange={(e) => setSoundOn(!e.currentTarget.muted && e.currentTarget.volume > 0)}
