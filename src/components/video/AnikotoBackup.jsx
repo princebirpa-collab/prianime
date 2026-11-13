@@ -55,9 +55,23 @@ async function getJikanTitles(title) {
   }
 }
 function rowsFrom(payload) {
-  const data = payload?.data;
-  const rows = Array.isArray(data) ? data : data?.anime || data?.results || data?.items || data?.data || [];
-  return Array.isArray(rows) ? rows : [];
+  const candidates = [
+    payload?.data,
+    payload?.data?.anime,
+    payload?.data?.results,
+    payload?.data?.items,
+    payload?.data?.data,
+    payload?.anime,
+    payload?.recent_anime,
+    payload?.recentAnime,
+    payload?.results,
+    payload?.items,
+  ];
+  for (const value of candidates) {
+    if (Array.isArray(value)) return value;
+    if (value && typeof value === "object" && (value.id || value.anime_id)) return [value];
+  }
+  return [];
 }
 function safeEmbed(value) {
   if (typeof value !== "string" || !value.trim()) return "";
@@ -91,13 +105,24 @@ export default function AnikotoBackup({ title, season = 1, episode = 1 }) {
   useEffect(() => {
     let cancelled = false;
     setBusy(true); setError("");
-    fetch("/api/anikoto?action=recent&page=1&per_page=50", { signal: AbortSignal.timeout(10000) })
-      .then(async (response) => {
-        const payload = await response.json().catch(() => ({}));
-        if (!response.ok || !payload?.ok) throw new Error(payload?.error || "AniKoto catalogue is unavailable.");
-        return rowsFrom(payload);
-      })
-      .then(async (rows) => {
+    (async () => {
+      try {
+        // AniKoto's recent endpoint is paginated. Search several pages so the
+        // current title is not missed just because it is outside the first 50.
+        const rows = [];
+        for (let page = 1; page <= 3; page += 1) {
+          const response = await fetch(`/api/anikoto?action=recent&page=${page}&per_page=50`, {
+            signal: AbortSignal.timeout(10000),
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok || !payload?.ok) {
+            if (page === 1) throw new Error(payload?.error || "AniKoto catalogue is unavailable.");
+            break;
+          }
+          const pageRows = rowsFrom(payload);
+          rows.push(...pageRows);
+          if (pageRows.length < 50) break;
+        }
         if (cancelled) return;
         const unique = new Map();
         rows.forEach((item, index) => {
@@ -111,9 +136,15 @@ export default function AnikotoBackup({ title, season = 1, episode = 1 }) {
         if (cancelled) return;
         const match = findTitleMatch(list, aliases);
         if (match && idOf(match)) setSelectedId(idOf(match));
-      })
-      .catch((err) => { if (!cancelled) setError(err.message || "AniKoto is temporarily unavailable."); })
-      .finally(() => { if (!cancelled) setBusy(false); });
+        else if (title && list.length) {
+          setError(`"${title}" was not found in AniKoto's latest ${list.length} entries. Try its exact AniKoto title from the list.`);
+        }
+      } catch (err) {
+        if (!cancelled) setError(err.message || "AniKoto is temporarily unavailable.");
+      } finally {
+        if (!cancelled) setBusy(false);
+      }
+    })();
     return () => { cancelled = true; };
   }, [title]);
 
@@ -125,7 +156,7 @@ export default function AnikotoBackup({ title, season = 1, episode = 1 }) {
       .then(async (response) => {
         const payload = await response.json().catch(() => ({}));
         if (!response.ok || !payload?.ok) throw new Error(payload?.error || "Could not load AniKoto episodes.");
-        if (!cancelled) setSeriesData(payload.data);
+        if (!cancelled) setSeriesData(payload.data?.data || payload.data);
       })
       .catch((err) => { if (!cancelled) setSeriesError(err.message || "Could not load episode metadata."); })
       .finally(() => { if (!cancelled) setSeriesBusy(false); });
