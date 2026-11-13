@@ -189,6 +189,23 @@ function normalizeExternalMedia(raw, source) {
   const poster = attrs.posterImage || { large: raw.images?.webp?.large_image_url || raw.images?.jpg?.large_image_url };
   return { id: "kitsu-" + id, source: "kitsu", display: titles.en || attrs.canonicalTitle || titles.en_jp || "Untitled anime", titleRomaji: titles.en_jp || attrs.canonicalTitle || raw.title || "", titleNative: titles.ja_jp || raw.title_japanese || "", titleAliases: [...new Set([...Object.values(titles), ...(raw.title_synonyms || [])].filter(Boolean))], cover: poster.large || poster.original || poster.medium || "", banner: poster.large || poster.original || "", description: attrs.synopsis || attrs.description || raw.synopsis || "", genres: [], score: attrs.averageRating ? Math.round(Number(attrs.averageRating)) : null, popularity: Number(attrs.userCount) || 0, episodes: attrs.episodeCount || null, duration: attrs.episodeLength || null, status: attrs.status || "", format: attrs.showType || "TV", season: "", seasonYear: dateParts(attrs.startDate)?.year || null, startDate: dateParts(attrs.startDate), endDate: dateParts(attrs.endDate), airingSchedule: [], studios: [], trailer: null, nextEpisode: null, characters: [], relations: [], recommendations: [] };
 }
+async function searchAniDBTitleIndex(query) {
+  try {
+    const response = await fetch(`/api/anidb?request=search&q=${encodeURIComponent(query)}`, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!response.ok) return [];
+    const payload = await response.json();
+    const hits = Array.isArray(payload?.data) ? payload.data : [];
+    return hits.map((hit) => normalizeExternalMedia(hit, "mal")).filter(Boolean)
+      .map((item) => ({ item, score: titleSearchScore(item, query) }))
+      .filter(({ score }) => score >= 50)
+      .sort((a, b) => b.score - a.score)
+      .map(({ item }) => item);
+  } catch { return []; }
+}
+
 async function searchExternalCatalog(query) {
   try {
     const hits = await searchMalTitles(query);
@@ -363,8 +380,12 @@ export async function callAniList(body) {
     // query, not only when AniList returns zero results. This makes the main
     // search a genuinely multi-catalogue search while retaining source IDs.
     if (catalogMode === "automatic") {
-      const externalItems = await searchExternalCatalog(variables.search);
-      if (externalItems.length) {
+      const [externalItems, anidbItems] = await Promise.all([
+        searchExternalCatalog(variables.search),
+        searchAniDBTitleIndex(variables.search),
+      ]);
+      const allExternalItems = [...externalItems, ...anidbItems];
+      if (allExternalItems.length) {
         const merged = [...result.items];
         const titleKey = (value) => String(value || "")
           .toLocaleLowerCase()
@@ -378,7 +399,7 @@ export async function callAniList(body) {
           item?.titleNative,
           ...(item?.titleAliases || []),
         ].map(titleKey).filter(Boolean);
-        for (const external of externalItems) {
+        for (const external of allExternalItems) {
           const externalKeys = new Set(titleKeys(external));
           const existingIndex = merged.findIndex((item) =>
             String(item.id) === String(external.id) ||
