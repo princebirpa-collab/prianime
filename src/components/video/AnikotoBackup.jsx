@@ -10,7 +10,8 @@ function idOf(item) {
   return value == null ? "" : String(value);
 }
 function episodesOf(payload) {
-  const value = payload?.episodes ?? payload?.data?.episodes ?? payload?.series?.episodes ?? [];
+  const value = payload?.episodes ?? payload?.data?.episodes ?? payload?.data?.data?.episodes
+    ?? payload?.series?.episodes ?? payload?.anime?.episodes ?? [];
   return Array.isArray(value) ? value : [];
 }
 function episodeNumber(item, index) {
@@ -53,6 +54,22 @@ async function getJikanTitles(title) {
   } catch {
     return [title];
   }
+}
+function safeEmbed(value) {
+  const candidate = typeof value === "string" ? value : value?.url || value?.embed_url || value?.src || "";
+  try {
+    const url = new URL(candidate);
+    return url.protocol === "https:" ? url.toString() : "";
+  } catch {
+    return "";
+  }
+}
+function episodeEmbeds(item) {
+  const urls = item?.embed_url || item?.embedUrl || item?.embeds || {};
+  return {
+    sub: safeEmbed(urls?.sub || urls?.SUB || item?.sub_embed_url || item?.sub),
+    dub: safeEmbed(urls?.dub || urls?.DUB || item?.dub_embed_url || item?.dub),
+  };
 }
 function rowsFrom(payload) {
   const candidates = [
