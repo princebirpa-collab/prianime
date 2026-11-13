@@ -484,7 +484,7 @@ export async function callAniList(body) {
       providers: { anilist: aniError ? "unavailable" : "ok", ...(feedInfo.providers || {}) },
       item: null,
     };
-
+  }
 
   if (cache.size > 200) cache.clear();
   // A genuinely empty list is cached only briefly, so a transient provider
