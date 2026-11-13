@@ -15,6 +15,7 @@ export default function AboutOwner() {
   const videoRef = useRef(null);
   const blurVideoRef = useRef(null);
   const [entered, setEntered] = useState(false);
+  const [gateVisible, setGateVisible] = useState(true);
   const [videoFailed, setVideoFailed] = useState(false);
   const [playing, setPlaying] = useState(true);
   const [muted, setMuted] = useState(true);
@@ -109,6 +110,7 @@ export default function AboutOwner() {
   const enterProfile = useCallback(async () => {
     const video = videoRef.current;
     setEntered(true);
+    window.setTimeout(() => setGateVisible(false), 720);
     if (!video || videoFailed) return;
     video.muted = false;
     video.volume = volume;
@@ -266,11 +268,11 @@ export default function AboutOwner() {
         </div>
       </section>
 
-      {!entered && (
+      {gateVisible && (
         <button
           type="button"
           onClick={enterProfile}
-          className="fixed inset-0 z-40 flex min-h-[100dvh] w-full items-center justify-center bg-[#05040b]/90 px-6 text-center text-white transition-opacity duration-700"
+          className={`fixed inset-0 z-40 flex min-h-[100dvh] w-full items-center justify-center bg-[#05040b]/90 px-6 text-center text-white transition-opacity duration-700 ${entered ? "pointer-events-none opacity-0" : "opacity-100"}`}
           aria-label="Click to enter About Owner profile and enable video sound"
         >
           <span className="animate-pulse rounded-full border border-violet-200/30 bg-white/[.06] px-8 py-4 font-['Cinzel_Decorative'] text-sm font-bold uppercase tracking-[.24em] shadow-[0_0_35px_rgba(155,130,255,.25)] sm:text-base">
