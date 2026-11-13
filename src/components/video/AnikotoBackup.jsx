@@ -134,31 +134,45 @@ export default function AnikotoBackup({ title, season = 1, episode = 1 }) {
       try {
         // AniKoto's recent endpoint is paginated. Search several pages so the
         // current title is not missed just because it is outside the first 50.
-        const rows = [];
-        for (let page = 1; page <= 3; page += 1) {
-          const response = await fetch(`/api/anikoto?action=recent&page=${page}&per_page=50`, {
-            signal: AbortSignal.timeout(10000),
-          });
-          const payload = await response.json().catch(() => ({}));
-          if (!response.ok || !payload?.ok) {
-            if (page === 1) throw new Error(payload?.error || "AniKoto catalogue is unavailable.");
-            break;
-          }
-          const pageRows = rowsFrom(payload);
-          rows.push(...pageRows);
-          if (pageRows.length < 50) break;
+        // Render the first page as soon as it arrives. Fetch the remaining
+        // catalogue pages in parallel in the background so the player UI does
+        // not wait for three sequential upstream round trips.
+        const firstResponse = await fetch("/api/anikoto?action=recent&page=1&per_page=50", {
+          signal: AbortSignal.timeout(10000),
+        });
+        const firstPayload = await firstResponse.json().catch(() => ({}));
+        if (!firstResponse.ok || !firstPayload?.ok) {
+          throw new Error(firstPayload?.error || "AniKoto catalogue is unavailable.");
         }
         if (cancelled) return;
+        const firstRows = rowsFrom(firstPayload);
         const unique = new Map();
-        rows.forEach((item, index) => {
+        const addRows = (rows) => rows.forEach((item, index) => {
           const id = idOf(item);
           if (id && !unique.has(id)) unique.set(id, item);
           else if (!id) unique.set(`no-id-${index}-${titleOf(item)}`, item);
         });
+        addRows(firstRows);
+        setItems([...unique.values()]);
+        setBusy(false);
+
+        const [pageTwo, pageThree] = await Promise.all([2, 3].map(async (page) => {
+          try {
+            const response = await fetch(`/api/anikoto?action=recent&page=${page}&per_page=50`, {
+              signal: AbortSignal.timeout(10000),
+            });
+            const payload = await response.json().catch(() => ({}));
+            return response.ok && payload?.ok ? rowsFrom(payload) : [];
+          } catch {
+            return [];
+          }
+        }));
+        if (cancelled) return;
+        addRows([...pageTwo, ...pageThree]);
         const list = [...unique.values()];
         setItems(list);
-        // Resolve aliases from independent catalogues concurrently. This avoids
-        // waiting for a slow Jikan response before starting AniList.
+
+        // Resolve title aliases without blocking the visible catalogue.
         const [jikanResult, aniListResult] = await Promise.allSettled([
           getJikanTitles(title),
           title ? searchAniListTitles(title) : Promise.resolve([]),
