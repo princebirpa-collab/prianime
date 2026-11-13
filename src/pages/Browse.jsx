@@ -103,7 +103,7 @@ export default function Browse() {
               Find your next <span className="text-rose-300">anime.</span>
             </h1>
             <p className="mt-6 max-w-xl text-sm leading-7 text-white/70 sm:text-base">
-              Explore a growing, multi-source anime catalogue. Search titles, filter genres, or browse alphabetically with more pages as you go.
+              Browse a continuously paginated catalogue combined from AniList, MyAnimeList and Kitsu. Load more pages to explore titles from every connected source.
             </p>
             {featured && (
               <div className="mt-8 flex flex-wrap items-center gap-3 text-xs text-white/75">
@@ -130,7 +130,7 @@ export default function Browse() {
         <PageHeader
           eyebrow="Browse A–Z"
           title={committedQuery ? `Results for “${committedQuery}”` : "The anime catalogue"}
-          description="Anime metadata from connected catalogues, with paginated results. Pick a letter to narrow the titles loaded so far."
+          description="Combined anime catalogues with pagination. Keep loading pages to explore more titles from every connected source."
         >
           <div className="flex flex-wrap items-center gap-2">
             <form onSubmit={(event) => { event.preventDefault(); commitQuery(input); }}

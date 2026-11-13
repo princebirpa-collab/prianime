@@ -133,7 +133,7 @@ async function graphql(query, variables) {
 function buildListVariables(body) {
   const action = body.action || "trending";
   const variables = {
-    page: Math.min(Math.max(Number(body.page) || 1, 1), 100),
+    page: Math.min(Math.max(Number(body.page) || 1, 1), 1000),
     perPage: Math.min(Math.max(Number(body.perPage) || 20, 1), 50),
     search: null,
     // Preserve the Browse genre filter for popular/trending/top/seasonal
@@ -427,34 +427,64 @@ export async function callAniList(body) {
   } else {
     const variables = buildListVariables(body);
     if (!variables) return { items: [], pageInfo: null, item: null };
+    let aniItems = [];
+    let aniPageInfo = null;
+    let aniError = null;
     try {
       const data = await graphql(LIST_QUERY, variables);
       if (!data?.Page) throw new Error("AniList returned an invalid catalogue response.");
-      result = {
-        items: (data.Page.media || []).map(normalize).filter(Boolean),
-        pageInfo: data.Page.pageInfo || null,
-        item: null,
-      };
-    } catch (primaryError) {
-      // Keep browse/home useful during AniList outages by switching to an
-      // independent anime-only feed. Preserve the source ID so detail routes
-      // resolve through the matching catalogue instead of mixing IDs.
+      aniItems = (data.Page.media || []).map(normalize).filter(Boolean);
+      aniPageInfo = data.Page.pageInfo || null;
+    } catch (error) { aniError = error; }
+
+    // Merge the same page from all available catalogues, not just use backups
+    // when AniList fails. IDs remain source-qualified for correct detail routes.
+    let malItems = [];
+    let kitsuItems = [];
+    let feedInfo = {};
+    try {
       const response = await fetch(`/api/catalog-feed?mode=${encodeURIComponent(body.action || "popular")}&page=${variables.page}`, {
         headers: { Accept: "application/json" },
-        signal: AbortSignal.timeout(9000),
+        signal: AbortSignal.timeout(12000),
       });
-      if (!response.ok) throw primaryError;
-      const payload = await response.json();
-      const source = payload.source === "kitsu" ? "kitsu" : "mal";
-      const items = (payload.data || []).map((row) => normalizeExternalMedia(row, source)).filter(Boolean);
-      if (!items.length) throw primaryError;
-      result = {
-        items,
-        pageInfo: { total: items.length * 10, currentPage: variables.page, lastPage: 50, hasNextPage: true },
-        item: null,
-      };
+      if (response.ok) {
+        feedInfo = await response.json();
+        malItems = (feedInfo.mal || []).map((row) => normalizeExternalMedia(row, "mal")).filter(Boolean);
+        kitsuItems = (feedInfo.kitsu || []).map((row) => normalizeExternalMedia(row, "kitsu")).filter(Boolean);
+      }
+    } catch { /* AniList still serves the page if backup sources time out. */ }
+
+    const allItems = [...aniItems];
+    const titleKey = (value) => String(value || "").toLocaleLowerCase().normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+    const keysFor = (item) => [item?.display, item?.titleRomaji, item?.titleNative, ...(item?.titleAliases || [])]
+      .map(titleKey).filter(Boolean);
+    for (const external of [...malItems, ...kitsuItems]) {
+      const aliases = new Set(keysFor(external));
+      const index = allItems.findIndex((item) =>
+        String(item.id) === String(external.id) || keysFor(item).some((key) => aliases.has(key))
+      );
+      if (index < 0) allItems.push({ ...external, sources: [external.source] });
+      else {
+        const current = allItems[index];
+        allItems[index] = { ...current, sources: [...new Set([...(current.sources || [current.source]), external.source])] };
+      }
     }
-  }
+    if (!allItems.length && aniError) throw aniError;
+    const total = Math.max(Number(aniPageInfo?.total) || 0,
+      (Number(feedInfo.totals?.jikan) || 0) + (Number(feedInfo.totals?.kitsu) || 0));
+    result = {
+      items: allItems,
+      pageInfo: {
+        total: total || allItems.length,
+        currentPage: variables.page,
+        lastPage: Math.max(Number(aniPageInfo?.lastPage) || 1, Math.ceil(total / 25) || 1),
+        hasNextPage: Boolean(aniPageInfo?.hasNextPage || feedInfo.hasNext),
+      },
+      providers: { anilist: aniError ? "unavailable" : "ok", ...(feedInfo.providers || {}) },
+      item: null,
+    };
+
 
   if (cache.size > 200) cache.clear();
   // A genuinely empty list is cached only briefly, so a transient provider
