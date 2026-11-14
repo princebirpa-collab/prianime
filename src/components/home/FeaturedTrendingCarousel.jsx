@@ -35,9 +35,6 @@ export default function FeaturedTrendingCarousel() {
   return (
     <section className="relative isolate mx-auto my-5 w-full max-w-[1600px] overflow-hidden px-3 pt-4 sm:px-6 lg:px-10">
       <div className="pri-trending-shell relative overflow-hidden rounded-[1.8rem] border border-white/10 bg-[#080808] text-white shadow-[0_28px_100px_rgba(0,0,0,.55)]">
-        <div aria-hidden="true" className="pri-smoke-layer absolute inset-0 pointer-events-none" />
-        <div aria-hidden="true" className="pri-sakura-layer absolute inset-0 pointer-events-none" />
-        {featured && <div aria-hidden="true" className="absolute inset-0 scale-105 bg-cover bg-center opacity-35 blur-[2px] transition-all duration-1000" style={{ backgroundImage: `url("${featured.cover}")` }} />}
         <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.98)_0%,rgba(0,0,0,.88)_35%,rgba(0,0,0,.38)_72%,rgba(0,0,0,.72)_100%)]" />
         <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(ellipse_at_78%_45%,rgba(255,255,255,.13),transparent_45%)]" />
         <div className="relative z-10 grid min-h-[420px] items-center gap-6 p-6 sm:min-h-[480px] sm:grid-cols-[1fr_300px] sm:px-12 sm:py-9 lg:grid-cols-[1fr_360px] lg:px-16">
@@ -59,9 +56,9 @@ export default function FeaturedTrendingCarousel() {
               </>
             )}
           </div>
-          {featured && <div className="relative mx-auto w-full max-w-[300px] sm:max-w-[250px] lg:max-w-[290px]">
+          {featured && <div className="relative mx-auto w-full max-w-[340px] sm:max-w-[300px] lg:max-w-[360px]">
             <Link key={featured.id} to={`/anime/${featured.id}`} className="group relative mx-auto block overflow-hidden rounded-xl border border-white/35 bg-black shadow-[0_30px_80px_rgba(0,0,0,.8)] transition duration-700 hover:scale-[1.025]">
-              <img src={featured.cover} alt={`${featured.display} full poster`} loading="eager" className="aspect-[2/3] max-h-[390px] w-full object-cover"/>
+              <img src={featured.cover} alt={`${featured.display} full poster`} loading="eager" className="aspect-[2/3] max-h-[500px] w-full object-cover"/>
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/35 to-transparent p-4 pt-16">
                 <p className="text-[9px] font-bold uppercase tracking-[.28em] text-white/70">Featured poster · {active + 1}/7</p>
                 <p className="mt-1 line-clamp-2 font-display text-xl text-white">{featured.display}</p>
@@ -79,7 +76,7 @@ export default function FeaturedTrendingCarousel() {
             {anime.map((item, index) => {
               const rawOffset = (index - active + anime.length) % anime.length;
               const offset = rawOffset > Math.floor(anime.length / 2) ? rawOffset - anime.length : rawOffset;
-              return <button key={item.id} type="button" onClick={() => select(index)} aria-label={`Show ${item.display}`} aria-current={active === index ? "true" : undefined} className={`pri-coverflow-card ${offset === 0 ? "is-active" : ""}`} style={{ transform: `translate(-50%, -50%) translateX(${offset * 108}px) rotateY(${offset * -28}deg) scale(${1 - Math.min(Math.abs(offset), 3) * 0.105})`, opacity: 1 - Math.min(Math.abs(offset), 4) * 0.17, zIndex: 10 - Math.abs(offset), filter: offset === 0 ? "saturate(1.08) brightness(1)" : "saturate(.78) brightness(.68)" }}>
+              return <button key={item.id} type="button" onClick={() => select(index)} aria-label={`Show ${item.display}`} aria-current={active === index ? "true" : undefined} className={`pri-coverflow-card ${offset === 0 ? "is-active" : ""}`} style={{ transform: `translate(-50%, -50%) translateX(${offset * 170}px) rotateY(${offset * -28}deg) scale(${1 - Math.min(Math.abs(offset), 3) * 0.105})`, opacity: 1 - Math.min(Math.abs(offset), 4) * 0.17, zIndex: 10 - Math.abs(offset), filter: offset === 0 ? "saturate(1.08) brightness(1)" : "saturate(.78) brightness(.68)" }}>
                 <img src={item.cover} alt={`${item.display} poster`} loading="lazy"/>
                 <span>{item.display}</span>
               </button>;
