@@ -100,6 +100,15 @@ export default function NavBar() {
         <div className="ml-auto flex items-center gap-1.5">{searchField(false)}<button type="button" onClick={() => setSearchOpen((value) => !value)} aria-label="Search" aria-expanded={searchOpen} className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition hover:bg-foreground/5 hover:text-foreground md:hidden"><Search className="h-4 w-4" /></button><NotificationsBell /><ThemeMenu /><Link to="/settings" className="ml-1 grid h-9 w-9 place-items-center overflow-hidden rounded-full border border-primary/50 bg-primary/15 text-sm font-semibold text-primary shadow-[0_0_16px_rgba(244,63,94,.18)] transition hover:scale-105" aria-label={"Profile settings for " + profile.name}>{profile.avatar ? <img src={profile.avatar} alt="" className="h-full w-full object-cover" /> : profile.name.slice(0, 1).toUpperCase()}</Link><button type="button" onClick={() => setMobileOpen((value) => !value)} aria-label={mobileOpen ? "Close menu" : "Open menu"} aria-expanded={mobileOpen} className="grid h-10 w-10 place-items-center rounded-xl border border-white/[0.07] bg-white/[0.035] text-muted-foreground transition hover:border-primary/40 hover:bg-primary/10 hover:text-primary">{mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</button></div>
       </div>
       {searchOpen && <div className="border-t border-border/50 px-4 py-3 md:hidden">{searchField(true)}</div>}
+      <nav aria-label="Primary navigation" className="hidden border-t border-white/[0.055] bg-black/[0.12] md:flex">
+        <div className="mx-auto flex w-full max-w-[1600px] items-center gap-1 overflow-x-auto px-5 py-2 [scrollbar-width:none] lg:px-8">
+          {NAV_LINKS.map((link) => (
+            <NavLink key={link.to} to={link.to} end={link.to === "/"} className={({ isActive }) => "inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-2 text-[11px] font-medium tracking-wide transition " + (isActive ? "bg-primary/12 text-primary" : "text-muted-foreground hover:bg-white/[0.055] hover:text-foreground")}>
+              <link.icon className="h-3.5 w-3.5" aria-hidden="true" />{link.label}
+            </NavLink>
+          ))}
+        </div>
+      </nav>
       {mobileOpen && <nav aria-label="Main menu" className="absolute left-3 right-3 top-[calc(100%+8px)] z-[80] grid max-h-[min(78vh,620px)] gap-1 overflow-y-auto rounded-2xl border border-white/10 bg-[#100e14]/95 p-3 shadow-2xl backdrop-blur-2xl sm:left-auto sm:right-6 sm:w-[340px]">{NAV_LINKS.concat({ to: "/settings", label: "Profile", icon: Settings }).map((link) => <NavLink key={link.to} to={link.to} end={link.to === "/"} onClick={() => setMobileOpen(false)} className={({ isActive }) => "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm " + (isActive ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-foreground/5")}><link.icon className="h-4 w-4" aria-hidden="true" />{link.label}</NavLink>)}</nav>}
     </header>
   );
