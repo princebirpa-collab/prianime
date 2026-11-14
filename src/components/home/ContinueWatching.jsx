@@ -4,6 +4,8 @@ import { Play } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { listProgress } from "@/lib/library";
 import { percent } from "@/lib/format";
+import { communityRequest } from "@/lib/communityApi";
+import { getProfile } from "@/lib/profile";
 
 export default function ContinueWatching() {
   const [rows, setRows] = useState([]);
@@ -11,19 +13,44 @@ export default function ContinueWatching() {
 
   useEffect(() => {
     let alive = true;
-    Promise.all([listProgress("video"), listProgress("anime")])
-      .then(([videos, anime]) => {
-        if (!alive) return;
-        const merged = [...videos, ...anime]
-          .filter((row) => row.title)
-          .sort((a, b) => new Date(b.updated_date) - new Date(a.updated_date))
-          .slice(0, 10);
-        setRows(merged);
-      })
-      .catch(() => setRows([]))
-      .finally(() => alive && setLoading(false));
+    const load = async () => {
+      setLoading(true);
+      const profileId = getProfile().id;
+      const [videos, localAnime, cloud] = await Promise.all([
+        listProgress("video").catch(() => []),
+        listProgress("anime").catch(() => []),
+        communityRequest(`/watch-history?profileId=${encodeURIComponent(profileId)}`)
+          .then((data) => (data.history || []).map((row) => ({
+            id: `cloud_${row.anime_id}`, owner_ref: profileId, kind: "anime",
+            ref_id: String(row.anime_id), title: row.title, cover: row.cover,
+            episode: row.episode, actual_episode: row.episode, season: row.season,
+            position: Number(row.position) || 0, duration: Number(row.duration) || 0,
+            link: row.link, updated_date: row.updated_at,
+          })))
+          .catch(() => []),
+      ]);
+      if (!alive) return;
+      const byAnime = new Map();
+      [...localAnime, ...cloud].forEach((row) => {
+        const key = String(row.ref_id);
+        const current = byAnime.get(key);
+        if (!current || (Date.parse(row.updated_date || "") || 0) >= (Date.parse(current.updated_date || "") || 0)) byAnime.set(key, row);
+      });
+      const merged = [...videos, ...byAnime.values()]
+        .filter((row) => row.title)
+        .sort((a, b) => (Date.parse(b.updated_date || "") || 0) - (Date.parse(a.updated_date || "") || 0))
+        .slice(0, 10);
+      setRows(merged);
+      setLoading(false);
+    };
+    const refresh = () => { load(); };
+    load();
+    window.addEventListener("pri-anime:progress-updated", refresh);
+    window.addEventListener("focus", refresh);
     return () => {
       alive = false;
+      window.removeEventListener("pri-anime:progress-updated", refresh);
+      window.removeEventListener("focus", refresh);
     };
   }, []);
 
