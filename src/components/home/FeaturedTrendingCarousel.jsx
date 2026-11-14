@@ -68,7 +68,7 @@ export default function FeaturedTrendingCarousel() {
             {anime.map((item, index) => {
               const rawOffset = (index - active + anime.length) % anime.length;
               const offset = rawOffset > Math.floor(anime.length / 2) ? rawOffset - anime.length : rawOffset;
-              return <button key={item.id} type="button" onClick={() => select(index)} aria-label={`Show ${item.display}`} aria-current={active === index ? "true" : undefined} className={`pri-coverflow-card ${offset === 0 ? "is-active" : ""}`} style={{ "--card-offset": offset }}>
+              return <button key={item.id} type="button" onClick={() => select(index)} aria-label={`Show ${item.display}`} aria-current={active === index ? "true" : undefined} className={`pri-coverflow-card ${offset === 0 ? "is-active" : ""}`} style={{ transform: `translate(-50%, -50%) translateX(${offset * 108}px) rotateY(${offset * -28}deg) scale(${1 - Math.min(Math.abs(offset), 3) * 0.105})`, opacity: 1 - Math.min(Math.abs(offset), 4) * 0.17, zIndex: 10 - Math.abs(offset), filter: offset === 0 ? "saturate(1.08) brightness(1)" : "saturate(.78) brightness(.68)" }}>
                 <img src={item.cover} alt={`${item.display} poster`} loading="lazy"/>
                 <span>{item.display}</span>
               </button>;
