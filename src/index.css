@@ -414,7 +414,7 @@ body::before {
     radial-gradient(ellipse at 24% 78%, hsl(258 72% 35% / 0.13), transparent 34%),
     linear-gradient(135deg, hsl(var(--background)) 0%, hsl(258 34% 5%) 48%, hsl(var(--background)) 100%);
   background-size: 150% 150%;
-  animation: none;
+  animation: priAmbientDrift 42s ease-in-out infinite;
   will-change: transform;
 }
 
@@ -432,8 +432,13 @@ body::after {
     radial-gradient(hsl(0 0% 100% / 0.12) 0.55px, transparent 0.7px);
   background-size: 170px 170px, 230px 230px, 310px 310px, 5px 5px;
   background-position: 0 -180px, 70px -260px, 130px -340px, 0 0;
-  animation: none;
+  animation: priGlobalSakuraDrift 30s linear infinite;
   mask-image: linear-gradient(to bottom, black, transparent 94%);
+}
+
+@keyframes priGlobalSakuraDrift {
+  from { background-position: 0 -180px, 70px -260px, 130px -340px, 0 0; }
+  to { background-position: 95px 1050px, -55px 1180px, 220px 1320px, 0 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -459,7 +464,7 @@ body::after {
     radial-gradient(circle, hsl(0 0% 100% / .72) 0 1px, transparent 1.8px),
     radial-gradient(hsl(337 90% 88% / .12) .6px, transparent .8px);
   background-size: 190px 210px, 260px 280px, 170px 170px, 5px 5px;
-  animation: none;
+  animation: priGlobalSakuraDrift 30s linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -536,7 +541,7 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: clamp(148px, 22vw, 218px);
+  height: clamp(190px, 27vw, 280px);
   perspective: 1100px;
   transform-style: preserve-3d;
   overflow: hidden;
@@ -545,7 +550,7 @@ body::after {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: clamp(88px, 13vw, 150px);
+  width: clamp(112px, 13vw, 178px);
   aspect-ratio: 2 / 3;
   overflow: hidden;
   border: 1px solid rgba(255,255,255,.18);
@@ -616,8 +621,8 @@ body::after {
 }
 .pri-coverflow-controls button:hover { background: rgba(255,255,255,.12); transform: scale(1.06); }
 @media (max-width: 640px) {
-  .pri-coverflow { height: 150px; }
-  .pri-coverflow-card { width: 88px; }
+  .pri-coverflow { height: 190px; }
+  .pri-coverflow-card { width: 112px; }
   .pri-coverflow-card span { font-size: 8px; }
 }
 @media (prefers-reduced-motion: reduce) {
