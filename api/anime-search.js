@@ -11,7 +11,7 @@ function send(res, status, data, cache="public, s-maxage=60, stale-while-revalid
   res.setHeader("X-Content-Type-Options","nosniff");
   res.end(JSON.stringify(data));
 }
-function clean(value) { return String(value||"").trim().replace(/[\\u0000-\\u001f\\u007f]/g,"").slice(0,100); }
+function clean(value) { return String(value||"").trim().replace(/[\u0000-\u001f\u007f]/g,"").slice(0,100); }
 async function jsonFetch(url, options={}) {
   const response=await fetch(url,{headers:{Accept:"application/json",...(options.headers||{})},signal:AbortSignal.timeout(6500),...options});
   if(!response.ok) throw new Error("Upstream unavailable");
@@ -31,7 +31,7 @@ async function kitsu(q) {
   params.set("filter[text]", q);
   params.set("page[limit]", "20");
   const payload=await jsonFetch(`${KITSU}?${params.toString()}`,{headers:{"Accept":"application/vnd.api+json","Content-Type":"application/vnd.api+json"}});
-  const normalizeText = (value) => String(value||"").toLocaleLowerCase().normalize("NFKD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^\\p{L}\\p{N}]+/gu," ").trim();
+  const normalizeText = (value) => String(value||"").toLocaleLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g,"").replace(/[^\p{L}\p{N}]+/gu," ").trim();
   const query = normalizeText(q);
   return (payload.data||[]).filter((entry)=>{
     const a=entry.attributes||{};
@@ -39,7 +39,7 @@ async function kitsu(q) {
     const guide=String(a.ageRatingGuide||"").toUpperCase();
     const titles = [a.canonicalTitle, ...Object.values(a.titles||{}), ...(a.abbreviatedTitles||[])].map(normalizeText).filter(Boolean);
     const titleMatch = query.length >= 3 && titles.some((title)=>title===query||title.startsWith(query)||(title.length >= 5 && query.startsWith(title)));
-    return titleMatch && !["R","R18","R18+","NC-17"].includes(rating)&&!/(18\\s*\\+|R18|NC-17|ADULT)/.test(guide);
+    return titleMatch && !["R","R18","R18+","NC-17"].includes(rating)&&!/(18\s*\\+|R18|NC-17|ADULT)/.test(guide);
   });
 }
 export default async function handler(req,res) {
@@ -47,7 +47,7 @@ export default async function handler(req,res) {
   const q=clean(req.query?.q);
   const page=Math.min(Math.max(Number(req.query?.page)||1,1),10);
   if(q.length<2)return send(res,200,{anilist:[],mal:[],kitsu:[],pageInfo:null});
-  const variants=[...new Set([q,q.replace(/[^\\p{L}\\p{N}]+/gu," ").trim()])].filter(Boolean).slice(0,2);
+  const variants=[...new Set([q,q.replace(/[^\p{L}\p{N}]+/gu," ").trim()])].filter(Boolean).slice(0,2);
   const settled=await Promise.allSettled([
     ...variants.map((term)=>aniList(term,page)),
     jikan(q),
