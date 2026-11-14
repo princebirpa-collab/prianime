@@ -22,12 +22,13 @@ export default function FeaturedTrendingCarousel() {
   const select = (index) => setActive((index + anime.length) % anime.length);
 
   return (
-    <section className="relative isolate mx-auto my-5 w-full max-w-[1600px] overflow-hidden px-4 pt-5 sm:px-6 lg:px-10">
-      <div className="relative overflow-hidden rounded-[1.8rem] border border-white/10 bg-[#080808] text-white shadow-[0_28px_100px_rgba(0,0,0,.48)]">
+    <section className="relative isolate mx-auto my-5 w-full max-w-[1600px] overflow-hidden px-3 pt-4 sm:px-6 lg:px-10">
+      <div className="pri-trending-shell relative overflow-hidden rounded-[1.8rem] border border-white/10 bg-[#080808] text-white shadow-[0_28px_100px_rgba(0,0,0,.55)]">
+        <div aria-hidden="true" className="pri-smoke-layer absolute inset-0 pointer-events-none" />
         {featured && <div aria-hidden="true" className="absolute inset-0 scale-105 bg-cover bg-center opacity-35 blur-[2px] transition-all duration-1000" style={{ backgroundImage: `url("${featured.cover}")` }} />}
         <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.98)_0%,rgba(0,0,0,.88)_35%,rgba(0,0,0,.38)_72%,rgba(0,0,0,.72)_100%)]" />
         <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(ellipse_at_78%_45%,rgba(255,255,255,.13),transparent_45%)]" />
-        <div className="relative z-10 grid min-h-[430px] items-center gap-6 p-6 sm:min-h-[510px] sm:grid-cols-[1fr_300px] sm:px-12 sm:py-10 lg:grid-cols-[1fr_360px] lg:px-16">
+        <div className="relative z-10 grid min-h-[420px] items-center gap-6 p-6 sm:min-h-[480px] sm:grid-cols-[1fr_300px] sm:px-12 sm:py-9 lg:grid-cols-[1fr_360px] lg:px-16">
           <div className="max-w-2xl">
             <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.34em] text-white/65"><TrendingUp className="h-3.5 w-3.5"/> PRI-ANIME / TRENDING NOW</p>
             <h1 className="mt-4 font-display text-4xl font-semibold tracking-tight sm:text-6xl">Trending <span className="text-white/55">Anime.</span></h1>
@@ -46,9 +47,9 @@ export default function FeaturedTrendingCarousel() {
               </>
             )}
           </div>
-          {featured && <div className="relative mx-auto w-full max-w-[300px] sm:max-w-[270px] lg:max-w-[310px]">
+          {featured && <div className="relative mx-auto w-full max-w-[300px] sm:max-w-[250px] lg:max-w-[290px]">
             <Link key={featured.id} to={`/anime/${featured.id}`} className="group relative mx-auto block overflow-hidden rounded-xl border border-white/35 bg-black shadow-[0_30px_80px_rgba(0,0,0,.8)] transition duration-700 hover:scale-[1.025]">
-              <img src={featured.cover} alt={featured.display} loading="eager" className="aspect-[2/3] w-full object-cover"/>
+              <img src={featured.cover} alt={`${featured.display} full poster`} loading="eager" className="aspect-[2/3] max-h-[390px] w-full object-cover"/>
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/35 to-transparent p-4 pt-16">
                 <p className="text-[9px] font-bold uppercase tracking-[.28em] text-white/70">Featured poster · {active + 1}/7</p>
                 <p className="mt-1 line-clamp-2 font-display text-xl text-white">{featured.display}</p>
@@ -61,11 +62,22 @@ export default function FeaturedTrendingCarousel() {
             </div>
           </div>}
         </div>
-        {anime.length > 0 && <div className="relative z-10 grid grid-cols-4 gap-2 border-t border-white/10 bg-black/35 p-3 sm:grid-cols-7 sm:gap-3 sm:px-8 sm:py-4">
-          {anime.map((item, index) => <button key={item.id} type="button" onClick={() => select(index)} aria-label={`Show trending anime ${index + 1}: ${item.display}`} aria-current={active === index ? "true" : undefined} className={`group relative overflow-hidden rounded-lg border transition-all duration-300 ${active === index ? "border-white shadow-[0_0_22px_rgba(255,255,255,.2)] opacity-100" : "border-white/10 opacity-55 hover:opacity-100"}`}>
-            <img src={item.cover} alt={item.display} loading="lazy" className="aspect-[2/3] w-full object-cover transition duration-500 group-hover:scale-105"/>
-            <span className="absolute inset-x-0 bottom-0 truncate bg-black/75 px-1.5 py-1 text-left text-[9px] text-white">{index + 1}. {item.display}</span>
-          </button>)}
+        {anime.length > 0 && <div className="pri-coverflow-wrap relative z-10 border-t border-white/10 bg-black/40">
+          <div className="pri-coverflow" aria-label="Trending anime poster carousel">
+            {anime.map((item, index) => {
+              const rawOffset = (index - active + anime.length) % anime.length;
+              const offset = rawOffset > Math.floor(anime.length / 2) ? rawOffset - anime.length : rawOffset;
+              return <button key={item.id} type="button" onClick={() => select(index)} aria-label={`Show ${item.display}`} aria-current={active === index ? "true" : undefined} className={`pri-coverflow-card ${offset === 0 ? "is-active" : ""}`} style={{ "--card-offset": offset }}>
+                <img src={item.cover} alt={`${item.display} poster`} loading="lazy"/>
+                <span>{item.display}</span>
+              </button>;
+            })}
+          </div>
+          <div className="pri-coverflow-controls">
+            <button type="button" onClick={() => select(active - 1)} aria-label="Previous trending poster"><ChevronLeft className="h-4 w-4"/></button>
+            <span>{String(active + 1).padStart(2, "0")} <i/> {String(anime.length).padStart(2, "0")} · DRAG-FREE COVER FLOW</span>
+            <button type="button" onClick={() => select(active + 1)} aria-label="Next trending poster"><ChevronRight className="h-4 w-4"/></button>
+          </div>
         </div>}
       </div>
     </section>
