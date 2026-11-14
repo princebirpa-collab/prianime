@@ -32,7 +32,7 @@ export default function FeaturedTrendingCarousel() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_75%_40%,rgba(196,92,145,.22),transparent_48%)]" />
         </div>
       )}
-      <div className="relative mx-auto grid min-h-[min(760px,88vh)] w-full max-w-[1800px] items-center gap-8 px-5 py-14 sm:grid-cols-[1fr_ minmax(280px,420px)] sm:px-10 lg:grid-cols-[1fr_460px] lg:px-20">
+      <div className="relative mx-auto grid min-h-[min(760px,88vh)] w-full max-w-[1800px] items-center gap-8 px-5 py-14 sm:grid-cols-[minmax(0,1fr)_minmax(280px,420px)] sm:px-10 lg:grid-cols-[1fr_460px] lg:px-20">
         <div className="relative z-10 max-w-3xl">
           <p className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.38em] text-white/65"><TrendingUp className="h-3.5 w-3.5"/> PRI-ANIME ORIGINALS <span className="text-rose-300">/</span> TRENDING NOW</p>
           <h1 className="mt-6 font-display text-5xl font-semibold leading-[.98] tracking-tight text-white sm:text-7xl lg:text-8xl">Stories that<br/><span className="text-rose-200">stay with you.</span></h1>
