@@ -57,7 +57,7 @@ export default function Library() {
         [...localRows, ...cloudRows].forEach((row) => {
           const key = String(row.ref_id);
           const current = byAnime.get(key);
-          if (!current || String(row.updated_date || "") >= String(current.updated_date || "")) {
+          if (!current || (Date.parse(row.updated_date || "") || 0) >= (Date.parse(current.updated_date || "") || 0)) {
             byAnime.set(key, row);
           }
         });
