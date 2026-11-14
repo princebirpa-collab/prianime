@@ -27,12 +27,19 @@ async function jikan(q) {
   return payload.data||[];
 }
 async function kitsu(q) {
-  const payload=await jsonFetch(`${KITSU}?filter[text]=${encodeURIComponent(q)}&page[limit]=10`,{headers:{"Accept":"application/vnd.api+json"}});
+  const params = new URLSearchParams();
+  params.set("filter[text]", q);
+  params.set("page[limit]", "20");
+  const payload=await jsonFetch(`${KITSU}?${params.toString()}`,{headers:{"Accept":"application/vnd.api+json","Content-Type":"application/vnd.api+json"}});
+  const normalizeText = (value) => String(value||"").toLocaleLowerCase().normalize("NFKD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^\\p{L}\\p{N}]+/gu," ").trim();
+  const query = normalizeText(q);
   return (payload.data||[]).filter((entry)=>{
     const a=entry.attributes||{};
     const rating=String(a.ageRating||"").toUpperCase();
     const guide=String(a.ageRatingGuide||"").toUpperCase();
-    return !["R","R18","R18+","NC-17"].includes(rating)&&!/(18\\s*\\+|R18|NC-17|ADULT)/.test(guide);
+    const titles = [a.canonicalTitle, ...Object.values(a.titles||{}), ...(a.abbreviatedTitles||[])].map(normalizeText).filter(Boolean);
+    const titleMatch = titles.some((title)=>title===query||title.includes(query)||query.includes(title));
+    return titleMatch && !["R","R18","R18+","NC-17"].includes(rating)&&!/(18\\s*\\+|R18|NC-17|ADULT)/.test(guide);
   });
 }
 export default async function handler(req,res) {
