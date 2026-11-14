@@ -39,7 +39,7 @@ async function kitsu(q) {
     const guide=String(a.ageRatingGuide||"").toUpperCase();
     const titles = [a.canonicalTitle, ...Object.values(a.titles||{}), ...(a.abbreviatedTitles||[])].map(normalizeText).filter(Boolean);
     const titleMatch = query.length >= 3 && titles.some((title)=>title===query||title.startsWith(query)||(title.length >= 5 && query.startsWith(title)));
-    return titleMatch && !["R","R18","R18+","NC-17"].includes(rating)&&!/(18\s*\\+|R18|NC-17|ADULT)/.test(guide);
+    return titleMatch && !["R","R18","R18+","NC-17"].includes(rating)&&!/(18\s*\+|R18|NC-17|ADULT)/.test(guide);
   });
 }
 export default async function handler(req,res) {
