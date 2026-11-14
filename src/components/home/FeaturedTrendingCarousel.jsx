@@ -25,6 +25,7 @@ export default function FeaturedTrendingCarousel() {
     <section className="relative isolate mx-auto my-5 w-full max-w-[1600px] overflow-hidden px-3 pt-4 sm:px-6 lg:px-10">
       <div className="pri-trending-shell relative overflow-hidden rounded-[1.8rem] border border-white/10 bg-[#080808] text-white shadow-[0_28px_100px_rgba(0,0,0,.55)]">
         <div aria-hidden="true" className="pri-smoke-layer absolute inset-0 pointer-events-none" />
+        <div aria-hidden="true" className="pri-sakura-layer absolute inset-0 pointer-events-none" />
         {featured && <div aria-hidden="true" className="absolute inset-0 scale-105 bg-cover bg-center opacity-35 blur-[2px] transition-all duration-1000" style={{ backgroundImage: `url("${featured.cover}")` }} />}
         <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.98)_0%,rgba(0,0,0,.88)_35%,rgba(0,0,0,.38)_72%,rgba(0,0,0,.72)_100%)]" />
         <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(ellipse_at_78%_45%,rgba(255,255,255,.13),transparent_45%)]" />
