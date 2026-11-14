@@ -294,136 +294,49 @@ export async function callAniList(body) {
   } else if (body.action === "search") {
     const variables = buildListVariables(body);
     if (!variables) return { items: [], pageInfo: null, item: null };
-    // Search every distinct spelling variant and MERGE the matching results.
-    // Previously the loop stopped after the first non-empty response, which
-    // could hide the requested title when AniList's fuzzy ranking returned
-    // an incomplete first page for the original spelling.
-    result = { items: [], pageInfo: null, item: null };
-    const variants = expandedSearchVariants(variables.search);
-    const merged = new Map();
-    const pageInfos = [];
-    for (const variant of variants) {
-      try {
-        const data = await graphql(LIST_QUERY, { ...variables, search: variant });
-        const page = data?.Page;
-        if (!page) continue;
-        if (page.pageInfo) pageInfos.push(page.pageInfo);
-        for (const anime of (page.media || []).map(normalize).filter(Boolean)) {
-          const score = titleSearchScore(anime, variables.search);
-          if (score >= 50) merged.set(String(anime.id), anime);
-        }
-      } catch {
-        // A failed spelling variant must not prevent other variants from
-        // returning useful matches or trigger a false "no anime found".
-      }
-      // AniList rate-limits aggressively. A short 180ms pause caused
-      // fallback title variants to be throttled, leaving only the first
-      // fuzzy result (for example, a Dragon Ball Z special) on screen.
-      // Space variant requests by about one second so the canonical franchise
-      // search can complete reliably.
-      if (variants.length > 1 && variant !== variants[variants.length - 1]) {
-        await new Promise((resolve) => setTimeout(resolve, 350));
-      }
+    const response = await fetch(`/api/anime-search?q=${encodeURIComponent(variables.search)}&page=${variables.page}`, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}));
+      throw new Error(payload.error || "Anime search providers are temporarily unavailable.");
     }
-    const ranked = rankSearchResults([...merged.values()], variables.search);
-    if (ranked.length) {
-      const bestPageInfo = pageInfos.sort((a, b) => (b.total || 0) - (a.total || 0))[0] || null;
-      result = {
-        items: ranked,
-        pageInfo: bestPageInfo ? {
-          ...bestPageInfo,
-          total: Math.max(...pageInfos.map((info) => info.total || 0)),
-          hasNextPage: pageInfos.some((info) => Boolean(info.hasNextPage)),
-        } : null,
-        item: null,
-      };
-    }
-
-    // MAL/Jikan is a title-discovery fallback only. Resolve any discovered
-    // MAL titles back through AniList so the UI keeps AniList IDs/routes and
-    // playback identity; never pass a MAL ID into an AniList watch route.
-    const catalogMode = typeof localStorage !== "undefined" ? localStorage.getItem(CATALOG_MODE_KEY) || "automatic" : "automatic";
-    if (result.items.length === 0 && catalogMode === "automatic") {
-      try {
-        const malHits = await searchMalTitles(variables.search);
-        const aliases = [...new Set(malHits.flatMap((hit) =>
-          [hit.title, hit.title_english, hit.title_japanese, ...(hit.title_synonyms || [])]
-            .filter(Boolean)
-        ))]
-          // MAL/Kitsu fallback may return unrelated fuzzy entries. Only query
-          // aliases that actually correspond to the user's typed title.
-          .filter((alias) => titleSearchScore({
-            display: alias, titleRomaji: alias, titleNative: alias,
-          }, variables.search) >= 50)
-          .slice(0, 4);
-        for (const alias of aliases) {
-          try {
-            const data = await graphql(LIST_QUERY, { ...variables, search: alias });
-            const normalizedAliasResults = (data?.Page?.media || []).map(normalize).filter(Boolean);
-            // Keep results tied to the original query; never trust the
-            // fallback provider's fuzzy alias as proof of relevance.
-            const items = rankSearchResults(normalizedAliasResults, variables.search);
-            if (items.length) {
-              result = { items, pageInfo: data?.Page?.pageInfo || null, item: null };
-              break;
-            }
-          } catch {
-            // A failed alias lookup should not hide other MAL-discovered names.
-          }
-        }
-      } catch {
-        // MAL is an optional secondary metadata source; retain AniList's
-        // valid empty result rather than turning an upstream outage into error.
-      }
-    }
-    // Search Jikan/MAL (or its Kitsu fallback) alongside AniList on every
-    // query, not only when AniList returns zero results. This makes the main
-    // search a genuinely multi-catalogue search while retaining source IDs.
-    if (catalogMode === "automatic") {
-      const [externalItems, anidbItems] = await Promise.all([
-        searchExternalCatalog(variables.search),
-        searchAniDBTitleIndex(variables.search),
-      ]);
-      const allExternalItems = [...externalItems, ...anidbItems];
-      if (allExternalItems.length) {
-        const merged = [...result.items];
-        const titleKey = (value) => String(value || "")
-          .toLocaleLowerCase()
-          .normalize("NFKD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/[^\p{L}\p{N}]+/gu, " ")
-          .trim();
-        const titleKeys = (item) => [
-          item?.display,
-          item?.titleRomaji,
-          item?.titleNative,
-          ...(item?.titleAliases || []),
-        ].map(titleKey).filter(Boolean);
-        for (const external of allExternalItems) {
-          const externalKeys = new Set(titleKeys(external));
-          const existingIndex = merged.findIndex((item) =>
-            String(item.id) === String(external.id) ||
-            titleKeys(item).some((key) => externalKeys.has(key))
-          );
-          if (existingIndex >= 0) {
-            const existing = merged[existingIndex];
-            merged[existingIndex] = {
-              ...existing,
-              sources: [...new Set([...(existing.sources || [existing.source]), external.source])],
-            };
-          } else {
-            merged.push({ ...external, sources: [external.source] });
-          }
-        }
-        result = {
-          ...result,
-          items: merged,
-          pageInfo: result.pageInfo || {
-            total: merged.length, currentPage: 1, lastPage: 1, hasNextPage: false,
-          },
+    const payload = await response.json();
+    const aniItems = (payload.anilist || []).map(normalize).filter(Boolean);
+    const externalItems = [
+      ...(payload.mal || []).map((raw) => normalizeExternalMedia(raw, "mal")),
+      ...(payload.kitsu || []).map((raw) => normalizeExternalMedia(raw, "kitsu")),
+    ].filter(Boolean);
+    const ranked = rankSearchResults([...aniItems, ...externalItems], variables.search);
+    const merged = [];
+    const titleKey = (value) => String(value || "").toLocaleLowerCase().normalize("NFKD")
+      .replace(/[\\u0300-\\u036f]/g, "").replace(/[^\\p{L}\\p{N}]+/gu, " ").trim();
+    const titleKeys = (item) => [
+      item?.display, item?.titleRomaji, item?.titleNative, ...(item?.titleAliases || []),
+    ].map(titleKey).filter(Boolean);
+    for (const item of ranked) {
+      const keys = new Set(titleKeys(item));
+      const existingIndex = merged.findIndex((other) =>
+        String(other.id) === String(item.id) || titleKeys(other).some((key) => keys.has(key))
+      );
+      if (existingIndex < 0) merged.push({ ...item, sources: [item.source] });
+      else {
+        const current = merged[existingIndex];
+        merged[existingIndex] = {
+          ...current,
+          sources: [...new Set([...(current.sources || [current.source]), item.source])],
         };
       }
     }
+    result = {
+      items: merged,
+      pageInfo: payload.pageInfo || {
+        total: merged.length, currentPage: 1, lastPage: 1, hasNextPage: false,
+      },
+      providers: payload.providers || {},
+      item: null,
+    };
   } else {
     const variables = buildListVariables(body);
     if (!variables) return { items: [], pageInfo: null, item: null };
