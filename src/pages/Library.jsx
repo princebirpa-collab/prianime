@@ -87,6 +87,9 @@ export default function Library() {
   const removeProgress = async (id) => {
     const row = [...progress.video, ...progress.anime].find((entry) => entry.id === id);
     await clearProgress(id, row?.kind, row?.ref_id);
+    if (row?.kind === "anime" && row?.ref_id) {
+      await communityRequest(`/watch-history?profileId=${encodeURIComponent(getProfile().id)}&animeId=${encodeURIComponent(row.ref_id)}`, { method: "DELETE" }).catch(() => {});
+    }
     setProgress((prev) => ({
       video: prev.video.filter((row) => row.id !== id),
       anime: prev.anime.filter((row) => row.id !== id),
@@ -123,7 +126,7 @@ export default function Library() {
       <PageHeader
         eyebrow="Your library"
         title="Everything you keep"
-        description="Saved titles, playback history and scripts live on this device profile — no account required."
+        description="Your saved titles and episode progress sync through your PRI-ANIME profile."
       />
 
       <div className="mx-auto w-full max-w-[1600px] px-4 pt-6 sm:px-6 lg:px-10">
