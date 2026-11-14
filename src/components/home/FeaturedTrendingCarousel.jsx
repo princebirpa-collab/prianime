@@ -22,73 +22,64 @@ export default function FeaturedTrendingCarousel() {
   useEffect(() => {
     if (anime.length < 2) return undefined;
     const timer = window.setInterval(() => setActive((current) => (current + 1) % anime.length), 8000);
-    return () => window.clearInterval(timer);
-  }, [anime.length]);
-
-  useEffect(() => {
-    if (active >= anime.length) setActive(0);
-  }, [active, anime.length]);
-
-  const featured = anime[active];
-  const select = (index) => setActive((index + anime.length) % anime.length);
-
-  return (
-    <section className="relative isolate mx-auto my-5 w-full max-w-[1600px] overflow-hidden px-3 pt-4 sm:px-6 lg:px-10">
-      <div className="pri-trending-shell relative overflow-hidden rounded-[1.8rem] border border-white/10 bg-[#080808] text-white shadow-[0_28px_100px_rgba(0,0,0,.55)]">
-        <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,.98)_0%,rgba(0,0,0,.88)_35%,rgba(0,0,0,.38)_72%,rgba(0,0,0,.72)_100%)]" />
-        <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(ellipse_at_78%_45%,rgba(255,255,255,.13),transparent_45%)]" />
-        <div className="relative z-10 grid min-h-[420px] items-center gap-6 p-6 sm:min-h-[480px] sm:grid-cols-[1fr_300px] sm:px-12 sm:py-9 lg:grid-cols-[1fr_360px] lg:px-16">
-          <div className="max-w-2xl">
-            <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.34em] text-white/65"><TrendingUp className="h-3.5 w-3.5"/> PRI-ANIME / TRENDING NOW</p>
-            <h1 className="mt-4 font-display text-4xl font-semibold tracking-tight sm:text-6xl">Trending <span className="text-white/55">Anime.</span></h1>
-            <p className="mt-4 max-w-lg text-sm leading-7 text-white/65">Seven trending anime, rotating automatically every 8 seconds.</p>
-            {error ? <p className="mt-5 text-sm text-white/60">{error}</p> : loading || !featured ? <p className="mt-7 text-sm text-white/55">Loading live anime posters…</p> : (
-              <>
-                <div className="mt-7 flex flex-wrap items-center gap-3 text-xs text-white/65">
-                  <span className="rounded-full border border-white/20 bg-white/5 px-3 py-1.5">#{active + 1} Trending</span>
-                  {featured.score ? <span className="inline-flex items-center gap-1.5"><Star className="h-3.5 w-3.5 fill-white text-white"/>{(featured.score/10).toFixed(1)} AniList</span> : null}
-                </div>
-                <h2 key={featured.id} className="mt-4 max-w-xl animate-in fade-in slide-in-from-bottom-2 duration-500 font-display text-3xl leading-tight sm:text-4xl">{featured.display}</h2>
-                <div className="mt-6 flex flex-wrap items-center gap-3">
-                  <Link to={`/anime/${featured.id}`} className="inline-flex items-center gap-3 rounded-full border border-white/25 bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-white/85"><Play className="h-4 w-4 fill-current"/> Explore anime <ArrowUpRight className="h-4 w-4"/></Link>
-                  <a href="#airing-radar" className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/30 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/10">Airing schedule <ArrowUpRight className="h-4 w-4"/></a>
-                </div>
-              </>
-            )}
-          </div>
-          {featured && <div className="relative mx-auto w-full max-w-[340px] sm:max-w-[300px] lg:max-w-[360px]">
-            <Link key={featured.id} to={`/anime/${featured.id}`} className="group relative mx-auto block overflow-hidden rounded-xl border border-white/35 bg-black shadow-[0_30px_80px_rgba(0,0,0,.8)] transition duration-700 hover:scale-[1.025]">
-              <img src={featured.cover} alt={`${featured.display} full poster`} loading="eager" className="aspect-[2/3] max-h-[500px] w-full object-cover"/>
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/35 to-transparent p-4 pt-16">
-                <p className="text-[9px] font-bold uppercase tracking-[.28em] text-white/70">Featured poster · {active + 1}/7</p>
-                <p className="mt-1 line-clamp-2 font-display text-xl text-white">{featured.display}</p>
+    return (
+    <section className="relative isolate w-full overflow-hidden">
+      {featured && (
+        <div className="absolute inset-0">
+          <img src={featured.banner || featured.cover} alt="" aria-hidden="true" className="h-full w-full scale-110 object-cover object-center opacity-45 blur-[2px]" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,5,8,.98)_0%,rgba(5,5,8,.86)_36%,rgba(5,5,8,.34)_72%,rgba(5,5,8,.68)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(0deg,#050508_0%,transparent_42%,rgba(5,5,8,.18)_100%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_75%_40%,rgba(196,92,145,.22),transparent_48%)]" />
+        </div>
+      )}
+      <div className="relative mx-auto grid min-h-[min(760px,88vh)] w-full max-w-[1800px] items-center gap-8 px-5 py-14 sm:grid-cols-[1fr_ minmax(280px,420px)] sm:px-10 lg:grid-cols-[1fr_460px] lg:px-20">
+        <div className="relative z-10 max-w-3xl">
+          <p className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.38em] text-white/65"><TrendingUp className="h-3.5 w-3.5"/> PRI-ANIME ORIGINALS <span className="text-rose-300">/</span> TRENDING NOW</p>
+          <h1 className="mt-6 font-display text-5xl font-semibold leading-[.98] tracking-tight text-white sm:text-7xl lg:text-8xl">Stories that<br/><span className="text-rose-200">stay with you.</span></h1>
+          {error ? <p className="mt-6 text-sm text-white/65">{error}</p> : loading || !featured ? <p className="mt-7 text-sm text-white/55">Curating the latest anime…</p> : (
+            <>
+              <div className="mt-8 flex flex-wrap items-center gap-3 text-xs text-white/65">
+                <span className="rounded-full border border-white/20 bg-black/25 px-3 py-1.5">TRENDING #{active + 1}</span>
+                {featured.score ? <span className="inline-flex items-center gap-1.5"><Star className="h-3.5 w-3.5 fill-rose-200 text-rose-200"/>{(featured.score/10).toFixed(1)} rating</span> : null}
+                {featured.status === "RELEASING" ? <span className="rounded-full border border-emerald-300/30 px-3 py-1.5 text-emerald-200">NOW AIRING</span> : null}
+              </div>
+              <h2 key={featured.id} className="mt-5 max-w-2xl font-display text-4xl font-semibold leading-tight text-white sm:text-6xl">{featured.display}</h2>
+              <p className="mt-4 max-w-xl text-sm leading-7 text-white/65">{featured.description || "Discover the anime everyone is talking about."}</p>
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <Link to={`/anime/${featured.id}`} className="inline-flex items-center gap-3 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-black transition hover:-translate-y-0.5 hover:bg-rose-100"><Play className="h-4 w-4 fill-current"/> Explore title <ArrowUpRight className="h-4 w-4"/></Link>
+                <a href="#airing-radar" className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/25 px-6 py-3.5 text-sm text-white transition hover:bg-white/10">Airing schedule <ArrowUpRight className="h-4 w-4"/></a>
+              </div>
+            </>
+          )}
+        </div>
+        {featured && (
+          <div className="relative z-10 mx-auto w-full max-w-[min(78vw,390px)] sm:max-w-[340px] lg:max-w-[390px]">
+            <Link key={featured.id} to={`/anime/${featured.id}`} className="group relative block overflow-hidden rounded-2xl border border-white/25 bg-black shadow-[0_35px_100px_rgba(0,0,0,.72)] transition duration-700 hover:-translate-y-2 hover:scale-[1.02]">
+              <img src={featured.cover} alt={`${featured.display} poster`} loading="eager" className="aspect-[2/3] max-h-[590px] w-full object-cover"/>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/10"/>
+              <div className="absolute inset-x-0 bottom-0 p-5">
+                <p className="text-[9px] font-semibold uppercase tracking-[.3em] text-rose-200/85">Featured selection · {active + 1}/{anime.length}</p>
+                <p className="mt-2 font-display text-2xl text-white">{featured.display}</p>
               </div>
             </Link>
-            <div className="mt-3 flex items-center justify-between">
-              <button type="button" onClick={() => select(active - 1)} aria-label="Previous anime" className="rounded-full border border-white/20 p-2 text-white/80 hover:bg-white/10"><ChevronLeft className="h-4 w-4"/></button>
-              <span className="text-[10px] tracking-[.25em] text-white/50">AUTO NEXT · 8 SEC</span>
-              <button type="button" onClick={() => select(active + 1)} aria-label="Next anime" className="rounded-full border border-white/20 p-2 text-white/80 hover:bg-white/10"><ChevronRight className="h-4 w-4"/></button>
+            <div className="mt-4 flex items-center justify-between text-[10px] tracking-[.24em] text-white/55">
+              <button type="button" onClick={() => select(active - 1)} aria-label="Previous anime" className="rounded-full border border-white/20 p-2.5 text-white hover:bg-white/10"><ChevronLeft className="h-4 w-4"/></button>
+              <span>DISCOVER · {String(active + 1).padStart(2,"0")} / {String(anime.length).padStart(2,"0")}</span>
+              <button type="button" onClick={() => select(active + 1)} aria-label="Next anime" className="rounded-full border border-white/20 p-2.5 text-white hover:bg-white/10"><ChevronRight className="h-4 w-4"/></button>
             </div>
-          </div>}
-        </div>
-        {anime.length > 0 && <div className="pri-coverflow-wrap relative z-10 border-t border-white/10 bg-black/40">
-          <div className="pri-coverflow" aria-label="Trending anime poster carousel">
-            {anime.map((item, index) => {
-              const rawOffset = (index - active + anime.length) % anime.length;
-              const offset = rawOffset > Math.floor(anime.length / 2) ? rawOffset - anime.length : rawOffset;
-              return <button key={item.id} type="button" onClick={() => select(index)} aria-label={`Show ${item.display}`} aria-current={active === index ? "true" : undefined} className={`pri-coverflow-card ${offset === 0 ? "is-active" : ""}`} style={{ transform: `translate(-50%, -50%) translateX(${offset * 170}px) rotateY(${offset * -28}deg) scale(${1 - Math.min(Math.abs(offset), 3) * 0.105})`, opacity: 1 - Math.min(Math.abs(offset), 4) * 0.17, zIndex: 10 - Math.abs(offset), filter: offset === 0 ? "saturate(1.08) brightness(1)" : "saturate(.78) brightness(.68)" }}>
-                <img src={item.cover} alt={`${item.display} poster`} loading="lazy"/>
-                <span>{item.display}</span>
-              </button>;
-            })}
           </div>
-          <div className="pri-coverflow-controls">
-            <button type="button" onClick={() => select(active - 1)} aria-label="Previous trending poster"><ChevronLeft className="h-4 w-4"/></button>
-            <span>{String(active + 1).padStart(2, "0")} <i/> {String(anime.length).padStart(2, "0")} · DRAG-FREE COVER FLOW</span>
-            <button type="button" onClick={() => select(active + 1)} aria-label="Next trending poster"><ChevronRight className="h-4 w-4"/></button>
-          </div>
-        </div>}
+        )}
       </div>
+      {anime.length > 1 && (
+        <div className="relative z-10 mx-auto flex w-full max-w-[1800px] items-center gap-3 overflow-x-auto px-5 pb-7 sm:px-10 lg:px-20">
+          {anime.map((item,index) => (
+            <button key={item.id} type="button" onClick={() => select(index)} aria-label={`Feature ${item.display}`} aria-current={active === index ? "true" : undefined} className={`group relative h-[76px] w-[54px] shrink-0 overflow-hidden rounded-lg border transition-all duration-500 sm:h-[92px] sm:w-[66px] ${active === index ? "border-rose-200 opacity-100 ring-2 ring-rose-200/30" : "border-white/15 opacity-55 hover:opacity-100"}`}>
+              <img src={item.cover} alt="" loading="lazy" className="h-full w-full object-cover"/>
+            </button>
+          ))}
+          <span className="ml-2 shrink-0 text-[9px] tracking-[.3em] text-white/40">TRENDING COLLECTION</span>
+        </div>
+      )}
     </section>
   );
 }
