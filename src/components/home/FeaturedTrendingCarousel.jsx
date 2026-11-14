@@ -5,7 +5,18 @@ import { useAnimeList } from "@/hooks/useAnime";
 
 export default function FeaturedTrendingCarousel() {
   const { items = [], loading, error } = useAnimeList({ action: "trending", perPage: 20 });
-  const anime = useMemo(() => items.filter((item) => item?.id && item?.cover).slice(0, 7), [items]);
+  const anime = useMemo(() => {
+    const today = new Date();
+    return items.filter((item) => {
+      if (!item?.id || !item?.cover || item.status === "NOT_YET_RELEASED") return false;
+      const start = item.startDate;
+      if (start?.year && start?.month && start?.day) {
+        const release = new Date(Date.UTC(start.year, start.month - 1, start.day));
+        if (release > today) return false;
+      }
+      return ["FINISHED", "RELEASING", "HIATUS", "CANCELLED"].includes(item.status);
+    }).slice(0, 7);
+  }, [items]);
   const [active, setActive] = useState(0);
 
   useEffect(() => {
