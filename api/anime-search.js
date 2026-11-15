@@ -13,7 +13,7 @@ function send(res, status, data, cache="public, s-maxage=60, stale-while-revalid
 }
 function clean(value) { return String(value||"").trim().replace(/[\u0000-\u001f\u007f]/g,"").slice(0,100); }
 async function jsonFetch(url, options={}) {
-  const response=await fetch(url,{headers:{Accept:"application/json",...(options.headers||{})},signal:AbortSignal.timeout(6500),...options});
+  const response=await fetch(url,{headers:{Accept:"application/json",...(options.headers||{})},signal:AbortSignal.timeout(5000),...options});
   if(!response.ok) throw new Error("Upstream unavailable");
   return response.json();
 }
