@@ -83,7 +83,7 @@ async function fetchGraphQL(query, variables) {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify({ query, variables }),
-    signal: AbortSignal.timeout(12000),
+    signal: AbortSignal.timeout(5000),
   });
   // HTTP errors and GraphQL errors are classified separately, and every
   // failure carries whether it is safe to retry.
