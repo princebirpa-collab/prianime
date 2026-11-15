@@ -353,32 +353,41 @@ export async function callAniList(body) {
   } else {
     const variables = buildListVariables(body);
     if (!variables) return { items: [], pageInfo: null, item: null };
+    // Start the independent catalogue immediately instead of waiting for
+    // AniList first. This prevents a slow primary provider from delaying the
+    // first usable home rows; both sources are still merged when ready.
+    const feedPromise = (async () => {
+      let malItems = [];
+      let kitsuItems = [];
+      let feedInfo = {};
+      try {
+        const response = await fetch(`/api/catalog-feed?mode=${encodeURIComponent(body.action || "popular")}&page=${variables.page}`, {
+          headers: { Accept: "application/json" },
+          signal: AbortSignal.timeout(7500),
+        });
+        if (response.ok) {
+          feedInfo = await response.json();
+          malItems = (feedInfo.mal || []).map((row) => normalizeExternalMedia(row, "mal")).filter(Boolean);
+          kitsuItems = (feedInfo.kitsu || []).map((row) => normalizeExternalMedia(row, "kitsu")).filter(Boolean);
+        }
+      } catch { /* The primary catalogue can still serve the page. */ }
+      return { malItems, kitsuItems, feedInfo };
+    })();
+
     let aniItems = [];
     let aniPageInfo = null;
     let aniError = null;
     try {
-      const data = await graphql(LIST_QUERY, variables);
+      // List pages use one bounded primary request: the independent catalogue
+      // is already running in parallel, so serial retry backoff only adds delay.
+      const data = await fetchGraphQL(LIST_QUERY, variables);
       if (!data?.Page) throw new Error("AniList returned an invalid catalogue response.");
       aniItems = (data.Page.media || []).map(normalize).filter(Boolean);
       aniPageInfo = data.Page.pageInfo || null;
     } catch (error) { aniError = error; }
 
-    // Merge the same page from all available catalogues, not just use backups
-    // when AniList fails. IDs remain source-qualified for correct detail routes.
-    let malItems = [];
-    let kitsuItems = [];
-    let feedInfo = {};
-    try {
-      const response = await fetch(`/api/catalog-feed?mode=${encodeURIComponent(body.action || "popular")}&page=${variables.page}`, {
-        headers: { Accept: "application/json" },
-        signal: AbortSignal.timeout(12000),
-      });
-      if (response.ok) {
-        feedInfo = await response.json();
-        malItems = (feedInfo.mal || []).map((row) => normalizeExternalMedia(row, "mal")).filter(Boolean);
-        kitsuItems = (feedInfo.kitsu || []).map((row) => normalizeExternalMedia(row, "kitsu")).filter(Boolean);
-      }
-    } catch { /* AniList still serves the page if backup sources time out. */ }
+    // Merge both sources once their parallel requests have settled.
+    const { malItems, kitsuItems, feedInfo } = await feedPromise;
 
     const allItems = [...aniItems];
     const titleKey = (value) => String(value || "").toLocaleLowerCase().normalize("NFKD")
