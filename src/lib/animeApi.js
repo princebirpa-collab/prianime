@@ -294,15 +294,28 @@ export async function callAniList(body) {
   } else if (body.action === "search") {
     const variables = buildListVariables(body);
     if (!variables) return { items: [], pageInfo: null, item: null };
-    const response = await fetch(`/api/anime-search?q=${encodeURIComponent(variables.search)}&page=${variables.page}`, {
-      headers: { Accept: "application/json" },
-      signal: AbortSignal.timeout(10000),
-    });
-    if (!response.ok) {
-      const payload = await response.json().catch(() => ({}));
-      throw new Error(payload.error || "Anime search providers are temporarily unavailable.");
-    }
-    const payload = await response.json();
+    const payload = await withRetries(async () => {
+      const response = await fetch(`/api/anime-search?q=${encodeURIComponent(variables.search)}&page=${variables.page}`, {
+        headers: { Accept: "application/json" },
+        // The proxy bounds upstream calls and returns partial results; this
+        // extra headroom covers cold starts and brief network jitter.
+        signal: AbortSignal.timeout(9000),
+      });
+      if (!response.ok) {
+        const details = await response.json().catch(() => ({}));
+        const error = new Error(details.error || "Anime search providers are temporarily unavailable.");
+        error.status = response.status;
+        error.retryable = response.status === 429 || response.status >= 500;
+        throw error;
+      }
+      try {
+        return await response.json();
+      } catch {
+        const error = new Error("Anime search returned an unreadable response.");
+        error.retryable = true;
+        throw error;
+      }
+    }, { retries: 1 });
     const aniItems = (payload.anilist || []).map(normalize).filter(Boolean);
     const externalItems = [
       ...(payload.mal || []).map((raw) => normalizeExternalMedia(raw, "mal")),
