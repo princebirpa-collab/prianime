@@ -3,7 +3,7 @@ import PageHeader from "@/components/common/PageHeader";
 const SECTIONS = [
   {
     title: "What this app streams",
-    body: "PRI-ANIME plays video that the creator uploaded through the creator studio, or open-licensed demo clips shipped with the app. AniList and MyAnimeList are metadata providers only â€” they do not host or licence episodes, and this app never scrapes streaming sites or stores pirate links.",
+    body: "PRI-ANIME plays video that the creator uploaded through the creator studio, or open-licensed demo clips shipped with the app. AniList and MyAnimeList are metadata providers only — they do not host or licence episodes, and this app never scrapes streaming sites or stores pirate links.",
   },
   {
     title: "Metadata licence",
@@ -15,19 +15,19 @@ const SECTIONS = [
   },
   {
     title: "Configuration",
-    body: "Secrets live in environment variables on the server. Nothing private is written to browser storage, HTML or public API responses. Video provider checks return status only â€” never a key.",
+    body: "Secrets live in environment variables on the server. Nothing private is written to browser storage, HTML or public API responses. Video provider checks return status only — never a key.",
   },
 ];
 
 const ENV_VARS = [
   ["ANILIST_API_URL", "https://graphql.anilist.co", "Public GraphQL endpoint. No key required."],
-  ["MAL_CLIENT_ID", "â€”", "From the MyAnimeList API panel. Required for MAL ratings."],
-  ["MAL_CLIENT_SECRET", "â€”", "Only needed for refresh-token flows."],
-  ["MAL_ACCESS_TOKEN", "â€”", "Bearer token from the MAL OAuth flow."],
+  ["MAL_CLIENT_ID", "—", "From the MyAnimeList API panel. Required for MAL ratings."],
+  ["MAL_CLIENT_SECRET", "—", "Only needed for refresh-token flows."],
+  ["MAL_ACCESS_TOKEN", "—", "Bearer token from the MAL OAuth flow."],
   ["VIDEO_PROVIDER", "cloudflare | mux | generic", "Selects the adapter."],
-  ["VIDEO_API_URL", "â€”", "Provider API base, e.g. Cloudflare account stream URL."],
-  ["VIDEO_API_KEY", "â€”", "Server-side API token (Basic id:secret for Mux)."],
-  ["VIDEO_PLAYBACK_URL", "â€”", "Playback host for signed manifests."],
+  ["VIDEO_API_URL", "—", "Provider API base, e.g. Cloudflare account stream URL."],
+  ["VIDEO_API_KEY", "—", "Server-side API token (Basic id:secret for Mux)."],
+  ["VIDEO_PLAYBACK_URL", "—", "Playback host for signed manifests."],
 ];
 
 export default function Policy() {
@@ -52,8 +52,8 @@ export default function Policy() {
         <section className="rounded-2xl border border-border/60 bg-card/40 p-5">
           <h2 className="font-display text-xl">Environment variables</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Set these in the workspace environment settings â€” never in frontend files. Missing values are reported as
-            â€œnot configuredâ€ rather than faked.
+            Set these in the workspace environment settings — never in frontend files. Missing values are reported as
+            “not configured” rather than faked.
           </p>
           <div className="mt-4 overflow-x-auto">
             <table className="w-full min-w-[640px] text-left text-sm">
@@ -90,7 +90,7 @@ npm run lint
 npm run build`}
           </pre>
           <p className="mt-3 text-xs text-muted-foreground">
-            In VS Code: open the folder, then Terminal â†’ New Terminal, and paste the commands above.
+            In VS Code: open the folder, then Terminal → New Terminal, and paste the commands above.
           </p>
         </section>
 
@@ -101,7 +101,7 @@ npm run build`}
               "Publish the app, then connect your domain from the dashboard's Domains page and point DNS at it.",
               "Serve over HTTPS only; HSTS protects signed playback URLs.",
               "Add the production origin to CORS allow-lists for every provider you call from the browser.",
-              "Store all provider keys as environment variables â€” rotate them if a key ever appears in client code.",
+              "Store all provider keys as environment variables — rotate them if a key ever appears in client code.",
               "Move metadata caching to a shared cache (Redis or edge KV) before traffic grows; the in-process cache is per instance.",
               "Put media behind object storage + CDN, and run long renders through a queue rather than a request.",
               "Add monitoring (error tracking + uptime checks) and load-test before claiming any concurrency figure.",
@@ -117,10 +117,10 @@ npm run build`}
         <section className="rounded-2xl border border-border/60 bg-card/40 p-5">
           <h2 className="font-display text-xl">Honest limits</h2>
           <ul className="mt-3 grid gap-2 text-sm text-muted-foreground">
-            <li>â€¢ This build runs without sign-in, so saved lists live in the device profile, not an account.</li>
-            <li>â€¢ MyAnimeList ratings need real credentials; until then the app says â€œunavailableâ€.</li>
-            <li>â€¢ AI video rendering depends on the workspace plan and the video model's limits.</li>
-            <li>â€¢ No claim is made about extreme concurrency â€” that needs load testing and shared infrastructure.</li>
+            <li>”¢ This build runs without sign-in, so saved lists live in the device profile, not an account.</li>
+            <li>”¢ MyAnimeList ratings need real credentials; until then the app says “unavailable”.</li>
+            <li>”¢ AI video rendering depends on the workspace plan and the video model's limits.</li>
+            <li>”¢ No claim is made about extreme concurrency — that needs load testing and shared infrastructure.</li>
           </ul>
         </section>
       </div>
