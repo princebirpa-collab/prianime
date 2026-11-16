@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
@@ -10,6 +10,7 @@ import ScrollToTop from './components/ScrollToTop';
 import { ThemeProvider } from '@/lib/theme';
 import Layout from '@/components/layout/Layout';
 import IntroOverlay from '@/components/IntroOverlay';
+import { installPriSmartExperience } from '@/lib/priSmart';
 // Add page imports here
 const Home = lazy(() => import('@/pages/Home'));
 const Browse = lazy(() => import('@/pages/Browse'));
@@ -97,6 +98,8 @@ const AuthenticatedApp = () => {
 };
 
 function App() {
+  useEffect(() => installPriSmartExperience(), []);
+
   return (
     <ThemeProvider>
       <IntroOverlay />
