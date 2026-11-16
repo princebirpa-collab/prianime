@@ -7,7 +7,7 @@ import { usePaginatedAnime } from "@/hooks/useAnime";
 import { currentSeason } from "@/lib/animeApi";
 
 export const CATEGORY_MAP = {
-  action: { title: "Action & Adventure", genre: "Action", description: "Momentum, stakes and spectacle â€” the pulse of the medium." },
+  action: { title: "Action & Adventure", genre: "Action", description: "Momentum, stakes and spectacle — the pulse of the medium." },
   "dark-fantasy": { title: "Dark Fantasy & Demons", genre: "Horror", description: "Cursed kingdoms, hungry shadows and bargains that always cost." },
   magic: { title: "Magic & Supernatural", genre: "Supernatural", description: "Rituals, spirits and powers that rewrite the rules of a world." },
   isekai: { title: "Isekai & Other Worlds", genre: "Fantasy", description: "Portal fantasy: ordinary people, impossible kingdoms." },
