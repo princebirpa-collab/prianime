@@ -27,7 +27,7 @@ const PROFILE_DECORATIONS = [
 
 const TOGGLES = [
   { key: "autoplayReels", label: "Autoplay reels", hint: "Play the next adjacent reel when it scrolls into view." },
-  { key: "reelMuted", label: "Start reels muted", hint: "Unmute manually â€” browsers require it anyway." },
+  { key: "reelMuted", label: "Start reels muted", hint: "Unmute manually — browsers require it anyway." },
   { key: "subtitles", label: "Captions when available", hint: "Turn on subtitle tracks automatically." },
   { key: "reduceMotion", label: "Reduce motion", hint: "Fewer parallax and glow effects." },
   { key: "notifications", label: "Job notifications", hint: "Show render completions in the notification tray." },
@@ -149,7 +149,7 @@ export default function Settings() {
           <div className="mt-4 flex items-center gap-4">
             <div className="relative"><img src={profile.avatar || "/avatar-default.svg"} alt="Profile avatar" className="h-20 w-20 rounded-full border-2 border-primary/70 object-cover" /><label htmlFor="profile-avatar-upload" className="absolute -bottom-1 -right-1 cursor-pointer rounded-full bg-primary px-2 py-1 text-white">＋</label><input id="profile-avatar-upload" type="file" accept="image/png,image/jpeg,image/webp" onChange={chooseAvatar} className="sr-only" /></div>
             <p className="text-xs text-muted-foreground">
-              This profile names your comments and saved scripts. No password, no email â€” it lives in this browser.
+              This profile names your comments and saved scripts. No password, no email — it lives in this browser.
             </p>
           </div>
 
