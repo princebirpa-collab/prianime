@@ -8,18 +8,7 @@ export default async function handler(req, res) {
   const source = String(req.query?.source || ""), id = String(req.query?.id || "");
   if (!["mal", "kitsu"].includes(source) || !/^\d{1,12}$/.test(id)) return send(res, 400, { error: "A valid catalogue source and numeric ID are required." });
   try {
-    if (source === "mal") {
-      const response = await fetch(`https://api.jikan.moe/v4/anime/${id}/full`, { headers: { Accept: "application/json" }, signal: AbortSignal.timeout(7000) });
-      if (!response.ok) return send(res, response.status === 404 ? 404 : 502, { error: "MyAnimeList detail is temporarily unavailable." });
-      const payload = await response.json(), data = payload?.data;
-      if (!data?.mal_id) return send(res, 502, { error: "MyAnimeList returned invalid detail data." });
-      await new Promise((resolve) => setTimeout(resolve, 380));
-      try {
-        const ep = await fetch(`https://api.jikan.moe/v4/anime/${id}/episodes?page=1`, { headers: { Accept: "application/json" }, signal: AbortSignal.timeout(5000) });
-        if (ep.ok) { const p = await ep.json(); data.episodes_list = (p?.data || []).map((e) => ({ mal_id: e.mal_id, aired: e.aired, title: e.title })); }
-      } catch { /* optional episode dates */ }
-      return send(res, 200, { source, data });
-    }
+    if (source === "mal") return send(res, 410, { error: "The legacy MAL detail provider has been retired. Search again to open the current catalogue entry." });
     const response = await fetch(`https://kitsu.io/api/edge/anime/${id}`, { headers: { Accept: "application/vnd.api+json" }, signal: AbortSignal.timeout(7000) });
     if (!response.ok) return send(res, response.status === 404 ? 404 : 502, { error: "Kitsu detail is temporarily unavailable." });
     const payload = await response.json();
