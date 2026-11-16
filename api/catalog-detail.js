@@ -54,7 +54,7 @@ export default async function handler(req, res) {
     return send(res, 405, { error: "Method not allowed. Use GET." });
   }
   const source = String(req.query?.source || ""), id = String(req.query?.id || "");
-  if (!["mal", "kitsu"].includes(source) || !/^\\d{1,12}$/.test(id)) {
+  if (!["mal", "kitsu"].includes(source) || !/^\d{1,12}$/.test(id)) {
     return send(res, 400, { error: "A valid catalogue source and numeric ID are required." });
   }
   try {
