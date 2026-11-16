@@ -23,12 +23,12 @@ export default function AiringRadar() {
     async function loadFallback() {
       setFallbackLoading(true);
       try {
-        let response = await fetch("/api/seasonal-feed?action=seasonal&page=1", { headers: { Accept: "application/json" }, signal: controller.signal });
+        let response = await fetch("/api/catalog-feed?mode=seasonal&view=current&page=1", { headers: { Accept: "application/json" }, signal: controller.signal });
         if (!response.ok) throw new Error("Seasonal backup unavailable");
         let payload = await response.json();
         let entries = Array.isArray(payload?.data) ? payload.data : [];
         if (!entries.length) {
-          response = await fetch("/api/seasonal-feed?action=upcoming&page=1", { headers: { Accept: "application/json" }, signal: controller.signal });
+          response = await fetch("/api/catalog-feed?mode=seasonal&view=upcoming&page=1", { headers: { Accept: "application/json" }, signal: controller.signal });
           if (!response.ok) throw new Error("Upcoming backup unavailable");
           payload = await response.json();
           entries = Array.isArray(payload?.data) ? payload.data : [];
