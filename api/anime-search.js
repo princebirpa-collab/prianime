@@ -13,7 +13,7 @@ function send(res, status, data, cache="public, s-maxage=60, stale-while-revalid
 }
 function clean(value) { return String(value||"").trim().replace(/[\u0000-\u001f\u007f]/g,"").slice(0,100); }
 async function jsonFetch(url, options={}) {
-  const response=await fetch(url,{headers:{Accept:"application/json",...(options.headers||{})},signal:AbortSignal.timeout(5000),...options});
+  const response=await fetch(url,{headers:{Accept:"application/json",...(options.headers||{})},signal:AbortSignal.timeout(4500),...options});
   if(!response.ok) throw new Error("Upstream unavailable");
   return response.json();
 }
@@ -60,6 +60,6 @@ export default async function handler(req,res) {
   const mal=settled[variants.length]?.status==="fulfilled"?settled[variants.length].value:[];
   const kitsuItems=settled[variants.length+1]?.status==="fulfilled"?settled[variants.length+1].value:[];
   const anyProvider=aniResults.length||mal.length||kitsuItems.length;
-  if(!anyProvider)return send(res,502,{error:"Anime search providers are temporarily unavailable."},"no-store");
+  if(!anyProvider)return send(res,200,{anilist:[],mal:[],kitsu:[],pageInfo:null,providers:{anilist:"unavailable",jikan:"unavailable",kitsu:"unavailable"},degraded:true},"public, s-maxage=15, stale-while-revalidate=60");
   return send(res,200,{anilist:[...aniMap.values()],mal,kitsu:kitsuItems,pageInfo:info,providers:{anilist:aniResults.length?"ok":"unavailable",jikan:settled[variants.length]?.status==="fulfilled"?"ok":"unavailable",kitsu:settled[variants.length+1]?.status==="fulfilled"?"ok":"unavailable"}});
 }
