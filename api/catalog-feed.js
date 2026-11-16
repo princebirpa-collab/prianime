@@ -1,52 +1,16 @@
-const ANILIST = "https://graphql.anilist.co";
-const KITSU = "https://kitsu.io/api/edge/anime";
-const QUERY = `query ($page: Int!, $sort: [MediaSort]!) {
-  Page(page: $page, perPage: 25) {
-    pageInfo { total currentPage lastPage hasNextPage }
-    media(type: ANIME, isAdult: false, sort: $sort) {
-      id title { romaji english native } coverImage { large extraLarge } averageScore popularity episodes status format season seasonYear startDate { year month day }
-    }
-  }
-}`;
-function send(res, status, payload) {
-  res.statusCode = status; res.setHeader("Content-Type", "application/json; charset=utf-8");
-  res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=900");
-  res.setHeader("X-Content-Type-Options", "nosniff"); res.end(JSON.stringify(payload));
-}
-async function fetchWithRetry(url, options = {}) {
-  let lastError;
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    try {
-      const response = await fetch(url, { ...options, signal: AbortSignal.timeout(5000) });
-      if (!response.ok) { lastError = new Error(`HTTP ${response.status}`); if (response.status < 500 && response.status !== 429) throw lastError; }
-      else return response.json();
-    } catch (error) { lastError = error; if (error.status && error.status < 500 && error.status !== 429) throw error; }
-    if (attempt < 2) await new Promise((resolve) => setTimeout(resolve, 250 * (2 ** attempt)));
-  }
-  throw lastError || new Error("Provider unavailable");
-}
-function safeKitsu(entry) {
-  const a = entry.attributes || {}, rating = String(a.ageRating || "").toUpperCase(), guide = String(a.ageRatingGuide || "").toUpperCase();
-  if (a.nsfw === true || ["R", "R18", "R18+", "NC-17"].includes(rating) || /(18\\s*\\+|R18|NC-17|ADULT)/.test(guide)) return false;
-  return true;
-}
-export default async function handler(req, res) {
-  if (req.method !== "GET") { res.setHeader("Allow", "GET"); return send(res, 405, { error: "Method not allowed" }); }
-  const page = Math.max(1, Math.min(100, Number(req.query?.page) || 1));
-  const mode = String(req.query?.mode || "popular");
-  const sort = mode === "top" ? ["SCORE_DESC"] : mode === "seasonal" ? ["POPULARITY_DESC"] : ["POPULARITY_DESC"];
-  const kitsuParams = new URLSearchParams({ "page[limit]": "20", "page[offset]": String((page - 1) * 20), sort: mode === "top" ? "-averageRating" : "-userCount" });
-  const [ani, kitsu] = await Promise.allSettled([
-    fetchWithRetry(ANILIST, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify({ query: QUERY, variables: { page, sort } }) }),
-    fetchWithRetry(`${KITSU}?${kitsuParams}`, { headers: { Accept: "application/vnd.api+json" } }),
-  ]);
-  const aniData = ani.status === "fulfilled" && !ani.value.errors?.length ? ani.value.data?.Page : null;
-  const kitsuData = kitsu.status === "fulfilled" ? (kitsu.value.data || []).filter(safeKitsu) : [];
-  if (!aniData && !kitsuData.length) return send(res, 200, { page, mode, anilist: [], kitsu: [], providers: { anilist: "unavailable", kitsu: "unavailable", jikan: "retired" }, degraded: true });
-  return send(res, 200, {
-    page, mode, anilist: aniData?.media || [], kitsu: kitsuData,
-    providers: { anilist: aniData ? "ok" : "unavailable", kitsu: kitsu.status === "fulfilled" ? "ok" : "unavailable", jikan: "retired" },
-    totals: { anilist: aniData?.pageInfo?.total || null, kitsu: kitsu.value?.meta?.count || null },
-    hasNext: Boolean(aniData?.pageInfo?.hasNextPage) || (kitsu.status === "fulfilled" && page * 20 < Number(kitsu.value?.meta?.count || 0)),
-  });
+const ANILIST="https://graphql.anilist.co", KITSU="https://kitsu.io/api/edge/anime";
+const QUERY=`query ($page:Int!,$sort:[MediaSort]!,$season:MediaSeason,$year:Int,$status:MediaStatus){Page(page:$page,perPage:25){pageInfo{total currentPage lastPage hasNextPage} media(type:ANIME,isAdult:false,season:$season,seasonYear:$year,status:$status,sort:$sort){id title{romaji english native} coverImage{large extraLarge} averageScore popularity episodes status format season seasonYear startDate{year month day} nextAiringEpisode{episode timeUntilAiring}}}}`;
+function send(res,status,payload){res.statusCode=status;res.setHeader("Content-Type","application/json; charset=utf-8");res.setHeader("Cache-Control","public, s-maxage=300, stale-while-revalidate=900");res.setHeader("X-Content-Type-Options","nosniff");res.end(JSON.stringify(payload));}
+async function fetchRetry(url,options={}){let last;for(let i=0;i<3;i++){try{const r=await fetch(url,{...options,headers:{Accept:"application/json",...(options.headers||{})},signal:AbortSignal.timeout(5000)});if(!r.ok){last=new Error("HTTP "+r.status);if(r.status<500&&r.status!==429)throw last;}else return await r.json();}catch(e){last=e;if(e.status&&e.status<500&&e.status!==429)throw e;}if(i<2)await new Promise(resolve=>setTimeout(resolve,250*2**i));}throw last||new Error("Provider unavailable");}
+function current(){const m=new Date().getUTCMonth();return{season:m<3?"WINTER":m<6?"SPRING":m<9?"SUMMER":"FALL",year:new Date().getUTCFullYear()};}
+function safe(entry){const a=entry.attributes||{},r=String(a.ageRating||"").toUpperCase(),g=String(a.ageRatingGuide||"").toUpperCase();return a.nsfw!==true&&!["R","R18","R18+","NC-17"].includes(r)&&!/(18\\s*\\+|R18|NC-17|ADULT)/.test(g);}
+function normalizeKitsu(e){const a=e.attributes||{},t=a.titles||{};return{id:"kitsu-"+e.id,source:"kitsu",title:t.en||a.canonicalTitle||t.en_jp||"Untitled anime",image:a.posterImage?.large||a.posterImage?.original||a.posterImage?.medium||"",episodes:a.episodeCount||null,status:a.status||"current",format:a.showType||"TV",nextAiringEpisode:null,startDate:a.startDate||null};}
+export default async function handler(req,res){
+ if(req.method!=="GET"){res.setHeader("Allow","GET");return send(res,405,{error:"Method not allowed"});}
+ const page=Math.max(1,Math.min(100,Number(req.query?.page)||1)),mode=String(req.query?.mode||"popular"),view=String(req.query?.view||"current"),s=current(),seasonal=mode==="seasonal",upcoming=seasonal&&view==="upcoming",sort=mode==="top"?["SCORE_DESC"]:["POPULARITY_DESC"],status=upcoming?"NOT_YET_RELEASED":seasonal?"RELEASING":null;
+ const kp=new URLSearchParams({"page[limit]":"20","page[offset]":String((page-1)*20),sort:mode==="top"?"-averageRating":"-userCount"});if(seasonal)kp.set("filter[status]",upcoming?"upcoming":"current");
+ const [a,k]=await Promise.allSettled([fetchRetry(ANILIST,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({query:QUERY,variables:{page,sort,season:seasonal?s.season:null,year:seasonal?s.year:null,status}})}),fetchRetry(KITSU+"?"+kp,{headers:{Accept:"application/vnd.api+json"}})]);
+ const pageData=a.status==="fulfilled"&&!a.value.errors?.length?a.value.data?.Page:null,ani=pageData?.media||[],kits=k.status==="fulfilled"?(k.value.data||[]).filter(safe):[],normalized= kits.map(normalizeKitsu),seen=new Set(ani.map(x=>(x.title?.english||x.title?.romaji||"").toLowerCase())),data=[...ani.map(x=>({id:String(x.id),source:"anilist",title:x.title?.english||x.title?.romaji||"Untitled anime",image:x.coverImage?.extraLarge||x.coverImage?.large||"",episodes:x.episodes||null,status:x.status||"",format:x.format||"TV",nextAiringEpisode:x.nextAiringEpisode||null,startDate:x.startDate||null})),...normalized.filter(x=>!seen.has(x.title.toLowerCase()))];
+ if(!pageData&&!kits.length)return send(res,200,{page,mode,anilist:[],mal:[],kitsu:[],data:[],providers:{anilist:"unavailable",kitsu:"unavailable",jikan:"retired"},degraded:true});
+ return send(res,200,{page,mode,anilist:ani,mal:[],kitsu:k.status==="fulfilled"?k.value.data||[]:[],data,providers:{anilist:pageData?"ok":"unavailable",kitsu:k.status==="fulfilled"?"ok":"unavailable",jikan:"retired"},totals:{anilist:pageData?.pageInfo?.total||null,kitsu:k.value?.meta?.count||null},hasNext:Boolean(pageData?.pageInfo?.hasNextPage)||(k.status==="fulfilled"&&page*20<Number(k.value?.meta?.count||0)),season:seasonal?s.season:null,year:seasonal?s.year:null});
 }
