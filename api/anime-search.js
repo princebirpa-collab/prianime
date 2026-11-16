@@ -11,7 +11,7 @@ function send(res, status, data, cache = "public, s-maxage=60, stale-while-reval
   res.end(JSON.stringify(data));
 }
 function clean(value) {
-  return String(value || "").trim().replace(/[\\u0000-\\u001f\\u007f]/g, "").slice(0, 100);
+  return String(value || "").trim().replace(/[\u0000-\u001f\u007f]/g, "").slice(0, 100);
 }
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function requestJson(url, options = {}) {
@@ -52,7 +52,7 @@ async function aniList(query, page) {
 }
 function normalizeText(value) {
   return String(value || "").toLocaleLowerCase().normalize("NFKD")
-    .replace(/[\\u0300-\\u036f]/g, "").replace(/[^\\p{L}\\p{N}]+/gu, " ").trim();
+    .replace(/[\u0300-\u036f]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 }
 async function kitsu(query) {
   const params = new URLSearchParams({ "filter[text]": query, "page[limit]": "20" });
@@ -66,7 +66,7 @@ async function kitsu(query) {
     const guide = String(a.ageRatingGuide || "").toUpperCase();
     const titles = [a.canonicalTitle, ...Object.values(a.titles || {}), ...(a.abbreviatedTitles || [])].map(normalizeText).filter(Boolean);
     const match = needle.length >= 2 && titles.some((title) => title === needle || title.startsWith(needle) || (title.length >= 5 && needle.startsWith(title)));
-    return match && a.nsfw !== true && !["R", "R18", "R18+", "NC-17"].includes(rating) && !/(18\\s*\\+|R18|NC-17|ADULT)/.test(guide);
+    return match && a.nsfw !== true && !["R", "R18", "R18+", "NC-17"].includes(rating) && !/(18\s*\\+|R18|NC-17|ADULT)/.test(guide);
   });
   return data;
 }

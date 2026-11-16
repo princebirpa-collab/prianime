@@ -24,12 +24,12 @@ export default async function handler(req, res) {
   try {
     const params = new URLSearchParams({ "filter[text]": query, "page[limit]": "20" });
     const payload = await requestJson(`${KITSU}?${params}`);
-    const needle = query.toLocaleLowerCase().normalize("NFKD").replace(/[\\u0300-\\u036f]/g, "");
+    const needle = query.toLocaleLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
     const data = (payload.data || []).filter((entry) => {
       const a = entry.attributes || {}, rating = String(a.ageRating || "").toUpperCase(), guide = String(a.ageRatingGuide || "").toUpperCase();
       const titles = [a.canonicalTitle, ...Object.values(a.titles || {}), ...(a.abbreviatedTitles || [])].filter(Boolean);
-      return a.nsfw !== true && !["R", "R18", "R18+", "NC-17"].includes(rating) && !/(18\\s*\\+|R18|NC-17|ADULT)/.test(guide)
-        && titles.some((title) => String(title).toLocaleLowerCase().normalize("NFKD").replace(/[\\u0300-\\u036f]/g, "").includes(needle));
+      return a.nsfw !== true && !["R", "R18", "R18+", "NC-17"].includes(rating) && !/(18\s*\\+|R18|NC-17|ADULT)/.test(guide)
+        && titles.some((title) => String(title).toLocaleLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").includes(needle));
     }).map((entry) => {
       const a = entry.attributes || {}, titles = a.titles || {};
       const synonyms = [...new Set([...Object.values(titles), ...(a.abbreviatedTitles || [])].filter((title) => typeof title === "string" && title.trim()))];
