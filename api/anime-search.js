@@ -47,7 +47,10 @@ export default async function handler(req,res) {
   const q=clean(req.query?.q);
   const page=Math.min(Math.max(Number(req.query?.page)||1,1),10);
   if(q.length<2)return send(res,200,{anilist:[],mal:[],kitsu:[],pageInfo:null});
-  const variants=[...new Set([q,q.replace(/[^\p{L}\p{N}]+/gu," ").trim()])].filter(Boolean).slice(0,2);
+  const normalized=q.replace(/[^\p{L}\p{N}]+/gu," ").trim();
+  // Add a bounded fallback for common trailing-z typos such as Dragon Ballz.
+  const typoVariant=normalized.replace(/z$/i,"").trim();
+  const variants=[...new Set([q,normalized,typoVariant])].filter(Boolean).slice(0,3);
   const settled=await Promise.allSettled([
     ...variants.map((term)=>aniList(term,page)),
     jikan(q),
