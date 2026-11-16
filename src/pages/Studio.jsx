@@ -127,7 +127,7 @@ export default function Studio() {
       <PageHeader
         eyebrow="AI atelier"
         title="Write the next original arc"
-        description="Recommendations, world-building, character bibles, episode outlines and scene dialogue â€” written in English or Hindi by PRI-ANIME's AI atelier."
+        description="Recommendations, world-building, character bibles, episode outlines and scene dialogue — written in English or Hindi by PRI-ANIME's AI atelier."
       />
 
       <div className="mx-auto grid w-full max-w-[1600px] gap-6 px-4 pt-8 sm:px-6 lg:grid-cols-[1fr_360px] lg:px-10">
@@ -185,7 +185,7 @@ export default function Studio() {
                 <Sparkles className="h-5 w-5 text-primary" aria-hidden="true" />
                 <p className="mt-3 font-display text-lg">Start with a seed</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  â€œA swordswoman who can only speak the truth hires herself out as a court liar.â€ Try a logline, a
+                  “A swordswoman who can only speak the truth hires herself out as a court liar.” Try a logline, a
                   character, or ask which anime to watch next.
                 </p>
               </div>
@@ -227,7 +227,7 @@ export default function Studio() {
 
             {busy && (
               <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin text-primary" /> The atelier is writingâ€¦
+                <Loader2 className="h-4 w-4 animate-spin text-primary" /> The atelier is writing”¦
               </p>
             )}
             {error && <p className="rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm">{error}</p>}
@@ -250,7 +250,7 @@ export default function Studio() {
                 }}
                 rows={2}
                 maxLength={4000}
-                placeholder="Describe the story, character or sceneâ€¦"
+                placeholder="Describe the story, character or scene”¦"
                 className="min-h-[52px] flex-1 resize-none rounded-xl border border-border bg-background px-4 py-3 text-sm"
               />
               <button
