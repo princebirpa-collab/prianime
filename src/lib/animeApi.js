@@ -431,53 +431,11 @@ export async function callAniList(body) {
 }
 
 const malCache = new Map();
-
-// MyAnimeList ratings come from Jikan (public MyAnimeList data, no key in the
-// browser) with the keyed backend as a fallback.
-async function jikanRating(title) {
-  const response = await fetch(
-    `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(title)}&limit=1&sfw=true`,
-    { headers: { Accept: "application/json" }, signal: AbortSignal.timeout(6000) },
-  );
-  if (!response.ok) return null;
-  const payload = await response.json();
-  const hit = payload?.data?.[0];
-  if (!hit?.score) return null;
-  return { score: hit.score, rank: hit.rank ?? null, id: hit.mal_id ?? null, source: "MAL" };
-}
-
 export async function fetchMalRating(title) {
-  if (!title) return null;
-  const cached = malCache.get(title);
-  if (cached && cached.expires > Date.now()) return cached.value;
-  if (cached) malCache.delete(title);
-
-  let rating = null;
-  try {
-    rating = await jikanRating(title);
-  } catch {
-    rating = null;
-  }
-
-  if (!rating) {
-    try {
-      const response = await base44.functions.invoke("mal", { action: "search", q: title, limit: 3 });
-      const data = response?.data;
-      rating = data?.ok && data.items?.[0]
-        ? { score: data.items[0].malScore, rank: data.items[0].rank, id: data.items[0].id, source: "MAL" }
-        : null;
-    } catch {
-      rating = null;
-    }
-  }
-
-  // Never substitute AniList's score for a MyAnimeList rating.
-  // If MAL/Jikan cannot supply a rating, the UI truthfully shows unavailable.
-  // Cache a missing result briefly only; upstream outages should self-recover.
-  malCache.set(title, { value: rating, expires: Date.now() + (rating ? TTL : 30 * 1000) });
-  return rating;
+ if(!title)return null;const cached=malCache.get(title);if(cached&&cached.expires>Date.now())return cached.value;
+ try{const response=await fetch("/api/catalog-ratings?q="+encodeURIComponent(title),{headers:{Accept:"application/json"},signal:AbortSignal.timeout(6000)});if(!response.ok)throw Error("Kitsu rating unavailable");const payload=await response.json(),hit=(payload.ratings||[]).find(x=>x?.rating&&x?.title),rating=hit?{score:Number(hit.rating),rank:null,id:hit.id,source:"Kitsu"}:null;malCache.set(title,{value:rating,expires:Date.now()+(rating?TTL:30000)});return rating;}
+ catch{malCache.set(title,{value:null,expires:Date.now()+30000});return null;}
 }
-
 export async function fetchProviderStatus() {
   try {
     const response = await base44.functions.invoke("videoProvider", { action: "status" });
