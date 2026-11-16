@@ -228,7 +228,7 @@ export default function Reels() {
             <div>
               <p className="font-display text-2xl text-white">No reels yet</p>
               <p className="mt-2 max-w-sm text-sm text-white/60">
-                Be the first â€” upload a clip you own or have a licence for.
+                Be the first — upload a clip you own or have a licence for.
               </p>
               <button
                 type="button"
