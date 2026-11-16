@@ -21,7 +21,7 @@ export default function RealmGrid() {
           <h2 className="mt-2 font-display text-3xl font-medium sm:text-4xl">Step into a realm</h2>
         </div>
         <Link to="/browse" className="text-sm text-muted-foreground transition hover:text-primary">
-          Browse every title â†’
+          Browse every title →
         </Link>
       </div>
 
