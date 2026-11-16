@@ -22,7 +22,7 @@ function cleanQuery(value) {
 async function jikan(path) {
   const response = await fetch(`${JIKAN_BASE}${path}`, {
     headers: { Accept: "application/json" },
-    signal: AbortSignal.timeout(7000),
+    signal: AbortSignal.timeout(4500),
   });
   if (response.status === 429) {
     const error = new Error("Jikan rate limit reached. Please retry shortly.");
@@ -86,6 +86,12 @@ export default async function handler(req, res) {
     return send(res, 200, { ok: true, data: payload.data || null, pagination: payload.pagination || null });
   } catch (error) {
     const status = Number.isInteger(error.status) ? error.status : 502;
-    return send(res, status, { ok: false, error: error.message || "Jikan metadata is temporarily unavailable." }, "no-store");
+    // Seasonal endpoints are optional metadata. A Jikan timeout/rate limit must
+    // not break the main catalogue or leak an upstream timeout to the UI.
+    if (["seasonal", "upcoming", "schedule"].includes(action) && (status === 429 || status === 502 || error.name === "TimeoutError" || error.name === "AbortError")) {
+      res.setHeader("X-Provider-Status", "jikan-unavailable");
+      return send(res, 200, { ok: true, data: [], pagination: null, providers: { jikan: "unavailable" } }, "public, s-maxage=30, stale-while-revalidate=120");
+    }
+    return send(res, status, { ok: false, error: "Jikan metadata is temporarily unavailable.", providers: { jikan: "unavailable" } }, "no-store");
   }
 }
