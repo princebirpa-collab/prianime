@@ -1,0 +1,18 @@
+{
+  "name": "PRI-ANIME",
+  "short_name": "PRI-ANIME",
+  "description": "Anime discovery and watch experience",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#100812",
+  "theme_color": "#100812",
+  "icons": [
+    {
+      "src": "/prianime-logo.jpg",
+      "sizes": "any",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}
