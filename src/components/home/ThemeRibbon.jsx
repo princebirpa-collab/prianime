@@ -9,10 +9,10 @@ export default function ThemeRibbon() {
       <div className="glass rounded-2xl p-5 sm:p-7">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.28em] text-primary">Six realms of light</p>
+            <p className="text-[11px] uppercase tracking-[0.28em] text-primary">Your visual style</p>
             <h2 className="mt-2 font-display text-2xl font-medium">Choose your palette</h2>
           </div>
-          <p className="text-xs text-muted-foreground">Saved to this device â€” it survives every reload.</p>
+          <p className="text-xs text-muted-foreground">Saved on this device.</p>
         </div>
 
         <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6" role="radiogroup" aria-label="Visual theme">
