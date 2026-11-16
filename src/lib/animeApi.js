@@ -275,7 +275,7 @@ function expandedSearchVariants(query) {
   return [...new Set([base[0], ...canonical, ...base.slice(1)])].slice(0, 2);
 }
 
-export async function callAniList(body) {
+async function callAniListUncached(body) {
   const key = JSON.stringify(body);
   const hit = cache.get(key);
   if (hit && hit.expires > Date.now()) return hit.value;
@@ -443,4 +443,20 @@ export async function fetchProviderStatus() {
   } catch {
     return null;
   }
+}
+
+
+const inFlightRequests = new Map();
+
+export function callAniList(body) {
+  const key = JSON.stringify(body);
+  const cached = cache.get(key);
+  if (cached && cached.expires > Date.now()) return Promise.resolve(cached.value);
+  if (inFlightRequests.has(key)) return inFlightRequests.get(key);
+
+  const request = callAniListUncached(body).finally(() => {
+    inFlightRequests.delete(key);
+  });
+  inFlightRequests.set(key, request);
+  return request;
 }
