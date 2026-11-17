@@ -140,6 +140,45 @@ client.on(Events.InteractionCreate, async interaction => {
     await channel.send(`Hello ${interaction.user}, staff will assist you here. Please describe your issue.`);
     return interaction.editReply(`Your private ticket is ready: ${channel}`);
   }
+
+  if (interaction.commandName === "purge") {
+    if (!interaction.memberPermissions?.has(PermissionFlagsBits.ManageMessages)) {
+      return interaction.reply({ content: "You need Manage Messages permission.", ephemeral: true });
+    }
+    const amount = interaction.options.getInteger("amount", true);
+    await interaction.deferReply({ ephemeral: true });
+    const deleted = await interaction.channel.bulkDelete(amount, true);
+    const log = getTextChannel(interaction.guild, CHANNEL.modLogs);
+    if (log) await log.send(`🧹 ${interaction.user} deleted ${deleted.size} recent messages in <#${interaction.channelId}>.`);
+    return interaction.editReply(`Deleted ${deleted.size} messages. Discord does not bulk-delete messages older than 14 days.`);
+  }
+
+  if (interaction.commandName === "timeout") {
+    if (!interaction.memberPermissions?.has(PermissionFlagsBits.ModerateMembers)) {
+      return interaction.reply({ content: "You need Moderate Members permission.", ephemeral: true });
+    }
+    const target = interaction.options.getMember("member");
+    const minutes = interaction.options.getInteger("minutes", true);
+    const reason = interaction.options.getString("reason", true);
+    if (!target || !target.moderatable) {
+      return interaction.reply({ content: "That member cannot be timed out by this bot. Check role hierarchy and permissions.", ephemeral: true });
+    }
+    await target.timeout(minutes * 60_000, reason);
+    const log = getTextChannel(interaction.guild, CHANNEL.modLogs);
+    if (log) await log.send(`⏱️ ${target.user.tag} was timed out by ${interaction.user.tag} for ${minutes} minute(s). Reason: ${reason}`);
+    return interaction.reply({ content: `Timed out ${target.user.tag} for ${minutes} minute(s).`, ephemeral: true });
+  }
+
+  if (interaction.commandName === "close-ticket") {
+    const ticket = db.prepare("SELECT user_id FROM tickets WHERE channel_id=?").get(interaction.channelId);
+    if (!ticket) return interaction.reply({ content: "This channel is not an active ticket.", ephemeral: true });
+    const isOwner = ticket.user_id === interaction.user.id;
+    const isStaff = interaction.memberPermissions?.has(PermissionFlagsBits.ManageChannels);
+    if (!isOwner && !isStaff) return interaction.reply({ content: "Only the ticket owner or staff can close this ticket.", ephemeral: true });
+    await interaction.reply({ content: "Ticket closed. This channel will be removed in a moment.", ephemeral: true });
+    db.prepare("DELETE FROM tickets WHERE channel_id=?").run(interaction.channelId);
+    await interaction.channel.delete("Ticket closed by owner or staff");
+  }
 });
 
 client.login(process.env.DISCORD_TOKEN);
