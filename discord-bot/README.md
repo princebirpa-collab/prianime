@@ -20,6 +20,8 @@ Copy `.env.example` to `.env` and fill in the values locally. Never commit `.env
 - `DISCORD_TOKEN`: token from the Discord Developer Portal
 - `DISCORD_CLIENT_ID`: application ID
 - `DISCORD_GUILD_ID`: PRI-ANIME server ID
+
+In the Discord Developer Portal, enable the **Server Members Intent** and **Message Content Intent** for this bot. These are used for welcome events and message-based XP. Keep the bot token only in your host's secret environment settings.
 - `OPENAI_API_KEY`: optional; only needed for AI replies
 
 ## Discord permissions
@@ -51,4 +53,6 @@ npm start
 
 ## Current status
 
-Source code is prepared in this repository. It is not yet connected to Discord or deployed. Deployment requires the server owner's Discord application token and guild authorization, stored as environment variables in the hosting provider.
+The source includes setup, welcome, XP/leaderboard, private tickets, message purge and member timeout commands. It is not yet connected to Discord or deployed. Deployment requires a Discord application created by the server owner, the bot invited to the guild, and secrets configured in a persistent Node.js host. This bot is separate from RISKORA BOT.
+
+AI chat is not implemented yet; the optional key is reserved for a later provider integration. Do not assume an AI response feature is active.
