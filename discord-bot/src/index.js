@@ -1,4 +1,6 @@
 import "dotenv/config";
+import { mkdirSync } from "node:fs";
+import { dirname } from "node:path";
 import {
   Client, GatewayIntentBits, Partials, Events, ChannelType,
   PermissionFlagsBits, EmbedBuilder
@@ -14,7 +16,10 @@ for (const key of required) {
   }
 }
 
-const db = new Database(process.env.DATABASE_PATH || "./data/pri-anime.sqlite");
+const databasePath = process.env.DATABASE_PATH || "./data/pri-anime.sqlite";
+mkdirSync(dirname(databasePath), { recursive: true });
+const db = new Database(databasePath);
+const xpCooldown = new Map();
 db.pragma("journal_mode = WAL");
 db.exec(`
   CREATE TABLE IF NOT EXISTS xp (
@@ -80,6 +85,10 @@ client.on(Events.MessageCreate, async message => {
     // AI replies are intentionally opt-in; connect a server-side provider before enabling.
     if (!process.env.OPENAI_API_KEY) return;
   }
+  const cooldownKey = `${message.guild.id}:${message.author.id}`;
+  const now = Date.now();
+  if (now - (xpCooldown.get(cooldownKey) || 0) < 60_000) return;
+  xpCooldown.set(cooldownKey, now);
   const points = db.prepare("INSERT INTO xp (guild_id,user_id,points) VALUES (?,?,1) ON CONFLICT(guild_id,user_id) DO UPDATE SET points=points+1 RETURNING points")
     .get(message.guild.id, message.author.id)?.points ?? 0;
   const oldLevel = Math.floor((points - 1) / 100);
