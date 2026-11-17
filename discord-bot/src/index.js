@@ -41,8 +41,44 @@ const client = new Client({
   partials: [Partials.Channel]
 });
 
-const getTextChannel = (guild, name) =>
-  guild.channels.cache.find(c => c.type === ChannelType.GuildText && c.name === name);
+const CHANNEL_ALIASES = {
+  welcome: ["welcome", "welcome-room", "new-members", "introductions"],
+  levelUps: ["level-ups", "level-up", "levelup", "level-up-notifications"],
+  leaderboard: ["leaderboard", "rankings", "top-members", "top-xp"],
+  modLogs: ["mod-logs", "mod-log", "moderation-logs", "automod-logs", "staff-logs"],
+  botLogs: ["bot-logs", "bot-log", "bot-status", "bot-activity"],
+  tickets: ["tickets", "ticket-support", "support-tickets", "help-desk"],
+  ai: ["ai-chat", "ask-ai", "anime-ai", "bot-chat", "assistant"]
+};
+
+const normalizeChannelName = value => String(value || "")
+  .normalize("NFKD")
+  .replace(/[\\u0300-\\u036f]/g, "")
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, "-")
+  .replace(/^-|-$/g, "");
+
+const getTextChannel = (guild, purpose) => {
+  const aliases = CHANNEL_ALIASES[purpose] || [purpose];
+  const candidates = guild.channels.cache.filter(c => c.type === ChannelType.GuildText);
+  return candidates.find(channel => {
+    const name = normalizeChannelName(channel.name);
+    return aliases.some(alias => {
+      const normalizedAlias = normalizeChannelName(alias);
+      return name === normalizedAlias || name.startsWith(normalizedAlias + "-") || name.endsWith("-" + normalizedAlias);
+    });
+  });
+};
+
+async function scanExistingChannels(guild) {
+  await guild.channels.fetch();
+  const routes = {};
+  for (const purpose of Object.keys(CHANNEL_ALIASES)) {
+    const channel = getTextChannel(guild, purpose);
+    if (channel) routes[purpose] = channel;
+  }
+  return routes;
+}
 
 async function ensureCommunityLayout(guild) {
   const everyone = guild.roles.everyone;
@@ -105,11 +141,30 @@ client.on(Events.InteractionCreate, async interaction => {
     if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
       return interaction.reply({ content: "Only server administrators can run setup.", ephemeral: true });
     }
+    // Acknowledge immediately: Discord requires an interaction response within 3 seconds.
     await interaction.deferReply({ ephemeral: true });
-    await ensureCommunityLayout(interaction.guild);
-    const log = getTextChannel(interaction.guild, CHANNEL.botLogs);
-    if (log) await log.send("✅ PRI-ANIME channel setup completed. Existing channels were left unchanged.");
-    return interaction.editReply("Setup complete. Missing categories and channels have been created; existing channels were left untouched.");
+    try {
+      const routes = await scanExistingChannels(interaction.guild);
+      const allTextChannels = interaction.guild.channels.cache.filter(c => c.type === ChannelType.GuildText);
+      const found = Object.entries(routes).map(([purpose, channel]) => `• **${purpose}** → <#${channel.id}>`);
+      const missing = Object.keys(CHANNEL_ALIASES).filter(purpose => !routes[purpose]);
+      const summary = [
+        "✅ **PRI-ANIME CORE channel scan complete**",
+        `Scanned **${allTextChannels.size}** existing text channels.`,
+        "",
+        found.length ? "**Connected channel routes**\\n" + found.join("\\n") : "No known feature channels matched yet.",
+        "",
+        missing.length ? "**Not found (no channel was created):** " + missing.join(", ") : "All supported channel routes were found.",
+        "",
+        "🔒 No channels, categories, names, or permissions were changed."
+      ].join("\\n");
+      const log = routes.botLogs;
+      if (log) await log.send(summary).catch(error => console.warn("Could not post setup summary to bot logs:", error.message));
+      return interaction.editReply(summary);
+    } catch (error) {
+      console.error("Channel scan failed:", error);
+      return interaction.editReply("❌ Channel scan failed. No channels were created, deleted, renamed, or changed. Check Railway logs for details.");
+    }
   }
 
   if (interaction.commandName === "leaderboard") {
