@@ -32,6 +32,8 @@ Invite the bot with the scopes `bot` and `applications.commands`. Grant only:
 - Read Message History
 - Embed Links
 - Manage Channels (for `/setup` and tickets)
+- Manage Messages (for `/purge`)
+- Moderate Members (for `/timeout`)
 - Manage Roles only if you later enable automatic milestone roles
 
 Do not grant Administrator.
