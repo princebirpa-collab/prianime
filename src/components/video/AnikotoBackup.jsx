@@ -133,7 +133,7 @@ export default function AnikotoBackup({ title, season = 1, episode = 1, onProgre
         });
         const firstPayload = await firstResponse.json().catch(() => ({}));
         if (!firstResponse.ok || !firstPayload?.ok) {
-          throw new Error(firstPayload?.error || "AniKoto catalogue is unavailable.");
+          throw new Error(firstPayload?.error || "Backup catalogue is unavailable.");
         }
         if (cancelled) return;
         const firstRows = rowsFrom(firstPayload);
@@ -186,11 +186,11 @@ export default function AnikotoBackup({ title, season = 1, episode = 1, onProgre
             setSelectedId(idOf(match));
             setQuery(titleOf(match));
           } else {
-            setError(`"${title}" is not in AniKoto's recent catalogue. AniList can identify the title, but it cannot provide AniKoto episode IDs or playable embeds.`);
+            setError(`"${title}" is not in the backup catalogue. AniList can identify the title, but it cannot provide AniKoto episode IDs or playable embeds.`);
           }
         }
       } catch (err) {
-        if (!cancelled) setError(err.message || "AniKoto is temporarily unavailable.");
+        if (!cancelled) setError(err.message || "Backup provider is temporarily unavailable.");
       } finally {
         if (!cancelled) setBusy(false);
       }
@@ -206,7 +206,7 @@ export default function AnikotoBackup({ title, season = 1, episode = 1, onProgre
     fetch(`/api/anikoto?action=series&id=${encodeURIComponent(selectedId)}`, { signal: AbortSignal.timeout(10000) })
       .then(async (response) => {
         const payload = await response.json().catch(() => ({}));
-        if (!response.ok || !payload?.ok) throw new Error(payload?.error || "Could not load AniKoto episodes.");
+        if (!response.ok || !payload?.ok) throw new Error(payload?.error || "Could not load backup episodes.");
         if (!cancelled) setSeriesData(payload.data?.data || payload.data);
       })
       .catch((err) => { if (!cancelled) setSeriesError(err.message || "Could not load episode metadata."); })
@@ -260,7 +260,7 @@ export default function AnikotoBackup({ title, season = 1, episode = 1, onProgre
   }, [onProgress, season, episodeNo]);
 
   return (
-    <section className="space-y-3 rounded-xl border border-border/60 bg-card/40 p-3 sm:p-4" aria-label="AniKoto video player">
+    <section className="space-y-3 rounded-xl border border-border/60 bg-card/40 p-3 sm:p-4" aria-label="MegaPlay backup video player">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <p className="text-sm font-semibold">MegaPlay · AniKoto backup</p>
@@ -271,13 +271,13 @@ export default function AnikotoBackup({ title, season = 1, episode = 1, onProgre
 
       <div className="relative">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Find title in recent AniKoto entries…" autoComplete="off" className="w-full rounded-xl border border-border bg-background py-3 pl-9 pr-10 text-sm outline-none focus:border-primary" />
+        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Find title in provider catalogue…" autoComplete="off" className="w-full rounded-xl border border-border bg-background py-3 pl-9 pr-10 text-sm outline-none focus:border-primary" />
         {query && <button type="button" onClick={() => setQuery("")} aria-label="Clear search" className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-muted-foreground hover:bg-muted"><X className="h-4 w-4" /></button>}
       </div>
 
       <label className="block text-xs text-muted-foreground">Anime
         <select value={selectedId} onChange={(event) => { setSeriesData(null); setSelectedId(event.target.value); }} className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm">
-          <option value="">Select anime from AniKoto recent list</option>
+          <option value="">Select anime from catalogue</option>
           {filteredItems.map((item, index) => {
             const id = idOf(item);
             return id ? <option key={id} value={id}>{titleOf(item)}</option> : <option key={`missing-${index}`} value="" disabled>{titleOf(item)}</option>;
@@ -300,17 +300,17 @@ export default function AnikotoBackup({ title, season = 1, episode = 1, onProgre
         </div>
       )}
 
-      {(busy || seriesBusy) && <p role="status" className="text-xs text-muted-foreground"><Loader2 className="mr-1 inline h-3.5 w-3.5 animate-spin" /> Loading AniKoto episodes…</p>}
+      {(busy || seriesBusy) && <p role="status" className="text-xs text-muted-foreground"><Loader2 className="mr-1 inline h-3.5 w-3.5 animate-spin" /> Loading backup catalogue episodes…</p>}
       {error && <p role="alert" className="text-xs text-destructive">{error}</p>}
       {seriesError && <p role="alert" className="text-xs text-destructive">{seriesError}</p>}
-      {!busy && !error && !items.length && <p className="text-xs text-muted-foreground">AniKoto did not return any recent titles.</p>}
+      {!busy && !error && !items.length && <p className="text-xs text-muted-foreground">The backup catalogue did not return any titles.</p>}
       {!busy && !error && items.length > 0 && !filteredItems.length && <p className="text-xs text-muted-foreground">No match in the latest 50 entries. Select another title or try again later.</p>}
 
       {activeEmbed ? (
         <div className="space-y-2">
-          <EmbedIframe key={`${selectedId}-${episodeIndex}-${activeLanguage}-${activeEmbed}`} src={activeEmbed} title={`AniKoto ${activeLanguage.toUpperCase()} player · ${selectedTitle} episode ${episodeNo}`} />
+          <EmbedIframe key={`${selectedId}-${episodeIndex}-${activeLanguage}-${activeEmbed}`} src={activeEmbed} title={`MegaPlay ${activeLanguage.toUpperCase()} player · ${selectedTitle} episode ${episodeNo}`} />
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-[11px] text-muted-foreground">AniKoto embed · {activeLanguage.toUpperCase()} · Episode {episodeNo}</p>
+            <p className="text-[11px] text-muted-foreground">MegaPlay embed · {activeLanguage.toUpperCase()} · Episode {episodeNo}</p>
             <a href={activeEmbed} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary">Open embed <ExternalLink className="h-3 w-3" /></a>
           </div>
         </div>
@@ -318,8 +318,8 @@ export default function AnikotoBackup({ title, season = 1, episode = 1, onProgre
         <div className="grid aspect-video place-items-center rounded-xl border border-border bg-background p-5 text-center">
           <div className="max-w-md">
             <Play className="mx-auto mb-2 h-7 w-7 text-muted-foreground" />
-            <p className="text-sm font-semibold text-foreground">{selectedEpisode ? "No SUB / DUB embed listed for this episode" : "Choose an anime and episode"}</p>
-            <p className="mt-1 text-xs leading-5 text-muted-foreground">The player appears when AniKoto returns an HTTPS embed URL for the selected episode.</p>
+            <p className="text-sm font-semibold text-foreground">{selectedEpisode ? "No MegaPlay SUB / DUB embed listed for this episode" : "Choose an anime and episode"}</p>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">The player appears when the catalogue returns a valid MegaPlay embed for the selected episode.</p>
           </div>
         </div>
       )}
