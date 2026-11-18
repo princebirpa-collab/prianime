@@ -49,12 +49,12 @@ npm start
 ## First-time setup
 
 1. Invite the bot to PRI-ANIME.
-2. Run `/setup` as a server administrator. It creates missing categories/channels and leaves existing channels untouched.
-3. Set the welcome channel to `#welcome`; messages are routed to their dedicated channels.
+2. Run `/setup` as a server administrator. It scans existing text channels and reports matching feature routes; it does not create, delete, rename, or change channel permissions.
+3. Keep existing channel names where possible (`welcome`, `level-ups`, `leaderboard`, `mod-logs`, `bot-logs`, `tickets`, `ai-chat`) so automatic routing can recognize them.
 4. Configure hosting with the same environment variables and keep the process running.
 
 ## Current status
 
-The source includes setup, welcome, XP/leaderboard, private tickets, message purge and member timeout commands. It is not yet connected to Discord or deployed. Deployment requires a Discord application created by the server owner, the bot invited to the guild, and secrets configured in a persistent Node.js host. This bot is separate from RISKORA BOT.
+The source includes a non-mutating existing-channel scan, welcome, XP/leaderboard, private tickets, message purge and member timeout commands. Deployment requires a Discord application created by the server owner, the bot invited to the guild, and secrets configured in a persistent Node.js host. This bot is separate from RISKORA BOT.
 
 AI chat is not implemented yet; the optional key is reserved for a later provider integration. Do not assume an AI response feature is active.
