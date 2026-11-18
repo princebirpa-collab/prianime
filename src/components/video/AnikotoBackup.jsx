@@ -57,14 +57,20 @@ async function getJikanTitles(title) {
   }
 }
 function episodeEmbeds(item) {
-  const explicitHindi = item?.embed_url?.hindi || item?.embed_url?.hi || item?.embed_url?.hindi_dub
-    || item?.hindi_embed_url || item?.hi_embed_url || item?.hindiEmbedUrl;
-  const hindiId = item?.hindi_episode_embed_id ?? item?.hindi_embed_id ?? item?.hi_embed_id;
+  if (!item || typeof item !== "object") return { sub: "", dub: "", hindi: "" };
+
+  const embedUrls = item.embed_url || item.embedUrl || item.embeds || item.data?.embed_url || {};
+  const explicitHindi = embedUrls.hindi || embedUrls.HINDI || embedUrls.hi || embedUrls.HI
+    || embedUrls.hindi_dub || embedUrls.hindiDub || item.hindi_embed_url
+    || item.hi_embed_url || item.hindiEmbedUrl || item.hindi_dub_url;
+  const hindiId = item.hindi_episode_embed_id ?? item.hindi_embed_id
+    ?? item.hi_embed_id ?? item.hindiEpisodeEmbedId;
   const hindiUrl = typeof explicitHindi === "string" ? explicitHindi
     : explicitHindi?.url || explicitHindi?.src || "";
   const safeHindiUrl = resolveMegaPlayUrl({ embed_url: { hindi: hindiUrl } }, "hindi")
-    || (typeof hindiId === "string" && /^\\d{1,12}$/.test(hindiId)
-      ? `https://megaplay.buzz/stream/s-2/${hindiId}/dub` : "");
+    || (/^\d{1,12}$/.test(String(hindiId ?? "").trim())
+      ? `https://megaplay.buzz/stream/s-2/${String(hindiId).trim()}/dub` : "");
+
   return {
     sub: resolveMegaPlayUrl(item, "sub"),
     dub: resolveMegaPlayUrl(item, "dub"),
