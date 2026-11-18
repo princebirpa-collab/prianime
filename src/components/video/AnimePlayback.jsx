@@ -16,7 +16,7 @@ export default function AnimePlayback({ anime, match }) {
         <a href={match.tmdbUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-primary hover:underline">TMDB {match.tmdbId} <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" /></a>
       </div>
       {playback.historyError && <p role="status" className="text-xs text-muted-foreground">Watch progress could not be restored or saved. Playback is still available.</p>}
-      <p className="text-xs leading-relaxed text-muted-foreground">VidStuck is the main player. Videasy and Vidrift are separate alternate players; each provider controls its own playback availability.</p>
+      <p className="text-xs leading-relaxed text-muted-foreground">VidStuck remains the main player. MegaPlay via AniKoto, Videasy and Vidrift are separate alternate servers; each provider controls its own playback availability.</p>
     </div>
   );
 }
