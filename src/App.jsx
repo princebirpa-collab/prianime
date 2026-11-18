@@ -19,6 +19,7 @@ const AnimeDetail = lazy(() => import('@/pages/AnimeDetail'));
 const Reels = lazy(() => import('@/pages/Reels'));
 const Videos = lazy(() => import('@/pages/Videos'));
 const Watch = lazy(() => import('@/pages/Watch'));
+const AniListPlayer = lazy(() => import('@/pages/AniListPlayer'));
 const Studio = lazy(() => import('@/pages/Studio'));
 const Creator = lazy(() => import('@/pages/Creator'));
 const AboutOwner = lazy(() => import('@/pages/AboutOwner'));
@@ -73,6 +74,7 @@ const AuthenticatedApp = () => {
           <Route path="/browse" element={<Browse />} />
           <Route path="/category/:slug" element={<Category />} />
           <Route path="/anime/:id" element={<AnimeDetail />} />
+          <Route path="/anilist-player/:id" element={<AniListPlayer />} />
           <Route path="/reels" element={<Reels />} />
           <Route path="/watch" element={<Videos />} />
           <Route path="/watch/:id" element={<Watch />} />
