@@ -68,7 +68,7 @@ function episodeEmbeds(item) {
   const hindiUrl = typeof explicitHindi === "string" ? explicitHindi
     : explicitHindi?.url || explicitHindi?.src || "";
   const safeHindiUrl = resolveMegaPlayUrl({ embed_url: { hindi: hindiUrl } }, "hindi")
-    || (/^\\d{1,12}$/.test(String(hindiId ?? "").trim())
+    || (/^\d{1,12}$/.test(String(hindiId ?? "").trim())
       ? `https://megaplay.buzz/stream/s-2/${String(hindiId).trim()}/dub` : "");
 
   return {
