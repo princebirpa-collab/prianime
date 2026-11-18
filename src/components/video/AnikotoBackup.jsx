@@ -57,9 +57,18 @@ async function getJikanTitles(title) {
   }
 }
 function episodeEmbeds(item) {
+  const explicitHindi = item?.embed_url?.hindi || item?.embed_url?.hi || item?.embed_url?.hindi_dub
+    || item?.hindi_embed_url || item?.hi_embed_url || item?.hindiEmbedUrl;
+  const hindiId = item?.hindi_episode_embed_id ?? item?.hindi_embed_id ?? item?.hi_embed_id;
+  const hindiUrl = typeof explicitHindi === "string" ? explicitHindi
+    : explicitHindi?.url || explicitHindi?.src || "";
+  const safeHindiUrl = resolveMegaPlayUrl({ embed_url: { hindi: hindiUrl } }, "hindi")
+    || (typeof hindiId === "string" && /^\\d{1,12}$/.test(hindiId)
+      ? `https://megaplay.buzz/stream/s-2/${hindiId}/dub` : "");
   return {
     sub: resolveMegaPlayUrl(item, "sub"),
     dub: resolveMegaPlayUrl(item, "dub"),
+    hindi: safeHindiUrl,
   };
 }
 function rowsFrom(payload) {
@@ -111,7 +120,7 @@ export default function AnikotoBackup({ title, season = 1, episode = 1, onProgre
   const [selectedId, setSelectedId] = useState("");
   const [seriesData, setSeriesData] = useState(null);
   const [episodeIndex, setEpisodeIndex] = useState("0");
-  const [language, setLanguage] = useState("sub");
+  const [language, setLanguage] = useState("hindi");
   const [query, setQuery] = useState(title || "");
   const [busy, setBusy] = useState(true);
   const [error, setError] = useState("");
@@ -232,8 +241,8 @@ export default function AnikotoBackup({ title, season = 1, episode = 1, onProgre
   }, [items, query]);
   const selectedEpisode = episodes[Number(episodeIndex)] || null;
   const embeds = episodeEmbeds(selectedEpisode);
-  const activeEmbed = embeds[language] || embeds.sub || embeds.dub || "";
-  const activeLanguage = embeds[language] ? language : embeds.sub ? "sub" : "dub";
+  const activeEmbed = embeds[language] || "";
+  const activeLanguage = language;
   const selectedTitle = seriesData?.anime?.title || seriesData?.anime?.name || titleOf(items.find((item) => idOf(item) === selectedId) || {});
   const episodeNo = selectedEpisode ? episodeNumber(selectedEpisode, Number(episodeIndex)) : Number(episode);
 
@@ -294,8 +303,8 @@ export default function AnikotoBackup({ title, season = 1, episode = 1, onProgre
       {Object.values(embeds).some(Boolean) && (
         <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Audio language">
           <span className="mr-1 inline-flex items-center gap-1 text-xs text-muted-foreground"><Languages className="h-3.5 w-3.5" /> Audio</span>
-          {["sub", "dub"].filter((key) => embeds[key]).map((key) => (
-            <button key={key} type="button" aria-pressed={language === key} onClick={() => setLanguage(key)} className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase transition ${language === key ? "border-primary bg-primary/10 text-primary" : "border-border bg-background text-muted-foreground hover:border-primary/60"}`}>{key}</button>
+          {["hindi", "dub", "sub"].filter((key) => embeds[key]).map((key) => (
+            <button key={key} type="button" aria-pressed={language === key} onClick={() => setLanguage(key)} className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase transition ${language === key ? "border-primary bg-primary/10 text-primary" : "border-border bg-background text-muted-foreground hover:border-primary/60"}`}>{key === "hindi" ? "Hindi Dub" : key === "dub" ? "Dub (language unspecified)" : "SUB"}</button>
           ))}
         </div>
       )}
@@ -318,8 +327,8 @@ export default function AnikotoBackup({ title, season = 1, episode = 1, onProgre
         <div className="grid aspect-video place-items-center rounded-xl border border-border bg-background p-5 text-center">
           <div className="max-w-md">
             <Play className="mx-auto mb-2 h-7 w-7 text-muted-foreground" />
-            <p className="text-sm font-semibold text-foreground">{selectedEpisode ? "No MegaPlay SUB / DUB embed listed for this episode" : "Choose an anime and episode"}</p>
-            <p className="mt-1 text-xs leading-5 text-muted-foreground">The player appears when the catalogue returns a valid MegaPlay embed for the selected episode.</p>
+            <p className="text-sm font-semibold text-foreground">{selectedEpisode ? "No verified Hindi-dub embed is listed for this episode" : "Choose an anime and episode"}</p>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">Hindi audio is shown only when the provider explicitly supplies a Hindi/HI embed for this episode. Generic dub links are not assumed to be Hindi.</p>
           </div>
         </div>
       )}
