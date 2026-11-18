@@ -34,7 +34,35 @@ db.exec(`
     user_id TEXT NOT NULL,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
+  CREATE TABLE IF NOT EXISTS mission_progress (
+    guild_id TEXT NOT NULL, user_id TEXT NOT NULL, period_type TEXT NOT NULL,
+    period_key TEXT NOT NULL, mission_id TEXT NOT NULL, progress INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (guild_id, user_id, period_type, period_key, mission_id)
+  );
+  CREATE TABLE IF NOT EXISTS mission_claims (
+    guild_id TEXT NOT NULL, user_id TEXT NOT NULL, period_type TEXT NOT NULL,
+    period_key TEXT NOT NULL, mission_id TEXT NOT NULL, claimed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (guild_id, user_id, period_type, period_key, mission_id)
+  );
 `);
+
+const DAILY_MISSION = { id: "daily-chat", title: "Daily chatter", target: 10, reward: 25, period: "daily" };
+const WEEKLY_MISSION = { id: "weekly-chat", title: "Weekly community member", target: 50, reward: 100, period: "weekly" };
+function missionPeriodKey(period, date = new Date()) {
+  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  if (period === "daily") return d.toISOString().slice(0, 10);
+  const day = (d.getUTCDay() + 6) % 7;
+  d.setUTCDate(d.getUTCDate() - day);
+  return d.toISOString().slice(0, 10);
+}
+function getMissionProgress(guildId, userId, mission) {
+  const key = missionPeriodKey(mission.period);
+  const row = db.prepare("SELECT progress FROM mission_progress WHERE guild_id=? AND user_id=? AND period_type=? AND period_key=? AND mission_id=?")
+    .get(guildId, userId, mission.period, key, mission.id);
+  const claimed = db.prepare("SELECT 1 FROM mission_claims WHERE guild_id=? AND user_id=? AND period_type=? AND period_key=? AND mission_id=?")
+    .get(guildId, userId, mission.period, key, mission.id);
+  return { key, progress: row?.progress ?? 0, claimed: Boolean(claimed) };
+}
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
@@ -121,6 +149,11 @@ client.on(Events.MessageCreate, async message => {
     // AI replies are intentionally opt-in; connect a server-side provider before enabling.
     if (!process.env.OPENAI_API_KEY) return;
   }
+  if (message.content.trim().length >= 8) {
+    const bumpMission = db.prepare("INSERT INTO mission_progress (guild_id,user_id,period_type,period_key,mission_id,progress) VALUES (?,?,?,?,?,1) ON CONFLICT(guild_id,user_id,period_type,period_key,mission_id) DO UPDATE SET progress=progress+1");
+    bumpMission.run(message.guild.id, message.author.id, "daily", missionPeriodKey("daily"), DAILY_MISSION.id);
+    bumpMission.run(message.guild.id, message.author.id, "weekly", missionPeriodKey("weekly"), WEEKLY_MISSION.id);
+  }
   const cooldownKey = `${message.guild.id}:${message.author.id}`;
   const now = Date.now();
   if (now - (xpCooldown.get(cooldownKey) || 0) < 60_000) return;
@@ -165,6 +198,33 @@ client.on(Events.InteractionCreate, async interaction => {
       console.error("Channel scan failed:", error);
       return interaction.editReply("❌ Channel scan failed. No channels were created, deleted, renamed, or changed. Check Railway logs for details.");
     }
+  }
+
+  if (interaction.commandName === "missions") {
+    const lines = [DAILY_MISSION, WEEKLY_MISSION].map(mission => {
+      const state = getMissionProgress(interaction.guildId, interaction.user.id, mission);
+      const status = state.claimed ? "✅ Reward claimed" : state.progress >= mission.target ? "🎁 Ready to claim" : "In progress";
+      return `**${mission.title}** — ${mission.period}\n${Math.min(state.progress, mission.target)}/${mission.target} messages • ${mission.reward} XP\n${status}`;
+    });
+    return interaction.reply({ content: "🎯 **PRI-ANIME Missions**\n\n" + lines.join("\n\n"), ephemeral: true });
+  }
+
+  if (interaction.commandName === "claim-mission") {
+    const period = interaction.options.getString("period", true);
+    const mission = period === "daily" ? DAILY_MISSION : WEEKLY_MISSION;
+    const state = getMissionProgress(interaction.guildId, interaction.user.id, mission);
+    if (state.claimed) return interaction.reply({ content: "You already claimed this mission's reward for the current period.", ephemeral: true });
+    if (state.progress < mission.target) return interaction.reply({ content: `Mission not complete yet: ${state.progress}/${mission.target} messages.`, ephemeral: true });
+    const claim = db.transaction(() => {
+      const inserted = db.prepare("INSERT OR IGNORE INTO mission_claims (guild_id,user_id,period_type,period_key,mission_id) VALUES (?,?,?,?,?)")
+        .run(interaction.guildId, interaction.user.id, mission.period, state.key, mission.id);
+      if (!inserted.changes) return false;
+      db.prepare("INSERT INTO xp (guild_id,user_id,points) VALUES (?,?,?) ON CONFLICT(guild_id,user_id) DO UPDATE SET points=points+excluded.points")
+        .run(interaction.guildId, interaction.user.id, mission.reward);
+      return true;
+    })();
+    if (!claim) return interaction.reply({ content: "This reward was already claimed.", ephemeral: true });
+    return interaction.reply({ content: `🎉 Mission complete! **+${mission.reward} XP** added to your PRI-ANIME profile.`, ephemeral: true });
   }
 
   if (interaction.commandName === "leaderboard") {
