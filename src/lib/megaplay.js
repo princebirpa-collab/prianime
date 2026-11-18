@@ -14,7 +14,7 @@ function safeMegaPlayUrl(value) {
 
 export function buildMegaPlayUrl(episode, language = "sub") {
   const id = String(episode?.episode_embed_id ?? episode?.embed_id ?? episode?.embedId ?? "").trim();
-  if (!/^\\d{1,12}$/.test(id)) return "";
+  if (!/^\d{1,12}$/.test(id)) return "";
   const audio = language === "dub" ? "dub" : "sub";
   return `https://megaplay.buzz/stream/s-2/${id}/${audio}`;
 }
