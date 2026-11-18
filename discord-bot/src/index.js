@@ -53,7 +53,7 @@ const CHANNEL_ALIASES = {
 
 const normalizeChannelName = value => String(value || "")
   .normalize("NFKD")
-  .replace(/[\\u0300-\\u036f]/g, "")
+  .replace(/\\p{M}/gu, "")
   .toLowerCase()
   .replace(/[^a-z0-9]+/g, "-")
   .replace(/^-|-$/g, "");
