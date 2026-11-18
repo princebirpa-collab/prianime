@@ -234,7 +234,7 @@ export default function ServerVideoPlayer({ src, title, animeId, startAt = 0, on
         <span className="mr-1 text-xs text-muted-foreground">Server</span>
         {[
           { id: "vidstuck", label: "VidStuck · Main" },
-          { id: "anikoto", label: "AniKoto · Player" },
+          { id: "anikoto", label: "MegaPlay · Anikoto" },
           { id: "videasy", label: "Videasy · Alternate" },
           { id: "vidrift", label: "Vidrift · 2nd Alternate" },
         ].map((item) => (
@@ -244,7 +244,7 @@ export default function ServerVideoPlayer({ src, title, animeId, startAt = 0, on
       {server === "vidstuck"
         ? <VidstuckPlayer src={src} startAt={resume?.src === src ? resume.position : startAt} onProgress={rememberProgress} />
         : server === "anikoto"
-          ? <AnikotoBackup key={src} title={title} season={source.season} episode={source.episode} tmdbId={source.tmdbId} />
+          ? <AnikotoBackup key={src} title={title} season={source.season} episode={source.episode} tmdbId={source.tmdbId} onProgress={rememberProgress} onEpisodeChange={onEpisodeChange} />
           : server === "videasy"
             ? <VideasyPanel source={videasySource} title={title} />
             : <VidriftPanel source={videasySource} title={title} animeId={animeId} startAt={resume?.src === src ? resume.position : startAt} onProgress={rememberProgress} onEpisodeChange={onEpisodeChange} />}
