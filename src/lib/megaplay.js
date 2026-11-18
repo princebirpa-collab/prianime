@@ -39,3 +39,12 @@ export function resolveMegaPlayUrl(episode, language = "sub") {
   }
   return buildMegaPlayUrl(episode, language);
 }
+
+
+export function buildMegaPlayAniListUrl(anilistId, episodeNumber, language = "sub") {
+  const id = String(anilistId ?? "").trim();
+  const episode = Number(episodeNumber);
+  if (!/^\\d{1,12}$/.test(id) || !Number.isInteger(episode) || episode < 1 || episode > 10000) return "";
+  const audio = language === "dub" ? "dub" : "sub";
+  return `https://megaplay.buzz/stream/ani/${id}/${episode}/${audio}`;
+}
