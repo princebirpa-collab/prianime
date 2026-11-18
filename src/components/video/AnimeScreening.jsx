@@ -6,6 +6,7 @@ import AnimePlayback from "@/components/video/AnimePlayback";
 import VidstuckSource from "@/components/video/VidstuckSource";
 import JikanAnimePanel from "@/components/video/JikanAnimePanel";
 import AnimeWatchHistory from "@/components/video/AnimeWatchHistory";
+import AnikotoBackup from "@/components/video/AnikotoBackup";
 import EmptyState from "@/components/common/EmptyState";
 
 export default function AnimeScreening({ animeId }) {
@@ -25,6 +26,7 @@ export default function AnimeScreening({ animeId }) {
           <EmptyState title="No verified TMDB match found" body="This anime is not yet linked to a TMDB title. No unrelated stream has been substituted." />
           <a href={`https://www.themoviedb.org/search?query=${encodeURIComponent(anime.item?.display || "")}`} target="_blank" rel="noopener noreferrer" className="inline-block text-sm text-primary hover:underline">Search for this anime on TMDB</a>
           <VidstuckSource />
+          {anime.item && <AnikotoBackup title={anime.item.display} season={1} episode={1} />}
         </>}
         <AnimeWatchHistory />
         {anime.item?.display && <JikanAnimePanel title={anime.item.display} />}
