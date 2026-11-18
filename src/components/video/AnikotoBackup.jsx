@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, Search, X, Play, Languages, ExternalLink } from "lucide-react";
+import { Loader2, Search, X, Play, Languages, ExternalLink, Maximize2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import EmbedIframe from "@/components/video/EmbedIframe";
 import { resolveMegaPlayUrl } from "@/lib/megaplay";
 
@@ -326,7 +327,19 @@ export default function AnikotoBackup({ title, season = 1, episode = 1, onProgre
           <EmbedIframe key={`${selectedId}-${episodeIndex}-${activeLanguage}-${activeEmbed}`} src={activeEmbed} title={`MegaPlay ${activeLanguage.toUpperCase()} player · ${selectedTitle} episode ${episodeNo}`} />
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-[11px] text-muted-foreground">MegaPlay embed · {activeLanguage.toUpperCase()} · Episode {episodeNo}</p>
-            <a href={activeEmbed} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary">Open embed <ExternalLink className="h-3 w-3" /></a>
+            <div className="flex flex-wrap items-center gap-3">
+              <a href={activeEmbed} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary">Open embed <ExternalLink className="h-3 w-3" /></a>
+              {(() => {
+                try {
+                  const parsed = new URL(activeEmbed);
+                  const match = parsed.pathname.match(/^\\/stream\\/s-2\\/(\\d+)\\/(sub|dub)$/);
+                  if (!match || !["megaplay.buzz", "www.megaplay.buzz"].includes(parsed.hostname)) return null;
+                  const audio = activeLanguage === "hindi" ? "dub" : activeLanguage;
+                  const server = parsed.searchParams.get("s") || "tcdn";
+                  return <Link to={`/megaplay-server/${match[1]}/${audio}?s=${encodeURIComponent(server)}`} className="inline-flex items-center gap-1 rounded-full border border-primary/40 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/10"><Maximize2 className="h-3 w-3" /> Open separate server page</Link>;
+                } catch { return null; }
+              })()}
+            </div>
           </div>
         </div>
       ) : (
