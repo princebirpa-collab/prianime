@@ -7,6 +7,14 @@ const commands = [
     .setDescription("Scan existing channels and connect supported PRI-ANIME features (no channel changes)")
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
   new SlashCommandBuilder()
+    .setName("missions")
+    .setDescription("View your daily and weekly PRI-ANIME missions"),
+  new SlashCommandBuilder()
+    .setName("claim-mission")
+    .setDescription("Claim a completed mission's XP reward")
+    .addStringOption(option => option.setName("period").setDescription("Mission period").setRequired(true)
+      .addChoices({ name: "Daily", value: "daily" }, { name: "Weekly", value: "weekly" })),
+  new SlashCommandBuilder()
     .setName("leaderboard")
     .setDescription("Show the PRI-ANIME XP leaderboard"),
   new SlashCommandBuilder()
