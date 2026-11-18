@@ -76,15 +76,15 @@ export default function Creator() {
     if (!licence) return setError("Confirm you own or are licensed to publish this video.");
     setUploading(true);
     try {
-      setUploadLabel("Uploading videoâ€¦");
+      setUploadLabel("Uploading video”¦");
       const video = await base44.integrations.Core.UploadPublicFile({ file: videoFile });
       let thumbnailUrl = "";
       if (thumbFile) {
-        setUploadLabel("Uploading thumbnailâ€¦");
+        setUploadLabel("Uploading thumbnail”¦");
         const thumb = await base44.integrations.Core.UploadPublicFile({ file: thumbFile });
         thumbnailUrl = thumb.file_url;
       }
-      setUploadLabel("Publishingâ€¦");
+      setUploadLabel("Publishing”¦");
       const created = await base44.entities.Video.create({
         title: title.trim().slice(0, 140),
         description: description.trim().slice(0, 2000),
@@ -129,7 +129,7 @@ export default function Creator() {
       });
       const data = response?.data;
       if (data?.job) setJobs((prev) => [data.job, ...prev.filter((job) => job.id !== data.job.id)]);
-      if (data?.ok) setMessage("Render complete â€” the clip is ready below.");
+      if (data?.ok) setMessage("Render complete — the clip is ready below.");
       else setError(data?.error || "The render could not be completed.");
       loadJobs();
     } catch (renderError) {
@@ -147,7 +147,7 @@ export default function Creator() {
         video_url: job.video_url,
         category: "AI original",
         creator_name: getProfile().name,
-        licence: "AI-generated â€” PRI-ANIME atelier",
+        licence: "AI-generated — PRI-ANIME atelier",
         status: "published",
         views: 0,
         tags: [job.style, job.language],
@@ -164,7 +164,7 @@ export default function Creator() {
       <PageHeader
         eyebrow="Creator studio"
         title="Publish licensed work"
-        description="Upload videos you own, or send a scene through the AI render pipeline. Everything is created from environment configuration â€” no keys touch the browser."
+        description="Upload videos you own, or send a scene through the AI render pipeline. Everything is created from environment configuration — no keys touch the browser."
       >
         <div className="flex gap-1 rounded-full border border-border/70 p-1">
           <button
@@ -223,7 +223,7 @@ export default function Creator() {
                   required
                   maxLength={140}
                   className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
-                  placeholder="Episode 1 â€” The gate at midnight"
+                  placeholder="Episode 1 — The gate at midnight"
                 />
               </div>
 
@@ -295,7 +295,7 @@ export default function Creator() {
               </div>
 
               <p className="text-[11px] leading-relaxed text-muted-foreground">
-                Video and images are stored publicly â€” anyone with the link can open them. Upload only work you own.
+                Video and images are stored publicly — anyone with the link can open them. Upload only work you own.
               </p>
 
               <label className="flex items-start gap-2 text-xs text-muted-foreground">
@@ -314,7 +314,7 @@ export default function Creator() {
                 className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition disabled:opacity-50"
               >
                 {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" aria-hidden="true" />}
-                {uploading ? uploadLabel || "Publishingâ€¦" : "Publish screening"}
+                {uploading ? uploadLabel || "Publishing”¦" : "Publish screening"}
               </button>
             </form>
 
@@ -366,7 +366,7 @@ export default function Creator() {
                   rows={5}
                   maxLength={1500}
                   className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
-                  placeholder="A silver-haired swordswoman stands in the rain, raising a glowing golden bladeâ€¦"
+                  placeholder="A silver-haired swordswoman stands in the rain, raising a glowing golden blade”¦"
                 />
               </div>
 
@@ -427,7 +427,7 @@ export default function Creator() {
                 className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition disabled:opacity-50"
               >
                 {rendering ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" aria-hidden="true" />}
-                {rendering ? "Renderingâ€¦" : "Start render job"}
+                {rendering ? "Rendering”¦" : "Start render job"}
               </button>
             </form>
 

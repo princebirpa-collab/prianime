@@ -70,7 +70,7 @@ export default function Admin() {
   };
 
   const removeVideo = async (video) => {
-    if (!window.confirm(`Delete â€œ${video.title}â€ permanently?`)) return;
+    if (!window.confirm(`Delete “${video.title}” permanently?`)) return;
     try {
       await base44.entities.Video.delete(video.id);
       setVideos((prev) => prev.filter((row) => row.id !== video.id));
@@ -110,7 +110,7 @@ export default function Admin() {
       <PageHeader
         eyebrow="Admin console"
         title="Moderation & connections"
-        description="Reports are readable only by workspace administrators â€” the rule is enforced by the database, not by hiding buttons."
+        description="Reports are readable only by workspace administrators — the rule is enforced by the database, not by hiding buttons."
       >
         <button
           type="button"
@@ -128,7 +128,7 @@ export default function Admin() {
         <section className="rounded-2xl border border-border/60 bg-card/40 p-5">
           <h2 className="font-display text-xl">Service connections</h2>
           {!health ? (
-            <p className="mt-3 text-sm text-muted-foreground">Checking providersâ€¦</p>
+            <p className="mt-3 text-sm text-muted-foreground">Checking providers”¦</p>
           ) : (
             <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
               {Object.entries(health.checks || {}).map(([key, check]) => (
@@ -149,7 +149,7 @@ export default function Admin() {
             </div>
           )}
           <p className="mt-3 text-[11px] text-muted-foreground">
-            Secret values are never returned to the browser â€” only presence and status.
+            Secret values are never returned to the browser — only presence and status.
           </p>
         </section>
 
