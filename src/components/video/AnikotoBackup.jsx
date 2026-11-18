@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Loader2, Search, X, Play, Languages, ExternalLink } from "lucide-react";
 import EmbedIframe from "@/components/video/EmbedIframe";
+import { resolveMegaPlayUrl } from "@/lib/megaplay";
 
 function titleOf(item) {
   return String(item?.title || item?.name || item?.anime_title || item?.anime?.title || item?.anime?.name || "Untitled anime");
@@ -55,20 +56,10 @@ async function getJikanTitles(title) {
     return [title];
   }
 }
-function safeEmbed(value) {
-  const candidate = typeof value === "string" ? value : value?.url || value?.embed_url || value?.src || "";
-  try {
-    const url = new URL(candidate);
-    return url.protocol === "https:" ? url.toString() : "";
-  } catch {
-    return "";
-  }
-}
 function episodeEmbeds(item) {
-  const urls = item?.embed_url || item?.embedUrl || item?.embeds || {};
   return {
-    sub: safeEmbed(urls?.sub || urls?.SUB || item?.sub_embed_url || item?.sub),
-    dub: safeEmbed(urls?.dub || urls?.DUB || item?.dub_embed_url || item?.dub),
+    sub: resolveMegaPlayUrl(item, "sub"),
+    dub: resolveMegaPlayUrl(item, "dub"),
   };
 }
 function rowsFrom(payload) {
@@ -115,7 +106,7 @@ async function searchAniListTitles(title) {
   }));
 }
 
-export default function AnikotoBackup({ title, season = 1, episode = 1 }) {
+export default function AnikotoBackup({ title, season = 1, episode = 1, onProgress, onEpisodeChange }) {
   const [items, setItems] = useState([]);
   const [selectedId, setSelectedId] = useState("");
   const [seriesData, setSeriesData] = useState(null);
@@ -246,11 +237,33 @@ export default function AnikotoBackup({ title, season = 1, episode = 1 }) {
   const selectedTitle = seriesData?.anime?.title || seriesData?.anime?.name || titleOf(items.find((item) => idOf(item) === selectedId) || {});
   const episodeNo = selectedEpisode ? episodeNumber(selectedEpisode, Number(episodeIndex)) : Number(episode);
 
+  useEffect(() => {
+    const onMessage = (event) => {
+      if (event.origin !== "https://megaplay.buzz" && event.origin !== "https://www.megaplay.buzz") return;
+      let data = event.data;
+      if (typeof data === "string") {
+        try { data = JSON.parse(data); } catch { return; }
+      }
+      if (!data || typeof data !== "object") return;
+      if (data.channel !== "megacloud" && data.type !== "watching-log") return;
+      const position = Number(data.time ?? data.currentTime);
+      const duration = Number(data.duration);
+      if (Number.isFinite(position) && position >= 0 && Number.isFinite(duration) && duration > 0) {
+        onProgress?.(position, duration, {
+          season: Number(season) || 1,
+          episode: episodeNo,
+        });
+      }
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [onProgress, season, episodeNo]);
+
   return (
     <section className="space-y-3 rounded-xl border border-border/60 bg-card/40 p-3 sm:p-4" aria-label="AniKoto video player">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <p className="text-sm font-semibold">AniKoto · Extra video server</p>
+          <p className="text-sm font-semibold">MegaPlay · AniKoto backup</p>
           <p className="mt-1 text-xs text-muted-foreground">{selectedTitle || title} · Season {season} · Episode {episodeNo}</p>
         </div>
         <span className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-[10px] font-semibold text-primary">Responsive player</span>
@@ -273,7 +286,7 @@ export default function AnikotoBackup({ title, season = 1, episode = 1 }) {
       </label>
 
       <label className="block text-xs text-muted-foreground">Episode
-        <select value={episodeIndex} onChange={(event) => setEpisodeIndex(event.target.value)} disabled={!episodes.length} className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm">
+        <select value={episodeIndex} onChange={(event) => { const nextIndex = Number(event.target.value); setEpisodeIndex(String(nextIndex)); const nextEpisode = episodes[nextIndex]; if (nextEpisode) onEpisodeChange?.(Number(season) || 1, episodeNumber(nextEpisode, nextIndex)); }} disabled={!episodes.length} className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm">
           {episodes.map((item, index) => <option key={idOf(item) || index} value={String(index)}>Episode {episodeLabel(item, index)}</option>)}
         </select>
       </label>
