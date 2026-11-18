@@ -53,7 +53,7 @@ const CHANNEL_ALIASES = {
 
 const normalizeChannelName = value => String(value || "")
   .normalize("NFKD")
-  .replace(/\\p{M}/gu, "")
+  .replace(/\p{M}/gu, "")
   .toLowerCase()
   .replace(/[^a-z0-9]+/g, "-")
   .replace(/^-|-$/g, "");
@@ -152,12 +152,12 @@ client.on(Events.InteractionCreate, async interaction => {
         "✅ **PRI-ANIME CORE channel scan complete**",
         `Scanned **${allTextChannels.size}** existing text channels.`,
         "",
-        found.length ? "**Connected channel routes**\\n" + found.join("\\n") : "No known feature channels matched yet.",
+        found.length ? "**Connected channel routes**\n" + found.join("\n") : "No known feature channels matched yet.",
         "",
         missing.length ? "**Not found (no channel was created):** " + missing.join(", ") : "All supported channel routes were found.",
         "",
         "🔒 No channels, categories, names, or permissions were changed."
-      ].join("\\n");
+      ].join("\n");
       const log = routes.botLogs;
       if (log) await log.send(summary).catch(error => console.warn("Could not post setup summary to bot logs:", error.message));
       return interaction.editReply(summary);
@@ -230,9 +230,9 @@ client.on(Events.InteractionCreate, async interaction => {
     const isOwner = ticket.user_id === interaction.user.id;
     const isStaff = interaction.memberPermissions?.has(PermissionFlagsBits.ManageChannels);
     if (!isOwner && !isStaff) return interaction.reply({ content: "Only the ticket owner or staff can close this ticket.", ephemeral: true });
-    await interaction.reply({ content: "Ticket closed. This channel will be removed in a moment.", ephemeral: true });
+    await interaction.channel.permissionOverwrites.edit(ticket.user_id, { SendMessages: false });
     db.prepare("DELETE FROM tickets WHERE channel_id=?").run(interaction.channelId);
-    await interaction.channel.delete("Ticket closed by owner or staff");
+    return interaction.reply({ content: "Ticket closed and locked. This channel has been kept; staff can still review it.", ephemeral: true });
   }
 });
 
