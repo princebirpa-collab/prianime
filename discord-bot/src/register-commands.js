@@ -4,7 +4,7 @@ import { REST, Routes, SlashCommandBuilder, PermissionFlagsBits } from "discord.
 const commands = [
   new SlashCommandBuilder()
     .setName("setup")
-    .setDescription("Create missing PRI-ANIME categories and channels")
+    .setDescription("Scan existing channels and connect supported PRI-ANIME features (no channel changes)")
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
   new SlashCommandBuilder()
     .setName("leaderboard")
