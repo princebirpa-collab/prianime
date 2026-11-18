@@ -127,6 +127,26 @@ async function ensureCommunityLayout(guild) {
   }
 }
 
+async function syncLevelRewardRoles(guild, userId, points) {
+  const level = Math.floor(points / 100);
+  const member = await guild.members.fetch(userId);
+  const awarded = [];
+  // Configure LEVEL_ROLE_5_ID, LEVEL_ROLE_10_ID, etc. in Railway.
+  // Roles are cumulative and this function never removes existing roles.
+  for (let milestone = 5; milestone <= level; milestone += 5) {
+    const roleId = process.env[`LEVEL_ROLE_${milestone}_ID`];
+    if (!roleId || member.roles.cache.has(roleId)) continue;
+    const role = guild.roles.cache.get(roleId) || await guild.roles.fetch(roleId).catch(() => null);
+    if (!role || !role.editable) {
+      console.warn(`Level ${milestone} reward role is missing or below the bot's role hierarchy.`);
+      continue;
+    }
+    await member.roles.add(role, `PRI-ANIME Level ${milestone} reward`);
+    awarded.push(role.name);
+  }
+  return awarded;
+}
+
 client.once(Events.ClientReady, ready => {
   console.log(`PRI-ANIME CORE online as ${ready.user.tag}`);
 });
@@ -166,6 +186,9 @@ client.on(Events.MessageCreate, async message => {
     const channel = getTextChannel(message.guild, CHANNEL.levelUps);
     if (channel) await channel.send(`🎉 ${message.author} reached **Level ${newLevel}**! Keep being part of PRI-ANIME.`);
   }
+  await syncLevelRewardRoles(message.guild, message.author.id, points).catch(error =>
+    console.warn("Could not sync level reward roles:", error.message)
+  );
 });
 
 client.on(Events.InteractionCreate, async interaction => {
@@ -224,6 +247,10 @@ client.on(Events.InteractionCreate, async interaction => {
       return true;
     })();
     if (!claim) return interaction.reply({ content: "This reward was already claimed.", ephemeral: true });
+    const totalPoints = db.prepare("SELECT points FROM xp WHERE guild_id=? AND user_id=?").get(interaction.guildId, interaction.user.id)?.points ?? 0;
+    await syncLevelRewardRoles(interaction.guild, interaction.user.id, totalPoints).catch(error =>
+      console.warn("Could not sync mission level reward roles:", error.message)
+    );
     return interaction.reply({ content: `🎉 Mission complete! **+${mission.reward} XP** added to your PRI-ANIME profile.`, ephemeral: true });
   }
 
