@@ -138,11 +138,11 @@ client.on(Events.MessageCreate, async message => {
 client.on(Events.InteractionCreate, async interaction => {
   if (!interaction.isChatInputCommand()) return;
   if (interaction.commandName === "setup") {
-    if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
-      return interaction.reply({ content: "Only server administrators can run setup.", ephemeral: true });
-    }
-    // Acknowledge immediately: Discord requires an interaction response within 3 seconds.
+    // Acknowledge before permission checks or network work to avoid Discord's 3-second timeout.
     await interaction.deferReply({ ephemeral: true });
+    if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
+      return interaction.editReply("Only server administrators can run setup.");
+    }
     try {
       const routes = await scanExistingChannels(interaction.guild);
       const allTextChannels = interaction.guild.channels.cache.filter(c => c.type === ChannelType.GuildText);
