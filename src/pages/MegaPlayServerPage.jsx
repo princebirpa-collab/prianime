@@ -25,7 +25,7 @@ export default function MegaPlayServerPage() {
 
   return (
     <main className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:px-10">
-      <Link to={-1} className="mb-5 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"><ArrowLeft className="h-4 w-4" /> Back</Link>
+      <Link to="/browse" className="mb-5 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"><ArrowLeft className="h-4 w-4" /> Back</Link>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div><p className="text-[10px] uppercase tracking-[.24em] text-primary">PRI-ANIME · Separate server</p><h1 className="mt-1 text-2xl font-semibold">MegaPlay Player</h1><p className="mt-1 text-xs text-muted-foreground">Episode ID {episodeId} · {audio.toUpperCase()} · source {server}</p></div>
         <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-2 text-xs text-primary"><Server className="h-4 w-4" /> Independent server page</span>
