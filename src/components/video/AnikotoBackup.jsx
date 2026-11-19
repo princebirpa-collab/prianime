@@ -332,7 +332,7 @@ export default function AnikotoBackup({ title, season = 1, episode = 1, onProgre
               {(() => {
                 try {
                   const parsed = new URL(activeEmbed);
-                  const match = parsed.pathname.match(/^\\/stream\\/s-2\\/(\\d+)\\/(sub|dub)$/);
+                  const match = parsed.pathname.match(/^\/stream\/s-2\/(\d+)\/(sub|dub)$/);
                   if (!match || !["megaplay.buzz", "www.megaplay.buzz"].includes(parsed.hostname)) return null;
                   const audio = activeLanguage === "hindi" ? "dub" : activeLanguage;
                   const server = parsed.searchParams.get("s") || "tcdn";
