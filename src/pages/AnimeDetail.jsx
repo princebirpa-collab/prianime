@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
-  Star, Heart, Bookmark, Loader2, Tv, Clock, CalendarDays, Building2, ExternalLink, Sparkles, PlayCircle,
+  Star, Heart, Bookmark, Loader2, Tv, Clock, CalendarDays, Building2, ExternalLink, Sparkles,
 } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import AnimeRow from "@/components/anime/AnimeRow";
@@ -144,10 +144,7 @@ export default function AnimeDetail() {
                 </div>
               )}
               <div className="mt-6 flex flex-wrap items-center gap-2">
-                <Link to={`/anilist-player/${item.id}`} className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90">
-                  <PlayCircle className="h-4 w-4" aria-hidden="true" /> AniList Player
-                </Link>
-                <AnimeStreamLink anime={item} />
+<AnimeStreamLink anime={item} />
                 <button
                   type="button"
                   onClick={() => watchlist.toggle(item)}
