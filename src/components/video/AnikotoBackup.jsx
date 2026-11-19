@@ -332,7 +332,10 @@ export default function AnikotoBackup({ title, season = 1, episode = 1, onProgre
               {(() => {
                 try {
                   const parsed = new URL(activeEmbed);
-                  const match = parsed.pathname.match(/^\/stream\/s-2\/(\d+)\/(sub|dub)$/);
+                  const pathParts = parsed.pathname.split("/");
+                  const match = pathParts.length === 5 && pathParts[1] === "stream" && pathParts[2] === "s-2" && /^\d+$/.test(pathParts[3]) && ["sub", "dub"].includes(pathParts[4])
+                    ? [null, pathParts[3], pathParts[4]]
+                    : null;
                   if (!match || !["megaplay.buzz", "www.megaplay.buzz"].includes(parsed.hostname)) return null;
                   const audio = activeLanguage === "hindi" ? "dub" : activeLanguage;
                   const server = parsed.searchParams.get("s") || "tcdn";
