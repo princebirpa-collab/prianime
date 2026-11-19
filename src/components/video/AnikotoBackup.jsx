@@ -250,6 +250,14 @@ export default function AnikotoBackup({ title, season = 1, episode = 1, onProgre
   const embeds = episodeEmbeds(selectedEpisode);
   const activeEmbed = embeds[language] || "";
   const activeLanguage = language;
+
+  // Prefer a verified Hindi track, then fall back to an available provider
+  // dub/sub stream so the player never stays blank just because Hindi is absent.
+  useEffect(() => {
+    if (embeds[language]) return;
+    const fallback = ["hindi", "dub", "sub"].find((key) => Boolean(embeds[key]));
+    if (fallback) setLanguage(fallback);
+  }, [embeds.hindi, embeds.dub, embeds.sub, language]);
   const selectedTitle = seriesData?.anime?.title || seriesData?.anime?.name || titleOf(items.find((item) => idOf(item) === selectedId) || {});
   const episodeNo = selectedEpisode ? episodeNumber(selectedEpisode, Number(episodeIndex)) : Number(episode);
 
