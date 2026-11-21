@@ -1,7 +1,7 @@
 import { Outlet, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import NavBar from "@/components/layout/NavBar";
-import Footer from "@/components/layout/Footer";
+import Footer from "@/components/layout/Footer";\nimport DiscordCommunityPopup from "@/components/layout/DiscordCommunityPopup";
 import { MessageCircle } from "lucide-react";
 
 export default function Layout() {
@@ -47,7 +47,7 @@ export default function Layout() {
         Skip to content
       </a>
 
-      <NavBar />
+      <NavBar />\n      <DiscordCommunityPopup />
       <main id="main-content" className="flex-1">
         <Outlet />
       </main>
