@@ -17,6 +17,7 @@ export default function Layout() {
     setExperience((current) => {
       const next = current === "modern" ? "classic" : "modern";
       try { localStorage.setItem("prianime-experience", next); } catch {}
+      window.dispatchEvent(new Event("prianime-experience-change"));
       return next;
     });
   };
