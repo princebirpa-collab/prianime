@@ -434,3 +434,20 @@ body::after {
     transition: none;
   }
 }
+
+/* Original PRI-ANIME Modern experience layer — separate from the Classic mode. */
+.prianime-experience.experience-modern { background: #08080b; color: #f2f0f3; }
+.experience-modern .pri-modern-ticker { overflow:hidden; border-bottom:1px solid rgba(255,255,255,.06); background:linear-gradient(90deg,#120b12,#09090d,#120b12); color:#c9a4c9; height:27px; display:flex; align-items:center; font:600 9px/1 system-ui,sans-serif; letter-spacing:.24em; }
+.experience-modern .pri-ticker-track { display:flex; width:max-content; white-space:nowrap; animation:pri-ticker 34s linear infinite; }
+.experience-modern .pri-ticker-track span { padding-right:4rem; }
+@keyframes pri-ticker { to { transform:translateX(-50%); } }
+.experience-modern .pri-modern-ticker:hover .pri-ticker-track { animation-play-state:paused; }
+.pri-experience-switch-wrap { display:flex; justify-content:flex-end; padding:7px 16px 0; }
+.pri-experience-switch { display:inline-flex; align-items:center; gap:7px; border:1px solid rgba(255,255,255,.12); border-radius:999px; padding:6px 11px; background:rgba(20,17,23,.76); color:#c6c0ca; font:600 9px/1 system-ui,sans-serif; letter-spacing:.14em; cursor:pointer; transition:border-color .2s,color .2s; }
+.pri-experience-switch:hover { border-color:rgba(214,128,191,.55); color:#f5e5f2; }
+.pri-switch-dot { width:6px;height:6px;border-radius:50%;background:#cf83b6;box-shadow:0 0 9px #cf83b6; }
+.pri-switch-divider { opacity:.45; }
+.experience-modern main { position:relative; }
+.experience-modern .glass-strong { background:rgba(8,8,11,.92); border-color:rgba(255,255,255,.08); }
+.experience-modern .glow-hover:hover { transform:translateY(-2px); }
+@media(prefers-reduced-motion:reduce){.pri-ticker-track{animation:none!important}.pri-experience-switch{transition:none}}
