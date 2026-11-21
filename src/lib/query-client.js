@@ -18,8 +18,8 @@ const isTransientFailure = (error) => {
 export const queryClientInstance = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 60 * 1000,
-      gcTime: 10 * 60 * 1000,
+      staleTime: 3 * 60 * 1000,
+      gcTime: 20 * 60 * 1000,
       refetchOnWindowFocus: false,
       refetchOnReconnect: true,
       retry: (failureCount, error) => failureCount < 1 && isTransientFailure(error),
