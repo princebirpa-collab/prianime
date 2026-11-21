@@ -80,6 +80,12 @@ export default function Browse() {
     ? { action: "search", q: committedQuery, genre: genre || undefined, perPage: 50 }
     : { action: sort, genre: genre || undefined, perPage: 50 };
   const { items, loading, error, hasNext, total, loadMore, retry } = usePaginatedAnime(body);
+  // Preload two AniList pages so the catalogue starts with up to 100 titles.
+  // AniList caps each page at 50; this preserves its pagination limit.
+  useEffect(() => {
+    if (!loading && items.length > 0 && items.length < 100 && hasNext) loadMore();
+  }, [loading, items.length, hasNext, loadMore]);
+
   const visibleItems = useMemo(
     () => letter ? items.filter((anime) => firstLetter(anime) === letter) : items,
     [items, letter]
