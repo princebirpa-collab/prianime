@@ -9,50 +9,40 @@ export default function Layout() {
   const { pathname } = useLocation();
   const adSlotRef = useRef(null);
   const [adDismissed, setAdDismissed] = useState(false);
+  const [experience, setExperience] = useState(() => {
+    try { return localStorage.getItem("prianime-experience") || "modern"; } catch { return "modern"; }
+  });
 
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" });
-  }, [pathname]);
+  const switchExperience = () => {
+    setExperience((current) => {
+      const next = current === "modern" ? "classic" : "modern";
+      try { localStorage.setItem("prianime-experience", next); } catch {}
+      return next;
+    });
+  };
+
+  useEffect(() => { window.scrollTo({ top: 0, behavior: "instant" }); }, [pathname]);
 
   useEffect(() => {
     const slot = adSlotRef.current;
     if (!slot || adDismissed) return;
-
-    // Adsterra 468x60 display banner. Adult ads are disabled in the publisher dashboard.
-    window.atOptions = {
-      key: "4b24d350aaefbfd0dc60c882142daffc",
-      format: "iframe",
-      height: 60,
-      width: 468,
-      params: {},
-    };
-
+    window.atOptions = { key: "4b24d350aaefbfd0dc60c882142daffc", format: "iframe", height: 60, width: 468, params: {} };
     const loader = document.createElement("script");
     loader.src = "https://bauval.org/22/4b24d350aaefbfd0dc60c882142daffc";
     loader.async = true;
     loader.setAttribute("data-cfasync", "false");
     slot.appendChild(loader);
-
-    return () => {
-      slot.replaceChildren();
-    };
+    return () => slot.replaceChildren();
   }, [adDismissed]);
 
   return (
-    <div className="relative flex min-h-screen flex-col overflow-x-hidden">
-
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
-      >
-        Skip to content
-      </a>
-
+    <div className={"prianime-experience relative flex min-h-screen flex-col overflow-x-hidden " + (experience === "modern" ? "experience-modern" : "experience-classic")}>
+      {experience === "modern" && <div className="pri-modern-ticker" aria-label="PRI-ANIME announcements"><div className="pri-ticker-track"><span>PRI-ANIME ✦ YOUR ANIME UNIVERSE ✦ DISCOVER • TRACK • EXPLORE ✦</span><span aria-hidden="true">PRI-ANIME ✦ YOUR ANIME UNIVERSE ✦ DISCOVER • TRACK • EXPLORE ✦</span></div></div>}
+      <div className="pri-experience-switch-wrap"><button type="button" onClick={switchExperience} className="pri-experience-switch" aria-label={"Switch to " + (experience === "modern" ? "Classic" : "Modern") + " experience"}><span className="pri-switch-dot" />{experience === "modern" ? "MODERN" : "CLASSIC"}<span className="pri-switch-divider">/</span>{experience === "modern" ? "CLASSIC" : "MODERN"}</button></div>
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground">Skip to content</a>
       <NavBar />
       <DiscordCommunityPopup />
-      <main id="main-content" className="flex-1">
-        <Outlet />
-      </main>
+      <main id="main-content" className="flex-1"><Outlet /></main>
       <Footer />
       <a href="https://discord.gg/2meCrBHQw" target="_blank" rel="noopener noreferrer" aria-label="Join the PRI-ANIME Discord community" className="fixed bottom-5 right-5 z-[90] inline-flex items-center gap-2 rounded-full border border-indigo-200/30 bg-[#5865F2]/90 px-4 py-3 text-xs font-bold text-white shadow-[0_12px_40px_rgba(88,101,242,.35)] backdrop-blur-xl transition hover:-translate-y-1 hover:bg-[#5865F2] focus-visible:outline-white"><MessageCircle className="h-4 w-4" /><span className="hidden sm:inline">Join Discord</span><span className="sm:hidden">Discord</span></a>
     </div>
