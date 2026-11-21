@@ -26,16 +26,16 @@ export default async function handler(req, res) {
   try {
     const upstream = await fetch(ANILIST_GRAPHQL, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      headers: { "Content-Type": "application/json", Accept: "application/json", "User-Agent": "PRI-ANIME/1.0 (anime catalog)" },
       body: JSON.stringify({ query, variables }),
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(10000),
     });
     const text = await upstream.text();
     let payload;
     try {
       payload = JSON.parse(text);
     } catch {
-      return send(res, 502, { errors: [{ message: "AniList returned an unreadable response." }] });
+      return send(res, upstream.status >= 400 ? upstream.status : 502, { errors: [{ message: `AniList response was not JSON (HTTP ${upstream.status}).` }] });
     }
     if (!upstream.ok) {
       return send(res, upstream.status, payload?.errors
