@@ -1,9 +1,3 @@
-import FeaturedTrendingCarousel from "@/components/home/FeaturedTrendingCarousel";
-import AiringRadar from "@/components/home/AiringRadar";
-import ContinueWatching from "@/components/home/ContinueWatching";
-import LiveCatalogue from "@/components/home/LiveCatalogue";
-import RealmGrid from "@/components/home/RealmGrid";
-
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Play, Sparkles } from "lucide-react";
