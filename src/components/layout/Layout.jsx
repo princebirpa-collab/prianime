@@ -37,7 +37,6 @@ export default function Layout() {
 
   return (
     <div className={"prianime-experience relative flex min-h-screen flex-col overflow-x-hidden " + (experience === "modern" ? "experience-modern" : "experience-classic")}>
-      {experience === "modern" && <div className="pri-modern-ticker" aria-label="PRI-ANIME announcements"><div className="pri-ticker-track"><span>PRI-ANIME ✦ YOUR ANIME UNIVERSE ✦ DISCOVER • TRACK • EXPLORE ✦</span><span aria-hidden="true">PRI-ANIME ✦ YOUR ANIME UNIVERSE ✦ DISCOVER • TRACK • EXPLORE ✦</span></div></div>}
       <div className="pri-experience-switch-wrap"><button type="button" onClick={switchExperience} className="pri-experience-switch" aria-label={"Switch to " + (experience === "modern" ? "Classic" : "Modern") + " experience"}><span className="pri-switch-dot" />{experience === "modern" ? "MODERN" : "CLASSIC"}<span className="pri-switch-divider">/</span>{experience === "modern" ? "CLASSIC" : "MODERN"}</button></div>
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground">Skip to content</a>
       <NavBar />
