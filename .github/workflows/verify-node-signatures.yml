@@ -1,0 +1,45 @@
+name: Verify Node.js release signatures
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 8 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install GPG
+        run: sudo apt-get update && sudo apt-get install -y gnupg
+
+      - name: Import Node.js release keys
+        shell: bash
+        run: |
+          set -euo pipefail
+          keys=(
+            5BE8A3F6C8A5C01D106C0AD820B1A390B168D356
+            DD792F5973C6DE52C432CBDAC77ABFA00DDBF2B7
+            CC68F5A3106FF448322E48ED27F5E38D5B0A215F
+            890C08DB8579162FEE0DF9DB8BEAB4DFCF555EF4
+            C82FA3AE1CBEDC6BE46B9360C43CEC45C17AB93C
+            108F52B48DB57BB0CC439B2997B01419BD92F80A
+            655F3B5C1FB3FA8D1A0CA6BDE4A7D232B936D2FD
+            A363A499291CBBC940DD62E41F10027AF002F8B0
+          )
+          for key in "${keys[@]}"; do
+            gpg --keyserver hkps://keys.openpgp.org --recv-keys "$key"
+          done
+
+      - name: Verify official Node.js checksums signature
+        shell: bash
+        run: |
+          set -euo pipefail
+          NODE_VERSION=22.12.0
+          curl --fail --silent --show-error --location "https://nodejs.org/dist/v${NODE_VERSION}/SHASUMS256.txt" -o SHASUMS256.txt
+          curl --fail --silent --show-error --location "https://nodejs.org/dist/v${NODE_VERSION}/SHASUMS256.txt.sig" -o SHASUMS256.txt.sig
+          gpg --batch --verify SHASUMS256.txt.sig SHASUMS256.txt
+          curl --fail --silent --show-error --location "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz" -o node.tar.xz
+          grep " node-v${NODE_VERSION}-linux-x64.tar.xz$" SHASUMS256.txt | sha256sum --check
