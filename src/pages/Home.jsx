@@ -3,12 +3,14 @@ import AiringRadar from "@/components/home/AiringRadar";
 import ContinueWatching from "@/components/home/ContinueWatching";
 import LiveCatalogue from "@/components/home/LiveCatalogue";
 import RealmGrid from "@/components/home/RealmGrid";
+import HomeRankings from "@/components/home/HomeRankings";
 
 export default function Home() {
   return (
     <main className="pri-home pri-home-reborn pb-20">
       <div className="pri-home-ambient" aria-hidden="true" />
       <FeaturedTrendingCarousel />
+      <HomeRankings />
       <div className="pri-home-content">
         <div className="pri-home-section-intro pri-home-intro-reborn">
           <div className="pri-home-kicker"><span className="pri-home-dot" /> THE PRI-ANIME EXPERIENCE</div>
@@ -33,6 +35,7 @@ export default function Home() {
         <ContinueWatching />
         <div id="pri-catalogue"><LiveCatalogue /></div>
         <div id="pri-realms"><RealmGrid /></div>
+        <AiringRadar />
       </div>
     </main>
   );
