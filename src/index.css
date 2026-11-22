@@ -443,3 +443,18 @@ button,a,[role=button]{transition:border-color .2s ease,background-color .2s eas
 .glow-hover:hover{box-shadow:0 0 24px -10px rgba(244,114,182,.35)!important;border-color:rgba(244,114,182,.38)!important}
 .gold-text{background-image:linear-gradient(100deg,#ffb6d9,#f472b6 48%,#c4a3ff)!important}
 ::selection{background:rgba(244,114,182,.35)}
+
+/* PRI-ANIME Reborn homepage */
+.pri-home{position:relative;isolation:isolate;overflow:clip}
+.pri-home-ambient{position:absolute;inset:0 0 auto;height:720px;pointer-events:none;z-index:-1;background:radial-gradient(ellipse at 12% 18%,rgba(245,126,185,.17),transparent 48%),radial-gradient(ellipse at 82% 28%,rgba(175,120,238,.13),transparent 48%);opacity:.9}
+.pri-home-content{position:relative}
+.pri-home-section-intro{max-width:1600px;margin:0 auto;padding:36px 24px 14px}
+.pri-home-kicker{display:flex;align-items:center;gap:10px;color:rgba(255,190,220,.75);font-size:10px;font-weight:700;letter-spacing:.28em}
+.pri-home-dot{height:7px;width:7px;border-radius:50%;background:#f472b6;box-shadow:0 0 12px #f472b6}
+.pri-home-section-intro h2{font-size:clamp(2rem,4vw,3.4rem);font-weight:600;letter-spacing:-.04em;line-height:1.1;margin-top:14px;color:#fff}
+.pri-home-section-intro h2 span{background:linear-gradient(100deg,#ffd1e5,#f472b6 52%,#c4a3ff);background-clip:text;color:transparent}
+.pri-home-section-intro p{margin-top:10px;color:rgba(255,255,255,.56);font-size:14px;line-height:1.7}
+.pri-home-content>div:not(.pri-home-section-intro){scroll-margin-top:90px}
+@media(min-width:768px){.pri-home-section-intro{padding-left:40px;padding-right:40px}}
+@media(min-width:1024px){.pri-home-section-intro{padding-left:5rem;padding-right:5rem}}
+@media(prefers-reduced-motion:no-preference){.pri-home-section-intro h2 span{background-size:200% 100%;animation:priRoseSheen 8s ease-in-out infinite alternate}@keyframes priRoseSheen{from{background-position:0%}to{background-position:100%}}}
