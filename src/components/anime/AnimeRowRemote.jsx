@@ -18,7 +18,7 @@ export default function AnimeRowRemote({ title, subtitle, body, viewAll, rank })
         setNearViewport(true);
         observer.disconnect();
       }
-    }, { rootMargin: "320px 0px" });
+    }, { rootMargin: "120px 0px" });
     observer.observe(node);
     return () => observer.disconnect();
   }, [nearViewport]);
