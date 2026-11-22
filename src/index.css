@@ -468,3 +468,28 @@ button,a,[role=button]{transition:border-color .2s ease,background-color .2s eas
 .pri-catalogue-rows h2{letter-spacing:-.035em}
 .pri-catalogue-rows a[class*=rounded-xl]{border-color:rgba(255,160,205,.13)}
 @media(max-width:640px){.pri-catalogue-header{border-radius:24px;padding:22px}.pri-catalogue-tags{gap:6px}.pri-catalogue-tags span{font-size:8px;padding:7px 9px}}
+
+/* Full homepage visual overhaul — layout only, no playback/data logic changes */
+.pri-home-reborn{overflow:clip}
+.pri-home-reborn .pri-home-ambient{height:1100px;background:radial-gradient(ellipse at 12% 5%,rgba(250,110,182,.19),transparent 44%),radial-gradient(ellipse at 88% 12%,rgba(160,110,255,.18),transparent 43%),linear-gradient(180deg,rgba(22,8,21,.35),transparent 70%)}
+.pri-home-reborn .pri-home-section-intro{padding-top:58px;padding-bottom:28px}
+.pri-home-intro-reborn h2{font-size:clamp(2.8rem,6.5vw,5.6rem);line-height:.94;letter-spacing:-.055em}
+.pri-home-intro-reborn h2 span{background:linear-gradient(105deg,#ffe0ed 0%,#f27db9 48%,#bba2ff 100%);background-clip:text;color:transparent}
+.pri-home-shortcuts{display:flex;flex-wrap:wrap;gap:10px;margin-top:25px}
+.pri-home-shortcuts a{display:inline-flex;gap:16px;align-items:center;border-radius:999px;border:1px solid rgba(255,190,220,.17);background:rgba(255,255,255,.035);padding:11px 16px;font-size:11px;font-weight:600;letter-spacing:.06em;color:rgba(255,235,245,.8);transition:all .25s}
+.pri-home-shortcuts a span{color:#f4a6ce}
+.pri-home-shortcuts a:hover{background:rgba(244,114,182,.11);border-color:rgba(244,114,182,.42);transform:translateY(-2px)}
+.pri-home-discovery-grid{max-width:1800px;margin:auto;display:grid;grid-template-columns:minmax(0,1fr);align-items:stretch;gap:16px}
+.pri-home-discovery-grid #airing-radar{padding-top:0}
+.pri-home-side-note{display:none}
+.pri-home-reborn #pri-catalogue{scroll-margin-top:90px}
+.pri-home-reborn #pri-realms{scroll-margin-top:90px}
+.pri-home-reborn .pri-catalogue-header{border-radius:30px;padding:clamp(24px,4vw,52px)}
+.pri-home-reborn .pri-catalogue-header h2{font-size:clamp(2.5rem,5.5vw,5rem);line-height:.96}
+.pri-home-reborn .pri-catalogue-rows>div>section{padding-top:38px;padding-bottom:22px}
+.pri-home-reborn .pri-catalogue-rows h2{font-size:clamp(1.5rem,2.3vw,2.25rem)}
+.pri-home-reborn #pri-realms>section{padding-top:52px}
+.pri-home-reborn #pri-realms>section>div:last-child a{min-height:180px;border-radius:22px;transition:transform .25s,border-color .25s}
+.pri-home-reborn #pri-realms>section>div:last-child a:hover{transform:translateY(-4px)}
+@media(min-width:1200px){.pri-home-discovery-grid{grid-template-columns:minmax(0,1fr) 300px;padding:0 40px}.pri-home-side-note{display:flex;flex-direction:column;justify-content:center;align-self:stretch;margin:0 0 0 0;padding:28px;border-radius:28px;border:1px solid rgba(255,190,220,.14);background:linear-gradient(145deg,rgba(66,24,53,.38),rgba(24,10,28,.55));min-height:260px}.pri-home-side-icon{font-size:30px;color:#f4a6ce}.pri-home-side-label{margin-top:18px;font-size:9px;letter-spacing:.22em;color:rgba(255,210,230,.6)}.pri-home-side-note h3{margin-top:12px;font-size:30px;line-height:1.02;color:#fff}.pri-home-side-note>p:not(.pri-home-side-label){margin-top:12px;font-size:13px;line-height:1.7;color:rgba(255,255,255,.55)}.pri-home-side-note>a{margin-top:22px;font-size:12px;color:#ffc4df;font-weight:600}}
+@media(max-width:640px){.pri-home-reborn .pri-home-section-intro{padding:30px 20px 20px}.pri-home-shortcuts{gap:7px}.pri-home-shortcuts a{padding:10px 12px;font-size:10px}.pri-home-reborn .pri-catalogue-header{padding:24px!important;border-radius:24px}.pri-home-reborn #pri-realms>section>div:last-child a{min-height:150px}}
