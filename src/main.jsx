@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from '@/App.jsx'
 import '@/index.css'
+import '@/seasonal.css'
 
 // Suppress the browser's standard right-click context menu on the site.
 // This is only a UI restriction; it does not disable DevTools or protect client code.
