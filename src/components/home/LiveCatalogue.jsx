@@ -20,7 +20,7 @@ export default function LiveCatalogue() {
           <Link to="/browse" className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[.06] px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10">Explore everything <ArrowUpRight className="h-4 w-4" /></Link>
         </div>
         <div className="pri-catalogue-tags relative z-10 mt-8 flex flex-wrap gap-2">
-          {["POPULAR", "CURRENT SEASON", "ACTION", "DARK FANTASY", "ISEKAI"].map((tag) => <span key={tag}>{tag}</span>)}
+          {[{label:"POPULAR",to:"/browse?sort=popular"},{label:"CURRENT SEASON",to:"/category/seasonal"},{label:"ACTION",to:"/category/action"},{label:"DARK FANTASY",to:"/category/dark-fantasy"},{label:"ISEKAI",to:"/category/isekai"}].map((tag) => <Link key={tag.label} to={tag.to} className="pri-catalogue-chip">{tag.label}<ArrowUpRight className="h-3 w-3" /></Link>)}
         </div>
       </header>
 
