@@ -10,6 +10,7 @@ import ScrollToTop from './components/ScrollToTop';
 import { ThemeProvider } from '@/lib/theme';
 import Layout from '@/components/layout/Layout';
 import IntroOverlay from '@/components/IntroOverlay';
+import SeasonalSnowfall from '@/components/SeasonalSnowfall';
 import { installPriSmartExperience } from '@/lib/priSmart';
 // Add page imports here
 const Home = lazy(() => import('@/pages/Home'));
@@ -107,6 +108,7 @@ function App() {
   return (
     <ThemeProvider>
       <IntroOverlay />
+      <SeasonalSnowfall />
       <AuthProvider>
         <QueryClientProvider client={queryClientInstance}>
           <Router>
