@@ -130,6 +130,23 @@ export default function Studio() {
         description="Recommendations, world-building, character bibles, episode outlines and scene dialogue â€” written in English or Hindi by PRI-ANIME's AI atelier."
       />
 
+      <section className="mx-auto mt-6 w-full max-w-[1600px] px-4 sm:px-6 lg:px-10">
+        <div className="overflow-hidden rounded-2xl border border-rose-300/20 bg-gradient-to-br from-rose-950/50 via-card/80 to-violet-950/40 p-5 sm:p-7">
+          <div className="flex flex-wrap items-start justify-between gap-5">
+            <div className="max-w-2xl">
+              <p className="text-xs font-semibold uppercase tracking-[.25em] text-rose-200">AI animation workspace</p>
+              <h2 className="mt-2 font-display text-2xl text-foreground sm:text-3xl">Turn your script into animation</h2>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">Prepare your story, scene breakdown, characters and dialogue here, then continue in Anijam's animation canvas for character generation, scene building, motion, lip sync and style customization.</p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <a href="https://www.anijam.ai/text-to-animation-ai" target="_blank" rel="noopener noreferrer" className="inline-flex items-center rounded-full bg-rose-200 px-5 py-3 text-sm font-semibold text-rose-950 transition hover:bg-rose-100">Text to animation ↗</a>
+              <a href="https://www.anijam.ai/script-to-animation-ai" target="_blank" rel="noopener noreferrer" className="inline-flex items-center rounded-full border border-white/20 px-5 py-3 text-sm font-semibold text-foreground transition hover:bg-white/10">Script to animation ↗</a>
+            </div>
+          </div>
+          <p className="mt-4 text-xs text-muted-foreground">Anijam opens as an external service. PRI-ANIME does not currently have a verified Anijam API connection.</p>
+        </div>
+      </section>
+
       <div className="mx-auto grid w-full max-w-[1600px] gap-6 px-4 pt-8 sm:px-6 lg:grid-cols-[1fr_360px] lg:px-10">
         <section className="flex min-h-[62vh] flex-col rounded-2xl border border-border/60 bg-card/40">
           <div className="flex flex-wrap items-center gap-2 border-b border-border/50 px-4 py-3">
