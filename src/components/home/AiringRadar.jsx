@@ -18,6 +18,7 @@ export default function AiringRadar() {
   const { items = [], loading } = useAnimeList({ action: "seasonal", season: season.season, year: season.year, perPage: 12 });
 
   useEffect(() => {
+    if (loading || items.some((anime) => anime?.nextEpisode?.timeUntilAiring != null)) return undefined;
     const controller = new AbortController();
     let active = true;
     async function loadFallback() {
