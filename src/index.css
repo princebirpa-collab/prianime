@@ -434,3 +434,12 @@ body::after {
     transition: none;
   }
 }
+
+/* PRI-ANIME: Sakura Rose premium global palette */
+:root{--background:316 38% 4%;--foreground:340 24% 96%;--card:316 30% 8%;--card-foreground:340 24% 96%;--popover:316 32% 9%;--popover-foreground:340 24% 96%;--primary:337 82% 72%;--primary-foreground:316 42% 8%;--secondary:324 36% 16%;--secondary-foreground:340 24% 96%;--muted:316 24% 12%;--muted-foreground:330 15% 72%;--accent:330 48% 23%;--accent-foreground:337 86% 88%;--border:330 34% 24%;--input:316 28% 17%;--ring:337 82% 72%;--gold:337 82% 72%;--amethyst:322 40% 25%;--surface:316 30% 9%;}
+html,body,#root{min-height:100%;} body{background-color:#100710;background-image:radial-gradient(ellipse at 12% 8%,rgba(236,98,170,.20),transparent 38%),radial-gradient(ellipse at 90% 12%,rgba(157,80,210,.15),transparent 42%),radial-gradient(ellipse at 52% 90%,rgba(190,45,110,.12),transparent 48%),linear-gradient(180deg,#100710,#08060b 75%);background-attachment:fixed;color:var(--foreground)}
+.glass,.glass-strong{border-color:rgba(255,160,205,.16)!important;background:rgba(24,10,23,.78)!important;backdrop-filter:blur(18px) saturate(135%);-webkit-backdrop-filter:blur(18px) saturate(135%)}
+button,a,[role=button]{transition:border-color .2s ease,background-color .2s ease,color .2s ease,box-shadow .2s ease}
+.glow-hover:hover{box-shadow:0 0 24px -10px rgba(244,114,182,.35)!important;border-color:rgba(244,114,182,.38)!important}
+.gold-text{background-image:linear-gradient(100deg,#ffb6d9,#f472b6 48%,#c4a3ff)!important}
+::selection{background:rgba(244,114,182,.35)}
