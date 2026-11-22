@@ -18,6 +18,7 @@ export const NAV_LINKS = [
   { to: "/community", label: "Community", icon: Users },
   { to: "/watch-party", label: "Watch Party", icon: Users2 },
   { to: "/missions", label: "Missions", icon: Trophy },
+  { to: "/universe", label: "Anime Universe", icon: Sparkles },
 ];
 
 export default function NavBar() {
