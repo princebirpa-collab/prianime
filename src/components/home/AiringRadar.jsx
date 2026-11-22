@@ -38,9 +38,9 @@ export default function AiringRadar() {
         if (active && !controller.signal.aborted) setFallbackItems([]);
       } finally { if (active) setFallbackLoading(false); }
     }
-    if (!upcoming.length) loadFallback();
+    loadFallback();
     return () => { active = false; controller.abort(); };
-  }, [upcoming.length]);
+  }, []);
 
   const fallbackCards = useMemo(() => fallbackItems.map((anime) => ({
     id: anime.id, title: anime.title || "Untitled anime", image: anime.image || "",
