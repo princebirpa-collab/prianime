@@ -101,11 +101,12 @@ async function fetchGraphQL(query, variables) {
   }
   let payload;
   try {
-    payload = await response.json();
+    const raw = await response.text();
+    payload = JSON.parse(raw);
+    if (!payload || typeof payload !== "object" || Array.isArray(payload)) throw new Error("Invalid JSON shape");
   } catch {
-    // An HTTP 200 with an unreadable body (e.g. a proxy/CDN interstitial) is
-    // NOT a genuine zero-results answer — it is a transient failure.
-    const error = new Error("AniList returned an unreadable response.");
+    // A 200 may still be an HTML interstitial or malformed proxy response.
+    const error = new Error("AniList proxy returned invalid JSON. Retrying with backup catalogue.");
     error.retryable = true;
     throw error;
   }
