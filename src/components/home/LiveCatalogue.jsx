@@ -25,7 +25,7 @@ export default function LiveCatalogue() {
       </header>
 
       <div className="pri-catalogue-rows">
-        <AnimeRowRemote title="Fan favourites" subtitle="The canon, ranked by followers" body={{ action: "popular", perPage: 20 }} viewAll="/browse?sort=popular" rank />
+        <AnimeRowRemote title="Fan favourites" subtitle="The canon, ranked by followers" body={{ action: "popular", perPage: 8 }} viewAll="/browse?sort=popular" rank />
         <AnimeRowRemote title={seasonTitle + " " + season.year} subtitle="The season's current lineup" body={{ action: "seasonal", season: season.season, year: season.year, perPage: 20 }} viewAll="/category/seasonal" />
         <AnimeRowRemote title="Action & adventure" subtitle="Momentum, stakes, spectacle" body={{ action: "genre", genre: "Action", perPage: 20 }} viewAll="/category/action" />
         <AnimeRowRemote title="Dark fantasy" subtitle="Darker worlds and supernatural stories" body={{ action: "genre", genre: "Horror", perPage: 20 }} viewAll="/category/dark-fantasy" />
