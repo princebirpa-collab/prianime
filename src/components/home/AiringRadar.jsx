@@ -15,7 +15,7 @@ export default function AiringRadar() {
   const [fallbackItems, setFallbackItems] = useState([]);
   const [fallbackLoading, setFallbackLoading] = useState(false);
   const season = currentSeason();
-  const { items, loading } = useAnimeList({ action: "seasonal", season: season.season, year: season.year, perPage: 12 });
+  const { items = [], loading } = useAnimeList({ action: "seasonal", season: season.season, year: season.year, perPage: 12 });
 
   useEffect(() => {
     const controller = new AbortController();
@@ -40,7 +40,7 @@ export default function AiringRadar() {
     }
     loadFallback();
     return () => { active = false; controller.abort(); };
-  }, []);
+  }, [loading, items.length]);
 
   const fallbackCards = useMemo(() => fallbackItems.map((anime) => ({
     id: anime.id, title: anime.title || "Untitled anime", image: anime.image || "",
