@@ -12,6 +12,7 @@ export default function Home() {
       <FeaturedTrendingCarousel />
       <HomeRankings />
       <div className="pri-home-content">
+        <ContinueWatching />
         <div className="pri-home-section-intro pri-home-intro-reborn">
           <div className="pri-home-kicker"><span className="pri-home-dot" /> THE PRI-ANIME EXPERIENCE</div>
           <h2>One universe.<br/><span>Infinite stories.</span></h2>
@@ -22,20 +23,11 @@ export default function Home() {
             <a href="#pri-catalogue">Full catalogue <span>↗</span></a>
           </nav>
         </div>
-        <div className="pri-home-discovery-grid">
-          <div className="pri-home-discovery-main"><AiringRadar /></div>
-          <aside className="pri-home-side-note">
-            <span className="pri-home-side-icon">✦</span>
-            <p className="pri-home-side-label">DISCOVER YOUR NEXT WORLD</p>
-            <h3>Not sure<br/>what to watch?</h3>
-            <p>Explore curated worlds, genre collections and seasonal picks.</p>
-            <a href="#pri-realms">Explore realms <span>↗</span></a>
-          </aside>
-        </div>
-        <ContinueWatching />
         <div id="pri-catalogue"><LiveCatalogue /></div>
         <div id="pri-realms"><RealmGrid /></div>
-        <AiringRadar />
+        <section id="airing-radar" className="pt-8">
+          <AiringRadar />
+        </section>
       </div>
     </main>
   );
