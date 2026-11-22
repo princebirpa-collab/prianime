@@ -13,15 +13,9 @@ export default async function handler(req, res) {
     res.setHeader("Allow", "POST");
     return send(res, 405, { errors: [{ message: "Method not allowed. Use POST." }] });
   }
-
   const query = typeof req.body?.query === "string" ? req.body.query : "";
-  const variables = req.body?.variables && typeof req.body.variables === "object"
-    ? req.body.variables
-    : {};
-
-  if (!query || query.length > 50000) {
-    return send(res, 400, { errors: [{ message: "A valid GraphQL query is required." }] });
-  }
+  const variables = req.body?.variables && typeof req.body.variables === "object" ? req.body.variables : {};
+  if (!query || query.length > 50000) return send(res, 400, { errors: [{ message: "A valid GraphQL query is required." }] });
 
   try {
     const upstream = await fetch(ANILIST_GRAPHQL, {
@@ -30,23 +24,19 @@ export default async function handler(req, res) {
       body: JSON.stringify({ query, variables }),
       signal: AbortSignal.timeout(10000),
     });
-    const text = await upstream.text();
+    const raw = await upstream.text();
     let payload;
-    try {
-      payload = JSON.parse(text);
-    } catch {
-      return send(res, upstream.status >= 400 ? upstream.status : 502, { errors: [{ message: `AniList response was not JSON (HTTP ${upstream.status}).` }] });
+    try { payload = JSON.parse(raw); }
+    catch { return send(res, 502, { errors: [{ message: "AniList upstream returned malformed JSON." }] }); }
+    if (!payload || typeof payload !== "object" || Array.isArray(payload) || (!payload.data && !payload.errors)) {
+      return send(res, 502, { errors: [{ message: "AniList upstream returned an invalid GraphQL payload." }] });
     }
     if (!upstream.ok) {
-      return send(res, upstream.status, payload?.errors
-        ? payload
-        : { errors: [{ message: `AniList upstream returned HTTP ${upstream.status}.` }] });
+      return send(res, upstream.status, payload.errors ? payload : { errors: [{ message: `AniList upstream returned HTTP ${upstream.status}.` }] });
     }
     return send(res, 200, payload);
   } catch (error) {
     const status = error?.name === "TimeoutError" ? 504 : 502;
-    return send(res, status, {
-      errors: [{ message: status === 504 ? "AniList request timed out." : "Could not reach AniList." }],
-    });
+    return send(res, status, { errors: [{ message: status === 504 ? "AniList request timed out." : "Could not reach AniList." }] });
   }
 }
