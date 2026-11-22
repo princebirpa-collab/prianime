@@ -9,19 +9,6 @@ export default function Layout() {
   const { pathname } = useLocation();
   const adSlotRef = useRef(null);
   const [adDismissed, setAdDismissed] = useState(false);
-  const [experience, setExperience] = useState(() => {
-    try { return localStorage.getItem("prianime-experience") || "modern"; } catch { return "modern"; }
-  });
-
-  const switchExperience = () => {
-    setExperience((current) => {
-      const next = current === "modern" ? "classic" : "modern";
-      try { localStorage.setItem("prianime-experience", next); } catch {}
-      window.dispatchEvent(new Event("prianime-experience-change"));
-      return next;
-    });
-  };
-
   useEffect(() => { window.scrollTo({ top: 0, behavior: "instant" }); }, [pathname]);
 
   useEffect(() => {
@@ -37,8 +24,7 @@ export default function Layout() {
   }, [adDismissed]);
 
   return (
-    <div className={"prianime-experience relative flex min-h-screen flex-col overflow-x-hidden " + (experience === "modern" ? "experience-modern" : "experience-classic")}>
-      <div className="pri-experience-switch-wrap"><button type="button" onClick={switchExperience} className="pri-experience-switch" aria-label={"Switch to " + (experience === "modern" ? "Classic" : "Modern") + " experience"}><span className="pri-switch-dot" />{experience === "modern" ? "MODERN" : "CLASSIC"}<span className="pri-switch-divider">/</span>{experience === "modern" ? "CLASSIC" : "MODERN"}</button></div>
+    <div className="prianime-experience relative flex min-h-screen flex-col overflow-x-hidden experience-modern">
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground">Skip to content</a>
       <NavBar />
       <DiscordCommunityPopup />
