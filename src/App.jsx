@@ -36,6 +36,7 @@ const WorldMap = lazy(() => import('@/pages/WorldMap'));
 const WatchParty = lazy(() => import('@/pages/WatchParty'));
 const Channels = lazy(() => import('@/pages/Channels'));
 const Manhwa = lazy(() => import('@/pages/Manhwa'));
+const LunarHub = lazy(() => import('@/pages/LunarHub'));
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -95,6 +96,7 @@ const AuthenticatedApp = () => {
           <Route path="/watch-party" element={<WatchParty />} />
           <Route path="/channels" element={<Channels />} />
           <Route path="/manhwa" element={<Manhwa />} />
+          <Route path="/universe" element={<LunarHub />} />
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>
