@@ -4,7 +4,7 @@ import { ArrowUpRight, Play, Star, TrendingUp, ChevronLeft, ChevronRight } from 
 import { useAnimeList } from "@/hooks/useAnime";
 
 export default function FeaturedTrendingCarousel() {
-  const { items = [], loading, error } = useAnimeList({ action: "trending", perPage: 20 });
+  const { items = [], loading, error } = useAnimeList({ action: "trending", perPage: 8 });
   const anime = useMemo(() => {
     const today = new Date();
     return items.filter((item) => {
