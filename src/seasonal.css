@@ -1,0 +1,9 @@
+
+/* Seasonal winter / Christmas theme, kept lightweight and isolated. */
+.pri-seasonal-snow{position:fixed;inset:0;z-index:40;pointer-events:none;overflow:hidden;contain:strict}
+.pri-seasonal-snow span{position:absolute;top:-24px;color:#fff;opacity:.56;text-shadow:0 0 7px rgba(255,255,255,.5);animation:pri-snow-fall linear infinite;will-change:transform}
+@keyframes pri-snow-fall{to{transform:translate3d(10vw,110vh,0) rotate(360deg)}}
+[data-pri-seasonal="winter"] body{background-image:radial-gradient(ellipse at 8% 0%,rgba(180,40,70,.13),transparent 36%),radial-gradient(ellipse at 90% 20%,rgba(40,130,190,.10),transparent 35%)}
+[data-pri-seasonal="winter"] header{border-bottom-color:rgba(180,60,80,.28)}
+@media(prefers-reduced-motion:reduce){.pri-seasonal-snow span{animation:none;display:none}}
+@media(max-width:767px){.pri-seasonal-snow span{opacity:.32}}
