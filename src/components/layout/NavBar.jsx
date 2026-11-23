@@ -16,6 +16,7 @@ export const NAV_LINKS = [
   { to: "/studio", label: "AI Studio", icon: Sparkles },
   { to: "/creator", label: "Creator", icon: Wand2 },
   { to: "/community", label: "Community", icon: Users },
+  { to: "/guild-space", label: "Guild & Profile", icon: Sparkles },
   { to: "/watch-party", label: "Watch Party", icon: Users2 },
   { to: "/missions", label: "Missions", icon: Trophy },
   { to: "/universe", label: "LUNRA", icon: Sparkles },
