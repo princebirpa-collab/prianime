@@ -97,13 +97,25 @@ export default function NavBar() {
   );
 
   return (
-    <header className="glass-strong sticky top-0 z-50 border-b border-white/[0.07]">
-      <div className="mx-auto flex h-[68px] w-full max-w-[1600px] items-center gap-3 px-3 sm:px-5 lg:px-8">
-        <Link to="/" className="group flex items-center gap-2.5" aria-label="PRI-ANIME home"><img src="/prianime-logo.jpg" alt="PRI-ANIME" className="h-9 w-9 rounded-full border border-primary/50 object-cover" /><span className="font-display text-xl font-semibold tracking-[0.16em] text-foreground">PRI<span className="text-primary">Â·</span>ANIME</span></Link>
-        <div className="ml-auto flex items-center gap-1.5">{searchField(false)}<button type="button" onClick={() => setSearchOpen((value) => !value)} aria-label="Search" aria-expanded={searchOpen} className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition hover:bg-foreground/5 hover:text-foreground md:hidden"><Search className="h-4 w-4" /></button><NotificationsBell />{pathname !== "/" && <ThemeMenu />}<Link to="/settings" className="ml-1 grid h-9 w-9 place-items-center overflow-hidden rounded-full border border-primary/50 bg-primary/15 text-sm font-semibold text-primary shadow-[0_0_16px_rgba(244,63,94,.18)] transition hover:scale-105" aria-label={"Profile settings for " + profile.name}>{profile.avatar ? <img src={profile.avatar} alt="" className="h-full w-full object-cover" /> : profile.name.slice(0, 1).toUpperCase()}</Link><button type="button" onClick={() => setMobileOpen((value) => !value)} aria-label={mobileOpen ? "Close menu" : "Open menu"} aria-expanded={mobileOpen} className="grid h-10 w-10 place-items-center rounded-xl border border-white/[0.07] bg-white/[0.035] text-muted-foreground transition hover:border-primary/40 hover:bg-primary/10 hover:text-primary">{mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</button></div>
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#0b0b0d]/95 text-white backdrop-blur-xl">
+      <div className="mx-auto flex h-9 max-w-[1600px] items-center justify-between border-b border-white/10 px-4 sm:px-6">
+        <div className="flex min-w-0 items-center gap-2 text-xs text-white/70"><span className="h-2 w-2 rounded-full bg-violet-500"/><Link to="/guild-space" className="truncate font-semibold text-white/90 hover:text-pink-300">PRI-ANIME</Link><span className="hidden sm:inline text-white/40">·</span><span className="hidden sm:inline">Community</span></div>
+        <div className="flex items-center gap-2 text-xs text-white/60"><span className="h-2 w-2 rounded-full bg-emerald-400"/><span>Online</span></div>
       </div>
-      {searchOpen && <div className="border-t border-border/50 px-4 py-3 md:hidden">{searchField(true)}</div>}
-      {mobileOpen && <nav aria-label="Main menu" className="absolute left-3 right-3 top-[calc(100%+8px)] z-[80] grid max-h-[min(78vh,620px)] gap-1 overflow-y-auto rounded-2xl border border-white/10 bg-[#100e14]/95 p-3 shadow-2xl backdrop-blur-2xl sm:left-auto sm:right-6 sm:w-[340px]">{NAV_LINKS.concat({ to: "/settings", label: "Profile", icon: Settings }).map((link) => <NavLink key={link.to} to={link.to} end={link.to === "/"} onClick={() => setMobileOpen(false)} className={({ isActive }) => "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm " + (isActive ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-foreground/5")}><link.icon className="h-4 w-4" aria-hidden="true" />{link.label}</NavLink>)}</nav>}
+      <div className="mx-auto flex min-h-[52px] max-w-[1600px] items-center gap-1 px-3 sm:px-5">
+        <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto [scrollbar-width:none]">
+          {NAV_LINKS.map((link) => <NavLink key={link.to} to={link.to} end={link.to === "/"} title={link.label} aria-label={link.label} className={({isActive}) => "grid h-9 w-9 shrink-0 place-items-center rounded-lg transition " + (isActive ? "bg-white/10 text-pink-300" : "text-white/70 hover:bg-white/5 hover:text-white")}><link.icon className="h-[17px] w-[17px]"/></NavLink>)}
+        </div>
+        <div className="ml-auto flex shrink-0 items-center gap-1.5 pl-2">
+          {searchField(false)}
+          <button type="button" onClick={() => setSearchOpen((value) => !value)} aria-label="Search" aria-expanded={searchOpen} className="grid h-9 w-9 place-items-center rounded-lg text-white/70 transition hover:bg-white/5 hover:text-white md:hidden"><Search className="h-4 w-4"/></button>
+          <NotificationsBell />
+          <Link to="/settings" title="Profile" className="ml-1 grid h-9 w-9 place-items-center overflow-hidden rounded-full border border-white/20 bg-white/10 text-sm font-semibold text-white">{profile.avatar ? <img src={profile.avatar} alt="" className="h-full w-full object-cover"/> : profile.name.slice(0,1).toUpperCase()}</Link>
+          <button type="button" onClick={() => setMobileOpen((value) => !value)} aria-label={mobileOpen ? "Close menu" : "Open menu"} aria-expanded={mobileOpen} className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 bg-white/5 text-white/70 transition hover:bg-white/10 hover:text-white">{mobileOpen ? <X className="h-4 w-4"/> : <Menu className="h-4 w-4"/>}</button>
+        </div>
+      </div>
+      {searchOpen && <div className="border-t border-white/10 px-4 py-3 md:hidden">{searchField(true)}</div>}
+      {mobileOpen && <nav aria-label="Main menu" className="absolute left-3 right-3 top-[calc(100%+8px)] z-[80] grid max-h-[min(78vh,620px)] gap-1 overflow-y-auto rounded-2xl border border-white/10 bg-[#100e14]/95 p-3 shadow-2xl backdrop-blur-2xl sm:left-auto sm:right-6 sm:w-[340px]">{NAV_LINKS.concat({to:"/settings",label:"Profile",icon:Settings}).map((link) => <NavLink key={link.to} to={link.to} end={link.to === "/"} onClick={() => setMobileOpen(false)} className={({isActive}) => "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm " + (isActive ? "bg-primary/15 text-primary" : "text-white/70 hover:bg-white/5")}><link.icon className="h-4 w-4" aria-hidden="true"/>{link.label}</NavLink>)}</nav>}
     </header>
   );
 }
