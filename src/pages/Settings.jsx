@@ -5,6 +5,7 @@ import { useProfile } from "@/lib/profile";
 import { useTheme } from "@/lib/theme";
 import { usePref, LANGUAGES } from "@/lib/prefs";
 import LibraryPage from "@/pages/Library";
+import ProfileEffects from "@/components/profile/ProfileEffects";
 
 
 const AVATAR_STYLES = [
@@ -264,6 +265,7 @@ export default function Settings() {
             </div>
           </div>
         </section>
+        <ProfileEffects />
         <section className="rounded-2xl border border-border/60 bg-card/40 p-5 lg:col-span-2">
           <h2 className="font-display text-xl">Playback & privacy</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
