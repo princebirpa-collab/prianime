@@ -137,7 +137,6 @@ export default function IntroOverlay() {
             </button>
           </div>
           {legacyNotice && <p className="mt-5 rounded-xl border border-white/10 bg-black/25 p-3 text-center text-sm text-white/75">OG version selector is ready, but the original legacy site has not yet been restored. The current version remains available.</p>}
-          <p className="mt-5 text-center text-xs text-white/40">Glass panel · 50% transparent · blurred background</p>
         </div>
       </div>}
       <IntroDetailsShowcase />
