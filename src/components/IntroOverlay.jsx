@@ -129,7 +129,7 @@ export default function IntroOverlay() {
               <p className="mt-2 text-sm text-white/60">Enter the current updated experience.</p>
               <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-rose-100">Enter site <ArrowRight className="h-4 w-4"/></span>
             </button>
-            <button type="button" onClick={() => setLegacyNotice(true)} className="rounded-2xl border border-white/15 bg-white/[.07] p-6 text-left backdrop-blur-xl transition hover:border-white/35 hover:bg-white/[.12]">
+            <button type="button" onClick={() => { dismiss(); window.location.assign('/og'); }} className="rounded-2xl border border-white/15 bg-white/[.07] p-6 text-left backdrop-blur-xl transition hover:border-white/35 hover:bg-white/[.12]">
               <History className="h-6 w-6 text-amber-100" />
               <h3 className="mt-4 text-xl font-semibold">OG Version</h3>
               <p className="mt-2 text-sm text-white/60">The original legacy experience.</p>
