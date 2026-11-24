@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import IntroDetailsShowcase from "@/components/IntroDetailsShowcase";
-import { Volume2, VolumeX, UserRound } from "lucide-react";
+import { Volume2, VolumeX, UserRound, ArrowRight, Sparkles, History } from "lucide-react";
 
 const INTRO_SEEN_KEY = "prianime-intro-completed:session:v2";
 const R2_PUBLIC_BASE_URL = (import.meta.env.VITE_R2_PUBLIC_BASE_URL || "").replace(/\/+$/, "");
@@ -19,6 +19,8 @@ function hasSeenIntro() {
 export default function IntroOverlay() {
   const [visible, setVisible] = useState(() => window.location.pathname !== "/about-owner" && !hasSeenIntro());
   const [audioEnabled, setAudioEnabled] = useState(false);
+  const [showVersionPicker, setShowVersionPicker] = useState(false);
+  const [legacyNotice, setLegacyNotice] = useState(false);
   const backgroundVideoRef = useRef(null);
 
   const enableBackgroundAudio = async () => {
@@ -96,7 +98,7 @@ export default function IntroOverlay() {
           </p>
 
           <div className="mt-9 flex flex-col items-center gap-3">
-            <button type="button" onClick={dismiss}
+            <button type="button" onClick={() => setShowVersionPicker(true)}
               className="inline-flex min-w-[218px] items-center justify-center gap-3 rounded-2xl border border-white/70 bg-white px-8 py-4 text-sm font-bold tracking-wide text-[#17151a] shadow-[0_12px_35px_rgba(0,0,0,.25)] transition hover:-translate-y-0.5 hover:bg-white/90">
               Enter PRI-ANIME
             </button>
@@ -111,6 +113,33 @@ export default function IntroOverlay() {
           </div>
         </div>
       </section>
+      {showVersionPicker && <div className="fixed inset-0 z-30 flex items-center justify-center p-4 sm:p-8">
+        <div className="absolute inset-0 bg-black/45 backdrop-blur-sm" onClick={() => setShowVersionPicker(false)} />
+        <div className="relative w-full max-w-3xl rounded-[28px] border border-white/15 bg-[#111]/50 p-6 shadow-2xl backdrop-blur-[20px] sm:p-9">
+          <button type="button" onClick={() => setShowVersionPicker(false)} aria-label="Close version selection" className="absolute right-4 top-4 rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-white/60 hover:text-white">✕</button>
+          <div className="text-center">
+            <p className="text-xs uppercase tracking-[.35em] text-rose-200/80">Choose your experience</p>
+            <h2 className="mt-3 text-3xl font-bold sm:text-4xl">What will you explore?</h2>
+            <p className="mt-2 text-white/60">Choose your PRI-ANIME experience.</p>
+          </div>
+          <div className="mt-7 grid gap-4 sm:grid-cols-2">
+            <button type="button" onClick={dismiss} className="group rounded-2xl border border-rose-200/30 bg-white/[.07] p-6 text-left backdrop-blur-xl transition hover:border-rose-200/70 hover:bg-white/[.12]">
+              <Sparkles className="h-6 w-6 text-rose-200" />
+              <h3 className="mt-4 text-xl font-semibold">PRI-ANIME</h3>
+              <p className="mt-2 text-sm text-white/60">Enter the current updated experience.</p>
+              <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-rose-100">Enter site <ArrowRight className="h-4 w-4"/></span>
+            </button>
+            <button type="button" onClick={() => setLegacyNotice(true)} className="rounded-2xl border border-white/15 bg-white/[.07] p-6 text-left backdrop-blur-xl transition hover:border-white/35 hover:bg-white/[.12]">
+              <History className="h-6 w-6 text-amber-100" />
+              <h3 className="mt-4 text-xl font-semibold">OG Version</h3>
+              <p className="mt-2 text-sm text-white/60">The original legacy experience.</p>
+              <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-amber-100">Select OG <ArrowRight className="h-4 w-4"/></span>
+            </button>
+          </div>
+          {legacyNotice && <p className="mt-5 rounded-xl border border-white/10 bg-black/25 p-3 text-center text-sm text-white/75">OG version selector is ready, but the original legacy site has not yet been restored. The current version remains available.</p>}
+          <p className="mt-5 text-center text-xs text-white/40">Glass panel · 50% transparent · blurred background</p>
+        </div>
+      </div>}
       <IntroDetailsShowcase />
     </div>,
     document.body
