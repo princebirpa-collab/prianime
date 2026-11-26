@@ -8,7 +8,9 @@ import NotificationsBell from "@/components/layout/NotificationsBell";
 
 export const NAV_LINKS = [
   { to: "/", label: "Discover", icon: Compass },
-  { to: "/browse", label: "Browse", icon: Film },\n  { to: "/shows", label: "PRI-SHOW", icon: Tv2 },\n  { to: "/movies", label: "PRI-MOVIE", icon: Film },
+  { to: "/browse", label: "Browse", icon: Film },
+  { to: "/shows", label: "PRI-SHOW", icon: Tv2 },
+  { to: "/movies", label: "PRI-MOVIE", icon: Film },
   { to: "/reels", label: "Reels", icon: Clapperboard },
   { to: "/watch", label: "Theater", icon: Film },
   { to: "/channels", label: "Channels", icon: Tv2 },

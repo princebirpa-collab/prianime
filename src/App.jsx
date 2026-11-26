@@ -37,7 +37,8 @@ const Channels = lazy(() => import('@/pages/Channels'));
 const Manhwa = lazy(() => import('@/pages/Manhwa'));
 const LunarHub = lazy(() => import('@/pages/LunarHub'));
 const GuildSpace = lazy(() => import('@/pages/GuildSpace'));
-const LunarrOG = lazy(() => import('@/pages/LunarrOG'));\nconst BrandLanding = lazy(() => import('@/pages/BrandLanding'));
+const LunarrOG = lazy(() => import('@/pages/LunarrOG'));
+const BrandLanding = lazy(() => import('@/pages/BrandLanding'));
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
