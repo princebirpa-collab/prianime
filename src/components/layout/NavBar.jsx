@@ -8,7 +8,7 @@ import NotificationsBell from "@/components/layout/NotificationsBell";
 
 export const NAV_LINKS = [
   { to: "/", label: "Discover", icon: Compass },
-  { to: "/browse", label: "Browse", icon: Film },
+  { to: "/browse", label: "Browse", icon: Film },\n  { to: "/shows", label: "PRI-SHOW", icon: Tv2 },\n  { to: "/movies", label: "PRI-MOVIE", icon: Film },
   { to: "/reels", label: "Reels", icon: Clapperboard },
   { to: "/watch", label: "Theater", icon: Film },
   { to: "/channels", label: "Channels", icon: Tv2 },
@@ -100,7 +100,7 @@ export default function NavBar() {
     <header className="fixed bottom-4 left-1/2 z-[100] w-[calc(100%-1.5rem)] max-w-[900px] -translate-x-1/2 text-white">
       <div className="relative flex items-center gap-1 rounded-2xl border border-white/10 bg-[#0b0b0d]/90 px-2 py-2 shadow-2xl backdrop-blur-2xl sm:px-3">
         <div className="flex min-w-0 flex-1 items-center justify-center gap-1 overflow-x-auto [scrollbar-width:none]">
-          {NAV_LINKS.map((link) => <NavLink key={link.to} to={link.to} end={link.to === "/"} title={link.label} aria-label={link.label} className={({isActive}) => "grid h-9 w-9 shrink-0 place-items-center rounded-xl transition " + (isActive ? "bg-white/10 text-pink-300 ring-1 ring-white/10" : "text-white/65 hover:bg-white/5 hover:text-white")}><link.icon className="h-[17px] w-[17px]"/></NavLink>)}
+          {NAV_LINKS.map((link) => <NavLink key={link.to} to={link.to} end={link.to === "/"} title={link.label} aria-label={link.label} className={({isActive}) => "grid h-9 w-9 shrink-0 place-items-center rounded-xl transition " + (isActive ? "bg-white/10 text-white ring-1 ring-white/10" : "text-white/65 hover:bg-white/5 hover:text-white")}><link.icon className="h-[17px] w-[17px]"/></NavLink>)}
         </div>
         <div className="flex shrink-0 items-center gap-1 border-l border-white/10 pl-1.5">
           {searchField(false)}
