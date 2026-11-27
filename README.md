@@ -1,3 +1,5 @@
+![CI](https://github.com/princebirpa-collab/prianime/actions/workflows/ci.yml/badge.svg)
+
 # PRI-ANIME
 
 PRI-ANIME is a React + Vite website deployed on Vercel.
