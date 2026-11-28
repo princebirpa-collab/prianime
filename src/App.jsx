@@ -38,7 +38,8 @@ const Manhwa = lazy(() => import('@/pages/Manhwa'));
 const LunarHub = lazy(() => import('@/pages/LunarHub'));
 const GuildSpace = lazy(() => import('@/pages/GuildSpace'));
 const LunarrOG = lazy(() => import('@/pages/LunarrOG'));
-const BrandLanding = lazy(() => import('@/pages/BrandLanding'));\nconst Shop = lazy(() => import('@/pages/Shop'));
+const BrandLanding = lazy(() => import('@/pages/BrandLanding'));
+const Shop = lazy(() => import('@/pages/Shop'));
 const MusicHub = lazy(() => import('@/pages/MusicHub'));
 const GameHub = lazy(() => import('@/pages/GameHub'));
 
