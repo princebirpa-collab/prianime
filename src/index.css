@@ -501,3 +501,20 @@ button,a,[role=button]{transition:border-color .2s ease,background-color .2s eas
 body{background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,.045),transparent 48%),#050505!important}
 body::before{background:linear-gradient(180deg,rgba(255,255,255,.025),transparent 50%),#050505!important}
 .glass,.glass-strong{background:rgba(12,12,12,.72)!important;border-color:rgba(255,255,255,.12)!important}
+
+/* PRI monochrome cinematic redesign — shared surfaces */
+:root{--background:0 0% 3%;--foreground:0 0% 96%;--primary:0 0% 90%;--primary-foreground:0 0% 4%;--secondary:0 0% 13%;--accent:0 0% 19%;--border:0 0% 19%;--ring:0 0% 78%;}
+body{background:#050505!important;color:#f5f5f5}
+.prianime-experience{background:radial-gradient(ellipse at 50% -12%,rgba(255,255,255,.055),transparent 55%),#050505!important}
+.pri-home,.pri-home-reborn{background:transparent!important}
+.pri-home-reborn .pri-home-section-intro h2,.pri-catalogue-header h2{color:#f5f5f5!important}
+.pri-home-reborn .pri-home-section-intro h2 span,.pri-catalogue-gradient{color:#cfcfcf!important;background:none!important;-webkit-text-fill-color:#cfcfcf!important}
+.pri-home-shortcuts a,.pri-catalogue-tags .pri-catalogue-chip{border-color:rgba(255,255,255,.16)!important;color:rgba(255,255,255,.72)!important}
+.pri-home-shortcuts a:hover,.pri-catalogue-tags .pri-catalogue-chip:hover{background:rgba(255,255,255,.08)!important;border-color:rgba(255,255,255,.4)!important;color:#fff!important}
+.pri-home-dot{background:#ddd!important;box-shadow:0 0 10px rgba(255,255,255,.35)!important}
+.pri-catalogue-header{border-color:rgba(255,255,255,.12)!important;background:linear-gradient(135deg,rgba(255,255,255,.08),rgba(10,10,10,.95))!important}
+.pri-catalogue-orb{opacity:.12!important;filter:grayscale(1)!important}
+.pri-home-reborn #pri-realms>section>div:last-child a{filter:grayscale(1);border:1px solid rgba(255,255,255,.12)!important}
+.pri-home-reborn #pri-realms>section>div:last-child a:hover{border-color:rgba(255,255,255,.35)!important}
+footer{background:#080808!important}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
