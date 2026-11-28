@@ -26,7 +26,7 @@ function applyTheme(id) {
 export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState(() => {
     if (typeof window === "undefined") return "sakura";
-    return localStorage.getItem(STORAGE_KEY) || "sakura";
+    return localStorage.getItem(STORAGE_KEY) || "royal";
   });
 
   useEffect(() => {
