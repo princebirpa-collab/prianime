@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
-import { Menu, Search, X, Compass, Clapperboard, Film, Sparkles, Wand2, Settings, Loader2, Users, Trophy, Users2, Tv2, BookOpen } from "lucide-react";
+import { Menu, Search, X, Compass, Clapperboard, Film, Sparkles, Wand2, Settings, Loader2, Users, Trophy, Users2, Tv2, BookOpen, Music2, Gamepad2 } from "lucide-react";
 import { useProfile } from "@/lib/profile";
 import { callAniList } from "@/lib/animeApi";
 import ThemeMenu from "@/components/layout/ThemeMenu";
@@ -9,6 +9,8 @@ import NotificationsBell from "@/components/layout/NotificationsBell";
 export const NAV_LINKS = [
   { to: "/", label: "Discover", icon: Compass },
   { to: "/browse", label: "Browse", icon: Film },
+  { to: "/music", label: "Music", icon: Music2 },
+  { to: "/games", label: "Game Realm", icon: Gamepad2 },
   { to: "/shows", label: "PRI-SHOW", icon: Tv2 },
   { to: "/movies", label: "PRI-MOVIE", icon: Film },
   { to: "/reels", label: "Reels", icon: Clapperboard },
