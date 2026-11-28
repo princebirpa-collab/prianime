@@ -91,17 +91,17 @@ export default function NavBar() {
   );
 
   return (
-    <header className="fixed bottom-4 left-1/2 z-[100] w-[calc(100%-1.5rem)] max-w-[900px] -translate-x-1/2 text-white">
-      <div className="relative flex items-center gap-1 rounded-2xl border border-white/10 bg-[#0b0b0d]/90 px-2 py-2 shadow-2xl backdrop-blur-2xl sm:px-3">
+    <header className="fixed bottom-3 left-1/2 z-[100] w-[calc(100%-1rem)] max-w-[760px] -translate-x-1/2 text-white">
+      <div className="relative flex items-center gap-1 rounded-xl border border-white/10 bg-[#0b0b0d]/90 px-1.5 py-1 shadow-2xl backdrop-blur-2xl sm:px-2">
         <div className="flex min-w-0 flex-1 items-center justify-center gap-1 overflow-x-auto [scrollbar-width:none]">
-          {NAV_LINKS.map((link) => <NavLink key={link.to} to={link.to} end={link.to === "/"} title={link.label} aria-label={link.label} className={({isActive}) => "grid h-9 w-9 shrink-0 place-items-center rounded-xl transition " + (isActive ? "bg-white/10 text-white ring-1 ring-white/10" : "text-white/65 hover:bg-white/5 hover:text-white")}><link.icon className="h-[17px] w-[17px]"/></NavLink>)}
+          {NAV_LINKS.map((link) => <NavLink key={link.to} to={link.to} end={link.to === "/"} title={link.label} aria-label={link.label} className={({isActive}) => "grid h-8 w-8 shrink-0 place-items-center rounded-lg transition " + (isActive ? "bg-white/10 text-white ring-1 ring-white/10" : "text-white/65 hover:bg-white/5 hover:text-white")}><link.icon className="h-4 w-4"/></NavLink>)}
         </div>
-        <div className="flex shrink-0 items-center gap-1 border-l border-white/10 pl-1.5">
+        <div className="flex shrink-0 items-center gap-1 border-l border-white/10 pl-1">
           {searchField(false)}
-          <button type="button" onClick={() => setSearchOpen((value) => !value)} aria-label="Search" aria-expanded={searchOpen} className="grid h-9 w-9 place-items-center rounded-xl text-white/70 transition hover:bg-white/5 hover:text-white md:hidden"><Search className="h-4 w-4"/></button>
+          <button type="button" onClick={() => setSearchOpen((value) => !value)} aria-label="Search" aria-expanded={searchOpen} className="grid h-8 w-8 place-items-center rounded-lg text-white/70 transition hover:bg-white/5 hover:text-white md:hidden"><Search className="h-4 w-4"/></button>
           <NotificationsBell />
-          <Link to="/settings" title="Profile" className="grid h-9 w-9 place-items-center overflow-hidden rounded-full border border-white/20 bg-white/10 text-sm font-semibold text-white">{profile.avatar ? <img src={profile.avatar} alt="" className="h-full w-full object-cover"/> : profile.name.slice(0,1).toUpperCase()}</Link>
-          <button type="button" onClick={() => setMobileOpen((value) => !value)} aria-label={mobileOpen ? "Close menu" : "Open menu"} aria-expanded={mobileOpen} className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/5 text-white/70 transition hover:bg-white/10 hover:text-white">{mobileOpen ? <X className="h-4 w-4"/> : <Menu className="h-4 w-4"/>}</button>
+          <Link to="/settings" title="Profile" className="grid h-8 w-8 place-items-center overflow-hidden rounded-full border border-white/20 bg-white/10 text-sm font-semibold text-white">{profile.avatar ? <img src={profile.avatar} alt="" className="h-full w-full object-cover"/> : profile.name.slice(0,1).toUpperCase()}</Link>
+          <button type="button" onClick={() => setMobileOpen((value) => !value)} aria-label={mobileOpen ? "Close menu" : "Open menu"} aria-expanded={mobileOpen} className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 bg-white/5 text-white/70 transition hover:bg-white/10 hover:text-white">{mobileOpen ? <X className="h-4 w-4"/> : <Menu className="h-4 w-4"/>}</button>
         </div>
       </div>
       {searchOpen && <div className="absolute bottom-full mb-2 w-full rounded-2xl border border-white/10 bg-[#100e14]/95 px-4 py-3 shadow-2xl backdrop-blur-2xl md:hidden">{searchField(true)}</div>}
