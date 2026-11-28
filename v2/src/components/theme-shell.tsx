@@ -1,0 +1,1 @@
+'use client';import {ThemeProvider} from 'next-themes';export function ThemeShell({children}:{children:React.ReactNode}){return <ThemeProvider attribute='data-theme' defaultTheme='royal' themes={['royal','void','crimson','sakura','jade','obsidian','jojo','parchment','frost']} enableSystem={false}>{children}</ThemeProvider>}

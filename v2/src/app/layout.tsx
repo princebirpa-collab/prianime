@@ -1,0 +1,4 @@
+import type { Metadata } from 'next';import { IBM_Plex_Sans,IBM_Plex_Mono,Cormorant_Garamond } from 'next/font/google';import './globals.css';import {ThemeShell} from '@/components/theme-shell';
+const ui=IBM_Plex_Sans({subsets:['latin'],variable:'--font-ui'});const mono=IBM_Plex_Mono({subsets:['latin'],weight:['400','500'],variable:'--font-mono'});const display=Cormorant_Garamond({subsets:['latin'],weight:['400','500','600'],variable:'--font-display'});
+export const metadata:Metadata={title:'PRI-ANIME — Discover Anime',description:'An editorial anime discovery and community experience.',openGraph:{title:'PRI-ANIME',description:'Discover anime. Explore stories. Find your next series.'}};
+export default function RootLayout({children}:{children:React.ReactNode}){return <html lang='en' suppressHydrationWarning><body className={`${ui.variable} ${mono.variable} ${display.variable}`}><ThemeShell>{children}</ThemeShell></body></html>}
