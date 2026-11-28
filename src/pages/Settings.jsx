@@ -28,7 +28,7 @@ const PROFILE_DECORATIONS = [
 
 const TOGGLES = [
   { key: "autoplayReels", label: "Autoplay reels", hint: "Play the next adjacent reel when it scrolls into view." },
-  { key: "reelMuted", label: "Start reels muted", hint: "Unmute manually â€” browsers require it anyway." },
+  { key: "reelMuted", label: "Start reels muted", hint: "Unmute manually — browsers require it anyway." },
   { key: "subtitles", label: "Captions when available", hint: "Turn on subtitle tracks automatically." },
   { key: "reduceMotion", label: "Reduce motion", hint: "Fewer parallax and glow effects." },
   { key: "notifications", label: "Job notifications", hint: "Show render completions in the notification tray." },
