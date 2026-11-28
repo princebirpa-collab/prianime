@@ -534,3 +534,36 @@ body, body::before, body::after { background-image: none !important; background-
 .pri-home-shortcuts a,.pri-catalogue-tags .pri-catalogue-chip,.pri-entertainment-card,.pri-game-hero,.pri-music-hero,.pri-game-link-card,.pri-music-card { border-color: rgba(255,255,255,.14) !important; }
 .pri-home-shortcuts a:hover,.pri-catalogue-tags .pri-catalogue-chip:hover,.glow-hover:hover { box-shadow: none !important; border-color: rgba(255,255,255,.32) !important; }
 .pri-catalogue-orb,.pri-home-side-note { filter: grayscale(1) !important; }
+
+
+/* PRI-ANIME palette requested by user: Midnight canvas with gold primary and semantic accents */
+:root,[data-theme="royal"] {
+ --background: 240 29% 3%; /* #06050B */
+ --foreground: 220 20% 97%; /* #F6F7F9 */
+ --card: 270 23% 6%; /* #0D0A14 */
+ --card-foreground: 220 20% 97%;
+ --popover: 270 23% 6%; --popover-foreground: 220 20% 97%;
+ --primary: 43 61% 52%; /* #D0A839 */
+ --primary-foreground: 240 29% 3%;
+ --secondary: 270 20% 11%; /* #1A1622 */
+ --secondary-foreground: 220 20% 97%;
+ --muted: 270 20% 11%; --muted-foreground: 220 10% 70%;
+ --accent: 270 20% 11%; --accent-foreground: 220 20% 97%;
+ --destructive: 350 75% 57%; /* #E5435E */
+ --destructive-foreground: 0 0% 100%;
+ --border: 43 25% 19%; /* #3D3624 */
+ --input: 270 20% 11%; --ring: 43 61% 52%;
+ --gold: 43 61% 52%; --amethyst: 270 20% 11%; --surface: 270 23% 6%;
+ --chart-1: 43 61% 52%; --chart-2: 350 75% 57%; --chart-3: 190 82% 57%; --chart-4: 152 58% 50%; --chart-5: 220 10% 70%;
+}
+html,body,#root{min-height:100%;}
+body { background:#06050B !important; background-image:none !important; color:#F6F7F9; }
+body::before { background:#06050B !important; background-image:none !important; }
+body::after { display:none !important; }
+.glass,.glass-strong { background:rgba(13,10,20,.88)!important; border-color:rgba(61,54,36,.72)!important; }
+.glow-soft { box-shadow:0 14px 40px -28px rgba(208,168,57,.35); }
+.glow-hover:hover { box-shadow:0 0 0 1px rgba(208,168,57,.25),0 16px 36px -26px rgba(208,168,57,.25)!important; border-color:rgba(208,168,57,.42)!important; }
+.gold-text { background-image:linear-gradient(100deg,#D0A839,#f0d27a,#D0A839)!important; }
+.pri-home-ambient { background:radial-gradient(ellipse at 50% 0%,rgba(208,168,57,.07),transparent 60%)!important; }
+.pri-home-kicker,.pri-home-dot,.pri-home-section-intro h2 span,.pri-home-shortcuts a span,.pri-home-side-icon,.pri-home-side-label,.pri-home-side-note>a { color:#D0A839!important; }
+.pri-home-dot { background:#D0A839!important; box-shadow:none!important; }
