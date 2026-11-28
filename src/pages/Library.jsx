@@ -177,7 +177,7 @@ export default function Library() {
                 icon={BookOpen}
                 title="No saved scripts"
                 body="Generate a story in the AI atelier and save it — it will appear here."
-                actionLabel="Open the atelier"
+                actionLabel="Browse anime"
                 actionTo="/studio"
               />
             ) : (
