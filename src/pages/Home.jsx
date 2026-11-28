@@ -4,31 +4,8 @@ import ContinueWatching from "@/components/home/ContinueWatching";
 import LiveCatalogue from "@/components/home/LiveCatalogue";
 import RealmGrid from "@/components/home/RealmGrid";
 import HomeRankings from "@/components/home/HomeRankings";
-
-export default function Home() {
-  return (
-    <main className="pri-home pri-home-reborn pb-20">
-      <div className="pri-home-ambient" aria-hidden="true" />
-      <FeaturedTrendingCarousel />
-      <HomeRankings />
-      <div className="pri-home-content">
-        <ContinueWatching />
-        <div className="pri-home-section-intro pri-home-intro-reborn">
-          <div className="pri-home-kicker"><span className="pri-home-dot" /> THE PRI-ANIME EXPERIENCE</div>
-          <h2>One universe.<br/><span>Infinite stories.</span></h2>
-          <p>Explore a world of anime, from timeless legends to the next big obsession.</p>
-          <nav className="pri-home-shortcuts" aria-label="Homepage sections">
-            <a href="#airing-radar">Airing radar <span>↗</span></a>
-            <a href="#pri-realms">Explore genres <span>↗</span></a>
-            <a href="#pri-catalogue">Full catalogue <span>↗</span></a>
-          </nav>
-        </div>
-        <div id="pri-catalogue"><LiveCatalogue /></div>
-        <div id="pri-realms"><RealmGrid /></div>
-        <section id="airing-radar" className="pt-8">
-          <AiringRadar />
-        </section>
-      </div>
-    </main>
-  );
-}
+import { Link } from "react-router-dom";
+import { Gamepad2, Music2, Sparkles } from "lucide-react";
+const portals=[{href:"/games",label:"PLAY",title:"Enter the Arcade",desc:"Anime trivia, quick rounds and challenges.",icon:Gamepad2},{href:"/music",label:"LISTEN",title:"Anime soundscape",desc:"Find openings, endings and soundtrack playlists.",icon:Music2},{href:"/browse",label:"DISCOVER",title:"Find your next story",desc:"Explore the catalogue and discover something new.",icon:Sparkles}];
+function EntertainmentPortal(){return <section className="pri-entertainment mx-auto w-full max-w-[1800px] px-4 sm:px-6 lg:px-10"><div className="pri-entertainment-heading"><div><span className="pri-entertainment-eyebrow">BEYOND THE SCREEN</span><h2>Watch. <span>Play.</span> Listen.</h2></div><p>One home for your anime entertainment.</p></div><div className="pri-entertainment-grid">{portals.map(({href,label,title,desc,icon:Icon})=><Link to={href} key={href} className="pri-entertainment-card"><div className="pri-entertainment-card-top"><span>{label}</span><Icon size={22}/></div><div><h3>{title}</h3><p>{desc}</p></div><span className="pri-entertainment-arrow">↗</span></Link>)}</div></section>}
+export default function Home(){return <main className="pri-home pri-home-reborn pb-20"><div className="pri-home-ambient" aria-hidden="true"/><FeaturedTrendingCarousel/><EntertainmentPortal/><HomeRankings/><div className="pri-home-content"><ContinueWatching/><div className="pri-home-section-intro pri-home-intro-reborn"><div className="pri-home-kicker"><span className="pri-home-dot"/> THE PRI-ANIME EXPERIENCE</div><h2>One universe.<br/><span>Infinite stories.</span></h2><p>Explore a world of anime, from timeless legends to the next big obsession.</p><nav className="pri-home-shortcuts" aria-label="Homepage sections"><a href="#airing-radar">Airing radar <span>↗</span></a><a href="#pri-realms">Explore genres <span>↗</span></a><a href="#pri-catalogue">Full catalogue <span>↗</span></a></nav></div><div id="pri-catalogue"><LiveCatalogue/></div><div id="pri-realms"><RealmGrid/></div><section id="airing-radar" className="pt-8"><AiringRadar/></section></div></main>}
