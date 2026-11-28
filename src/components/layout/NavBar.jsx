@@ -7,23 +7,13 @@ import ThemeMenu from "@/components/layout/ThemeMenu";
 import NotificationsBell from "@/components/layout/NotificationsBell";
 
 export const NAV_LINKS = [
-  { to: "/", label: "Discover", icon: Compass },
+  { to: "/", label: "Home", icon: Compass },
   { to: "/browse", label: "Browse", icon: Film },
   { to: "/music", label: "Music", icon: Music2 },
-  { to: "/games", label: "Game Realm", icon: Gamepad2 },
-  { to: "/shows", label: "PRI-SHOW", icon: Tv2 },
-  { to: "/movies", label: "PRI-MOVIE", icon: Film },
+  { to: "/games", label: "Games", icon: Gamepad2 },
   { to: "/reels", label: "Reels", icon: Clapperboard },
-  { to: "/watch", label: "Theater", icon: Film },
-  { to: "/channels", label: "Channels", icon: Tv2 },
+  { to: "/watch", label: "Watch", icon: Film },
   { to: "/manhwa", label: "Manhwa", icon: BookOpen },
-  { to: "/studio", label: "AI Studio", icon: Sparkles },
-  { to: "/creator", label: "Creator", icon: Wand2 },
-  { to: "/community", label: "Community", icon: Users },
-  { to: "/guild-space", label: "Guild & Profile", icon: Sparkles },
-  { to: "/watch-party", label: "Watch Party", icon: Users2 },
-  { to: "/missions", label: "Missions", icon: Trophy },
-  { to: "/universe", label: "LUNRA", icon: Sparkles },
 ];
 
 export default function NavBar() {
