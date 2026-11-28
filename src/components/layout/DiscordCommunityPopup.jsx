@@ -31,7 +31,7 @@ export default function DiscordCommunityPopup() {
         <h2 id="discord-popup-title" className="mt-2 text-2xl font-bold">Join the anime community</h2>
         <p className="mt-3 text-sm leading-6 text-white/70">Meet fellow anime fans, share recommendations, and join community events.</p>
         <a href="https://discord.gg/2meCrBHQw" target="_blank" rel="noopener noreferrer" onClick={close} className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-[#5865F2] px-5 py-3 font-semibold text-white transition hover:bg-[#4752c4]"><MessageCircle className="h-4 w-4" /> Join Discord</a>
-        <label className="mt-4 flex cursor-pointer items-center gap-2 text-xs text-white/60"><input type="checkbox" checked={dontShow} onChange={(event) => setDontShow(event.target.checked)} className="accent-indigo-500" /> Don't show again</label>
+        <label className="mt-4 flex cursor-pointer items-center gap-2 text-xs text-white/60"><input type="checkbox" checked={dontShow} onChange={(event) => setDontShow(event.target.checked)} className="accent-[#D0A839]" /> Don't show again</label>
         <button type="button" onClick={close} className="mt-3 w-full rounded-xl px-4 py-2 text-sm text-white/65 hover:bg-white/5">Not now</button>
       </section>
     </div>, document.body
